@@ -203,13 +203,24 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             List<PendingPoll> polls = new List<PendingPoll>();
             try
             {
-                ApiResponse response = await _apiRequester.GetRequestAsync(_endpoint, "/api/DefaultVoting/pendingpolls");
-                List<PendingPoll> pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(response.Content.ToString());
-                
-                response = await _apiRequester.GetRequestAsync(_endpoint, "/api/DefaultVoting/finishedpolls");
-                List<PendingPoll> approvedPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(response.Content.ToString());
+                ApiResponse responsePending = await _apiRequester.GetRequestAsync(_endpoint, "/api/DefaultVoting/pendingpolls");
+                ApiResponse responseApproved = await _apiRequester.GetRequestAsync(_endpoint, "/api/DefaultVoting/whitelistedhashes");
 
-                return pendingPolls.Union(approvedPolls).OrderByDescending(p => p.Id).ToList();
+                List<PendingPoll> pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responsePending.Content.ToString());
+                pendingPolls = pendingPolls.FindAll(x => x.VotingDataString.Contains("WhitelistHash"));
+                string[] approvedVotes = responseApproved.Content.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None);
+
+                foreach (var vote in approvedVotes)
+                {
+                    PendingPoll pp = new PendingPoll();
+                    pp.IsPending = false;
+                    pp.IsExecuted = true;
+                    pp.VotingDataString = $"Action: 'WhitelistHash',Hash: '{vote}'";
+                    pendingPolls.RemoveAt(pendingPolls.FindIndex(x => x.Hash == vote));
+                    pendingPolls.Add(pp);
+                }
+
+                return pendingPolls;
             }
             catch (Exception ex)
             {

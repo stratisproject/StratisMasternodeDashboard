@@ -57,13 +57,14 @@
                         </tr>
                     </thead>
                     <tbody>
+                    @{ int ordinal = 0; }
                     @foreach (var poll in Model?.Polls ?? new List<PendingPoll>())
                     {
                         <tr>
-                            <td class="text-left">@poll.Id</td>
+                            <td class="text-left">@(ordinal++)</td>
                             <td class="text-left ellipsis" style="min-width: 350px;" title="@poll.Hash">@poll.Hash</td>
                             <td class="text-center">@(poll.IsExecuted ? "Yes" : "No")</td>
-                            <td class="text-center ellipsis">@((poll.PubKeysHexVotedInFavor ?? new List<string>()).Count)</td>
+                            <td class="text-center ellipsis">@(poll.IsExecuted ? "51%" : poll.PubKeysHexVotedInFavor.Count.ToString())</td>
                             <td class="text-center ellipsis">@Model.FedMemberCount</td>
                         </tr>
                     }
