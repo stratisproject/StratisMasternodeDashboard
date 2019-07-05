@@ -200,15 +200,17 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
         protected async Task<List<PendingPoll>> UpdatePolls()
         {
-            List<PendingPoll> polls = new List<PendingPoll>();
+            List<PendingPoll> pendingPolls = new List<PendingPoll>();
             try
             {
                 ApiResponse responsePending = await _apiRequester.GetRequestAsync(_endpoint, "/api/DefaultVoting/pendingpolls");
                 ApiResponse responseApproved = await _apiRequester.GetRequestAsync(_endpoint, "/api/DefaultVoting/whitelistedhashes");
 
-                List<PendingPoll> pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responsePending.Content.ToString());
+                pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responsePending.Content.ToString());
                 pendingPolls = pendingPolls.FindAll(x => x.VotingDataString.Contains("WhitelistHash"));
                 string[] approvedVotes = responseApproved.Content.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None);
+
+                if (approvedVotes == null || approvedVotes.Length == 0) return pendingPolls;
 
                 foreach (var vote in approvedVotes)
                 {
@@ -216,18 +218,16 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                     pp.IsPending = false;
                     pp.IsExecuted = true;
                     pp.VotingDataString = $"Action: 'WhitelistHash',Hash: '{vote}'";
-                    pendingPolls.RemoveAt(pendingPolls.FindIndex(x => x.Hash == vote));
+                    pendingPolls.RemoveAll(x => x.Hash == vote);
                     pendingPolls.Add(pp);
                 }
-
-                return pendingPolls;
             }
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "Failed to update polls");
             }
 
-            return polls;
+            return pendingPolls;
         }
         
         protected async Task<int> UpdateFedMemberCount()
