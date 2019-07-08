@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore.Query.ExpressionVisitors.Internal;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -208,7 +209,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
                 pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responsePending.Content.ToString());
                 pendingPolls = pendingPolls.FindAll(x => x.VotingDataString.Contains("WhitelistHash"));
-                string[] approvedVotes = responseApproved.Content.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.None);
+                string[] approvedVotes = responseApproved.Content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
                 if (approvedVotes == null || approvedVotes.Length == 0) return pendingPolls;
 
