@@ -162,7 +162,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
 
                 sidechainNode.CoinTicker = "TCRS";
                 sidechainNode.LogRules = nodeDataServiceSidechain.LogRules;
-                sidechainNode.PoAPendingPolls = this.defaultEndpointsSettings.SidechainNodeType.ToUpper() == NodeTypes.FiftyK ? nodeDataServiceSidechain.PendingPolls : null;
+                sidechainNode.PoAPendingPolls = nodeDataServiceSidechain.PendingPolls;
                 sidechainNode.Uptime = nodeDataServiceSidechain.NodeStatus.Uptime;
                 sidechainNode.IsMining = this.nodeDataServiceSidechain.NodeDashboardStats?.IsMining ?? false;
                 sidechainNode.AddressIndexer = this.nodeDataServiceSidechain.NodeDashboardStats?.AddressIndexerHeight ?? 0;
