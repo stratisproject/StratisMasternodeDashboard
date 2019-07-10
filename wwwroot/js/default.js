@@ -30,11 +30,8 @@ $(document).ready(function()
     signalrHub.on("CacheIsDifferent", function () {
         NProgress.start();
         CacheIsDifferent = true;
-        if($('.modal').hasClass('show') == false)
-        {
-            $("#container").load("/update-dashboard");
-            Snackbar.close();
-        }
+        $("#container").load("/update-dashboard");
+        Snackbar.close();
         NProgress.done();
     });
     signalrHub.on("NodeUnavailable", function () {

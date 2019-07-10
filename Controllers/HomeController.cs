@@ -88,7 +88,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         /// <summary>
         /// This action redraw the dashboard with the new cached datas, it's only called from the SignalR event
         /// </summary>
-        [Ajax]
+        //[Ajax]
         [Route("update-dashboard")]
         public IActionResult UpdateDashboard()
         {
