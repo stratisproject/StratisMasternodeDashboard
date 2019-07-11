@@ -28,7 +28,7 @@ $(document).ready(function()
     NProgress.start();
     var signalrHub = new signalR.HubConnectionBuilder().withUrl("/ws-updater").build();
     signalrHub.on("CacheIsDifferent", function () {
-        NProgress.start();
+		NProgress.start();
         CacheIsDifferent = true;
         $("#container").load("/update-dashboard");
         Snackbar.close();
@@ -39,15 +39,6 @@ $(document).ready(function()
         Snackbar.show({text: "The full nodes API are unavailable", pos: "bottom-center", duration: 0, actionText: 'REFRESH', onActionClick: function() {document.location.reload();}});
     });
     signalrHub.start();
-
-    // Detects modal closing for refresh the dashboard
-    $('.modal').on('hidden.bs.modal', function () {
-        if(CacheIsDifferent)
-        {
-            // $("#container").load("/update-dashboard");
-            // Snackbar.close();
-        }
-    });
 
     // Prevent modal disclosure
     $(".close").click(function()
