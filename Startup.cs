@@ -29,7 +29,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard
                 StratisNode = !string.IsNullOrEmpty(this.Configuration["mainchainport"]) ? $"http://localhost:{this.Configuration["mainchainport"]}" : defaultEndpoints["StratisNode"],
                 EnvType = defaultEndpoints["EnvType"],
                 SidechainNodeType = this.Configuration["nodetype"] ?? defaultEndpoints["SidechainNodeType"],
-                SidechainNode = !string.IsNullOrEmpty(this.Configuration["sidechainport"]) ? $"http://localhost:{this.Configuration["sidechainport"]}" : defaultEndpoints["SidechainNode"]
+                SidechainNode = !string.IsNullOrEmpty(this.Configuration["sidechainport"]) ? $"http://localhost:{this.Configuration["sidechainport"]}" : defaultEndpoints["SidechainNode"],
+                IntervalTime = defaultEndpoints["IntervalTime"]
             };
 
             if (!string.IsNullOrEmpty(this.Configuration["nodetype"]))

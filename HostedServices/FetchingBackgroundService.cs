@@ -72,8 +72,9 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
 
             DoWorkAsync(null);
 
-            //TODO: Add timer setting in configuration file
-            this.dataRetrieverTimer = new Timer(DoWorkAsync, null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+            int interval = Int32.Parse(this.defaultEndpointsSettings.IntervalTime);
+
+            this.dataRetrieverTimer = new Timer(DoWorkAsync, null, TimeSpan.Zero, TimeSpan.FromSeconds(interval));
             await Task.CompletedTask;
         }
 
@@ -160,7 +161,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 sidechainNode.BlockHeight = (int) nodeDataServiceSidechain.NodeStatus.BlockStoreHeight;
                 sidechainNode.MempoolSize = nodeDataServiceSidechain.RawMempool;
 
-                sidechainNode.CoinTicker = "TCRS";
+                sidechainNode.CoinTicker = "CRS";
                 sidechainNode.LogRules = nodeDataServiceSidechain.LogRules;
                 sidechainNode.PoAPendingPolls = nodeDataServiceSidechain.PendingPolls;
                 sidechainNode.Uptime = nodeDataServiceSidechain.NodeStatus.Uptime;
