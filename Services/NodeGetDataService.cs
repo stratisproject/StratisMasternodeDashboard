@@ -89,8 +89,10 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                 StatusResponse = await _apiRequester.GetRequestAsync(_endpoint, "/api/Node/status");
                 nodeStatus.BlockStoreHeight = StatusResponse.Content.blockStoreHeight;
                 nodeStatus.ConsensusHeight = StatusResponse.Content.consensusHeight;
-                string upTimeLargePrecion = StatusResponse.Content.runningTime;
-                nodeStatus.Uptime = upTimeLargePrecion.Split('.')[0];
+                string runningTime = StatusResponse.Content.runningTime;
+                string[] parseTime = runningTime.Split('.');
+                parseTime = parseTime.Take(parseTime.Length - 1).ToArray();
+                nodeStatus.Uptime = string.Join(".",parseTime);
                 nodeStatus.State = StatusResponse.Content.state;
             }
             catch (Exception ex)
