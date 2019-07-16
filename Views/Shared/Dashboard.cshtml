@@ -307,6 +307,14 @@
                             </li>
                         </ul>
                     </li>
+                    <li class="col-12">
+                        <ul class="list-inline">
+                            <li class="list-inline-item"><strong>Mining Wallet balance :</strong></li>
+                            <li class="list-inline-item text-green">Confirmed: @Model.SidechainNode.ConfirmedBalance.ToString("N8") @Model.SidechainNode.CoinTicker</li>
+                            <li class="list-inline-item text-muted">/</li>
+                            <li class="list-inline-item text-muted">Unconfirmed: @Model.SidechainNode.UnconfirmedBalance.ToString("N8") @Model.SidechainNode.CoinTicker</li>
+                        </ul>
+                    </li>
                     @if (fiftyKOnlyFeature)
                     {
                         <li class="col-12">

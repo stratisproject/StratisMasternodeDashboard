@@ -123,8 +123,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 var stratisNode = new StratisNodeModel();
 
                 stratisNode.History = this.is50K ? ((NodeGetDataServiceMultisig)nodeDataServiceMainchain).WalletHistory : new JArray();
-                stratisNode.ConfirmedBalance = this.is50K ? ((NodeGetDataServiceMultisig)nodeDataServiceMainchain).WalletBalance.confirmedBalance : -1;
-                stratisNode.UnconfirmedBalance = this.is50K ? ((NodeGetDataServiceMultisig)nodeDataServiceMainchain).WalletBalance.unconfirmedBalance : -1;
+                stratisNode.ConfirmedBalance = this.is50K ? ((NodeGetDataServiceMultisig)nodeDataServiceMainchain).FedWalletBalance.confirmedBalance : -1;
+                stratisNode.UnconfirmedBalance = this.is50K ? ((NodeGetDataServiceMultisig)nodeDataServiceMainchain).FedWalletBalance.unconfirmedBalance : -1;
                 
                 stratisNode.WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/api").ToString();
                 stratisNode.SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/swagger").ToString();
@@ -149,8 +149,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 var sidechainNode = new SidechainNodeModel();
 
                 sidechainNode.History = this.is50K ? ((NodeDataServiceSidechainMultisig)nodeDataServiceSidechain).WalletHistory : new JArray();
-                sidechainNode.ConfirmedBalance = this.is50K ? ((NodeDataServiceSidechainMultisig)nodeDataServiceSidechain).WalletBalance.confirmedBalance : -1;
-                sidechainNode.UnconfirmedBalance = this.is50K ? ((NodeDataServiceSidechainMultisig)nodeDataServiceSidechain).WalletBalance.unconfirmedBalance : -1;
+                sidechainNode.ConfirmedBalance = this.is50K ? ((NodeDataServiceSidechainMultisig)nodeDataServiceSidechain).FedWalletBalance.confirmedBalance : -1;
+                sidechainNode.UnconfirmedBalance = this.is50K ? ((NodeDataServiceSidechainMultisig)nodeDataServiceSidechain).FedWalletBalance.unconfirmedBalance : -1;
 
                 sidechainNode.WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/api").ToString();
                 sidechainNode.SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/swagger").ToString();
