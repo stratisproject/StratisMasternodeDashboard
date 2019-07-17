@@ -159,15 +159,14 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             try
             {
                 ApiResponse response = await _apiRequester.GetRequestAsync(_endpoint, "/api/FederationWallet/balance");
-                confirmed = response.Content.balances[0].amountConfirmed / STRATOSHI;
-                unconfirmed = response.Content.balances[0].amountUnconfirmed / STRATOSHI;
+                Double.TryParse(response.Content.balances[0].amountConfirmed.ToString(), out confirmed);
+                Double.TryParse(response.Content.balances[0].amountUnconfirmed.ToString(), out unconfirmed);
             }
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "Failed to get wallet balance");
             }
-
-            return (confirmed, unconfirmed);
+            return (confirmed / STRATOSHI, unconfirmed / STRATOSHI);
         }
 
         protected async Task<(double, double)> UpdateMiningWalletBalance()
@@ -183,19 +182,20 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
                 ApiResponse responseBalance = await _apiRequester.GetRequestAsync(_endpoint, "/api/Wallet/balance", $"WalletName={firstWalletName}");
 
-                confirmed = responseBalance.Content.balances[0].amountConfirmed / STRATOSHI;
-                unconfirmed = responseBalance.Content.balances[0].amountUnconfirmed / STRATOSHI;
+                Double.TryParse(responseBalance.Content.balances[0].amountConfirmed.ToString(), out confirmed);
+                Double.TryParse(responseBalance.Content.balances[0].amountUnconfirmed.ToString(), out unconfirmed);
             }
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "Failed to get mining wallet balance");
             }
-            return (confirmed, unconfirmed);
+            return (confirmed / STRATOSHI, unconfirmed / STRATOSHI);
         }
 
         protected async Task<Object> UpdateHistory()
         {
             object history = new Object();
+
             try
             {
                 ApiResponse response = await _apiRequester.GetRequestAsync(_endpoint, "/api/FederationWallet/history", "maxEntriesToReturn=30");
