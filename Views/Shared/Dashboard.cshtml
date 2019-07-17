@@ -116,9 +116,9 @@
                         <li class="col-12 col-xl-12">
                             <ul class="list-inline">
                                 <li class="list-inline-item"><strong>Federation Wallet balance :</strong></li>
-                                <li class="list-inline-item text-green">Confirmed: @Model.StratisNode.ConfirmedBalance.ToString("N8") @Model.StratisNode.CoinTicker</li>
+                                <li class="list-inline-item text-green">Confirmed: @Model.StratisNode.ConfirmedBalanceFed.ToString("N8") @Model.StratisNode.CoinTicker</li>
                                 <li class="list-inline-item text-muted">/</li>
-                                <li class="list-inline-item text-muted">Unconfirmed: @Model.StratisNode.UnconfirmedBalance.ToString("N8") @Model.StratisNode.CoinTicker</li>
+                                <li class="list-inline-item text-muted">Unconfirmed: @Model.StratisNode.UnconfirmedBalanceFed.ToString("N8") @Model.StratisNode.CoinTicker</li>
                             </ul>
                         </li>
                     }
@@ -310,9 +310,9 @@
                     <li class="col-12">
                         <ul class="list-inline">
                             <li class="list-inline-item"><strong>Mining Wallet balance :</strong></li>
-                            <li class="list-inline-item text-green">Confirmed: @Model.SidechainNode.ConfirmedBalance.ToString("N8") @Model.SidechainNode.CoinTicker</li>
+                            <li class="list-inline-item text-green">Confirmed: @Model.SidechainNode.WalletBalance.confirmedBalance.ToString("N8") @Model.SidechainNode.CoinTicker</li>
                             <li class="list-inline-item text-muted">/</li>
-                            <li class="list-inline-item text-muted">Unconfirmed: @Model.SidechainNode.UnconfirmedBalance.ToString("N8") @Model.SidechainNode.CoinTicker</li>
+                            <li class="list-inline-item text-muted">Unconfirmed: @Model.SidechainNode.WalletBalance.unconfirmedBalance.ToString("N8") @Model.SidechainNode.CoinTicker</li>
                         </ul>
                     </li>
                     @if (fiftyKOnlyFeature)
@@ -320,9 +320,9 @@
                         <li class="col-12">
                             <ul class="list-inline">
                                 <li class="list-inline-item"><strong>Federation Wallet balance :</strong></li>
-                                <li class="list-inline-item text-green">Confirmed: @Model.SidechainNode.ConfirmedBalance.ToString("N8") @Model.SidechainNode.CoinTicker</li>
+                                <li class="list-inline-item text-green">Confirmed: @Model.SidechainNode.ConfirmedBalanceFed.ToString("N8") @Model.SidechainNode.CoinTicker</li>
                                 <li class="list-inline-item text-muted">/</li>
-                                <li class="list-inline-item text-muted">Unconfirmed: @Model.SidechainNode.UnconfirmedBalance.ToString("N8") @Model.SidechainNode.CoinTicker</li>
+                                <li class="list-inline-item text-muted">Unconfirmed: @Model.SidechainNode.UnconfirmedBalanceFed.ToString("N8") @Model.SidechainNode.CoinTicker</li>
                             </ul>
                         </li>
                     }

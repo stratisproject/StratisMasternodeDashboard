@@ -178,8 +178,13 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             try
             {
                 ApiResponse responseFiles = await _apiRequester.GetRequestAsync(_endpoint, "/api/Wallet/files");
-                string firstWalletName = responseFiles.Content.walletsFiles[0].Split;
-                //walletName = firstWalletName.
+
+                string firstWalletName = responseFiles.Content.walletsFiles[0].ToString().Split(".")[0];
+
+                ApiResponse responseBalance = await _apiRequester.GetRequestAsync(_endpoint, "/api/Wallet/balance", $"WalletName={firstWalletName}");
+
+                confirmed = responseBalance.Content.balances[0].amountConfirmed / STRATOSHI;
+                unconfirmed = responseBalance.Content.balances[0].amountUnconfirmed / STRATOSHI;
             }
             catch (Exception ex)
             {

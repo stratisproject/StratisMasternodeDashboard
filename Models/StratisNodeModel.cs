@@ -14,8 +14,9 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Models
         public int BlockHeight { get; set; }
         public int MempoolSize { get; set; }
         public string BlockHash { get; set; }
-        public double ConfirmedBalance { get; set; }
-        public double UnconfirmedBalance { get; set; }
+        public double ConfirmedBalanceFed { get; set; }
+        public double UnconfirmedBalanceFed { get; set; }
+        public (double confirmedBalance, double unconfirmedBalance) WalletBalance { get; set; } = (0, 0);
         public List<Peer> Peers { get; set; }
         public List<Peer> FederationMembers { get; set; }
         public object History { get; set; }
