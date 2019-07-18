@@ -28,6 +28,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         public ApiResponse FedInfoResponse { get; set; }
         public List<PendingPoll> PendingPolls { get; set; }
         public int FedMemberCount { get; set; }
+        public (double confirmedBalance, double unconfirmedBalance) WalletBalance { get; set; } = (0, 0);
         public NodeDashboardStats NodeDashboardStats { get; set; }
         public string MiningPubKey { get; set; }
 
@@ -89,8 +90,10 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                 StatusResponse = await _apiRequester.GetRequestAsync(_endpoint, "/api/Node/status");
                 nodeStatus.BlockStoreHeight = StatusResponse.Content.blockStoreHeight;
                 nodeStatus.ConsensusHeight = StatusResponse.Content.consensusHeight;
-                string upTimeLargePrecion = StatusResponse.Content.runningTime;
-                nodeStatus.Uptime = upTimeLargePrecion.Split('.')[0];
+                string runningTime = StatusResponse.Content.runningTime;
+                string[] parseTime = runningTime.Split('.');
+                parseTime = parseTime.Take(parseTime.Length - 1).ToArray();
+                nodeStatus.Uptime = string.Join(".",parseTime);
                 nodeStatus.State = StatusResponse.Content.state;
             }
             catch (Exception ex)
@@ -149,27 +152,50 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             return hash;
         }
 
-        protected async Task<(double, double)> UpdateWalletBalancec()
+        protected async Task<(double, double)> UpdateWalletBalance()
         {
             double confirmed = 0;
             double unconfirmed = 0;
             try
             {
                 ApiResponse response = await _apiRequester.GetRequestAsync(_endpoint, "/api/FederationWallet/balance");
-                confirmed = response.Content.balances[0].amountConfirmed / STRATOSHI;
-                unconfirmed = response.Content.balances[0].amountUnconfirmed / STRATOSHI;
+                Double.TryParse(response.Content.balances[0].amountConfirmed.ToString(), out confirmed);
+                Double.TryParse(response.Content.balances[0].amountUnconfirmed.ToString(), out unconfirmed);
             }
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "Failed to get wallet balance");
             }
+            return (confirmed / STRATOSHI, unconfirmed / STRATOSHI);
+        }
 
-            return (confirmed, unconfirmed);
+        protected async Task<(double, double)> UpdateMiningWalletBalance()
+        {
+            double confirmed = 0;
+            double unconfirmed = 0;
+            string walletName = String.Empty;
+            try
+            {
+                ApiResponse responseFiles = await _apiRequester.GetRequestAsync(_endpoint, "/api/Wallet/files");
+
+                string firstWalletName = responseFiles.Content.walletsFiles[0].ToString().Split(".")[0];
+
+                ApiResponse responseBalance = await _apiRequester.GetRequestAsync(_endpoint, "/api/Wallet/balance", $"WalletName={firstWalletName}");
+
+                Double.TryParse(responseBalance.Content.balances[0].amountConfirmed.ToString(), out confirmed);
+                Double.TryParse(responseBalance.Content.balances[0].amountUnconfirmed.ToString(), out unconfirmed);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Failed to get mining wallet balance");
+            }
+            return (confirmed / STRATOSHI, unconfirmed / STRATOSHI);
         }
 
         protected async Task<Object> UpdateHistory()
         {
             object history = new Object();
+
             try
             {
                 ApiResponse response = await _apiRequester.GetRequestAsync(_endpoint, "/api/FederationWallet/history", "maxEntriesToReturn=30");
@@ -323,7 +349,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
     public class NodeGetDataServiceMultisig : NodeGetDataService
     {
-        public (double confirmedBalance, double unconfirmedBalance) WalletBalance { get; set; } = (0, 0);
+        public (double confirmedBalance, double unconfirmedBalance) FedWalletBalance { get; set; } = (0, 0);
         public object WalletHistory { get; set; }
         public string FedAddress { get; set; }
 
@@ -340,7 +366,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             LogRules = await this.UpdateLogRules();
             RawMempool = await this.UpdateMempool();
             BestHash = await this.UpdateBestHash();
-            WalletBalance = await this.UpdateWalletBalancec();
+            FedWalletBalance = await this.UpdateWalletBalance();
             WalletHistory = await this.UpdateHistory();
             FedAddress = await this.UpdateFedInfo();
             return this;
@@ -361,7 +387,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             LogRules = await UpdateLogRules();
             RawMempool = await UpdateMempool();
             BestHash = await UpdateBestHash();
-            WalletBalance = await UpdateWalletBalancec();
+            FedWalletBalance = await UpdateWalletBalance();
+            WalletBalance = await UpdateMiningWalletBalance();
             WalletHistory = await UpdateHistory();
             FedAddress = await UpdateFedInfo();
             PendingPolls = await UpdatePolls();
@@ -384,6 +411,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             LogRules = await UpdateLogRules();
             RawMempool = await UpdateMempool();
             BestHash = await UpdateBestHash();
+            WalletBalance = await UpdateMiningWalletBalance();
             PendingPolls = await UpdatePolls();
             FedMemberCount = await UpdateFedMemberCount();
             return this;
