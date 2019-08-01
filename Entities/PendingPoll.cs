@@ -47,6 +47,12 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Entities
         }
     }
 
+    public class ApprovedPoll
+    {
+        [JsonProperty("hash")]
+        public string Hash { get; set; }
+    }
+
     public class HashHeightPairModel
     {
         [JsonProperty("hash")]
