@@ -15,6 +15,7 @@ using Stratis.FederatedSidechains.AdminDashboard.Entities;
 using Stratis.FederatedSidechains.AdminDashboard.Settings;
 using NBitcoin;
 using NBitcoin.DataEncoders;
+using Newtonsoft.Json.Linq;
 
 namespace Stratis.FederatedSidechains.AdminDashboard.Services
 {
@@ -228,24 +229,27 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         protected async Task<List<PendingPoll>> UpdatePolls()
         {
             List<PendingPoll> pendingPolls = new List<PendingPoll>();
+            List<ApprovedPoll> approvedPolls = new List<ApprovedPoll>();
+
             try
             {
                 ApiResponse responsePending = await _apiRequester.GetRequestAsync(_endpoint, "/api/DefaultVoting/pendingpolls");
                 ApiResponse responseApproved = await _apiRequester.GetRequestAsync(_endpoint, "/api/DefaultVoting/whitelistedhashes");
 
                 pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responsePending.Content.ToString());
+                approvedPolls = JsonConvert.DeserializeObject<List<ApprovedPoll>>(responseApproved.Content.ToString());
+
                 pendingPolls = pendingPolls.FindAll(x => x.VotingDataString.Contains("WhitelistHash"));
-                string[] approvedVotes = responseApproved.Content.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-                if (approvedVotes == null || approvedVotes.Length == 0) return pendingPolls;
+                if (approvedPolls == null || approvedPolls.Count == 0) return pendingPolls;
 
-                foreach (var vote in approvedVotes)
+                foreach (var vote in approvedPolls)
                 {
                     PendingPoll pp = new PendingPoll();
                     pp.IsPending = false;
                     pp.IsExecuted = true;
-                    pp.VotingDataString = $"Action: 'WhitelistHash',Hash: '{vote}'";
-                    pendingPolls.RemoveAll(x => x.Hash == vote);
+                    pp.VotingDataString = $"Action: 'WhitelistHash',Hash: '{vote.Hash}'";
+                    pendingPolls.RemoveAll(x => x.Hash == vote.Hash);
                     pendingPolls.Add(pp);
                 }
             }
@@ -262,12 +266,12 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             try
             {
                 ApiResponse response = await _apiRequester.GetRequestAsync(_endpoint, "/api/DefaultVoting/fedmembers");
-                var count = JsonConvert.DeserializeObject<List<string>>(response.Content.ToString());
-                return count.Count;
+                var token = JToken.Parse(response.Content.ToString());
+                return token.Count;
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Failed to update polls");
+                this.logger.LogError(ex, "Failed to update fed members count");
             }
 
             return 0;
