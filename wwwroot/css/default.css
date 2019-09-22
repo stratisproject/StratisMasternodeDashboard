@@ -9442,3 +9442,10 @@ i[role="copy"] {
     max-width: 150px;
 }
 
+select[name=stratis-peers_length] {
+    background: none;
+}
+
+select[name=sidechain-peers_length] {
+    background: none;
+}
