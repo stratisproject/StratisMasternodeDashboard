@@ -106,7 +106,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                     this.ParsePeers(nodeDataServiceSidechain, sidechainPeers);
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.logger.LogError(e, "Unable to parse feeds");
             }
@@ -125,7 +125,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 stratisNode.History = this.is50K ? ((NodeGetDataServiceMultisig)nodeDataServiceMainchain).WalletHistory : new JArray();
                 stratisNode.ConfirmedBalanceFed = this.is50K ? ((NodeGetDataServiceMultisig)nodeDataServiceMainchain).FedWalletBalance.confirmedBalance : -1;
                 stratisNode.UnconfirmedBalanceFed = this.is50K ? ((NodeGetDataServiceMultisig)nodeDataServiceMainchain).FedWalletBalance.unconfirmedBalance : -1;
-                
+
                 stratisNode.WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/api").ToString();
                 stratisNode.SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/swagger").ToString();
                 stratisNode.SyncingStatus = nodeDataServiceMainchain.NodeStatus.SyncingProgress;
@@ -158,7 +158,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 sidechainNode.Peers = sidechainPeers;
                 sidechainNode.FederationMembers = sidechainFederationMembers;
                 sidechainNode.BlockHash = nodeDataServiceSidechain.BestHash;
-                sidechainNode.BlockHeight = (int) nodeDataServiceSidechain.NodeStatus.BlockStoreHeight;
+                sidechainNode.BlockHeight = (int)nodeDataServiceSidechain.NodeStatus.BlockStoreHeight;
                 sidechainNode.MempoolSize = nodeDataServiceSidechain.RawMempool;
 
                 sidechainNode.CoinTicker = "CRS";
@@ -176,9 +176,11 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 sidechainNode.BlockProducerHitsValue = this.nodeDataServiceSidechain.NodeDashboardStats?.BlockProducerHitsValue ?? 0;
                 sidechainNode.ConfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.confirmedBalance;
                 sidechainNode.UnconfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.unconfirmedBalance;
+                sidechainNode.BlockProducersMining = Convert.ToInt32(this.nodeDataServiceSidechain.NodeDashboardStats.BlockProducersMining);
+                sidechainNode.BlockProducersTotal = Convert.ToInt32(this.nodeDataServiceSidechain.NodeDashboardStats.BlockProducersTotal);
                 dashboardModel.SidechainNode = sidechainNode;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.logger.LogError(e, "Unable to fetch feeds.");
                 return;
@@ -315,7 +317,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
             var mainNodeUp = this.PortCheck(new Uri(this.defaultEndpointsSettings.StratisNode));
             var sidechainsNodeUp = this.PortCheck(new Uri(this.defaultEndpointsSettings.SidechainNode));
             return mainNodeUp && sidechainsNodeUp;
-        } 
+        }
 
         /// <summary>
         /// Perform a TCP port scan

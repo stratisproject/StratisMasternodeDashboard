@@ -9449,3 +9449,7 @@ select[name=stratis-peers_length] {
 select[name=sidechain-peers_length] {
     background: none;
 }
+
+.inline-flex {
+    display: inline-flex;
+}

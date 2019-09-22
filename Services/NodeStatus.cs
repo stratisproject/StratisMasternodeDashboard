@@ -25,5 +25,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         public int LastMinedIndex { get; set; } = 0;
         public string BlockProducerHits { get; set; } = string.Empty;
         public decimal BlockProducerHitsValue { get; set; }
+        public decimal BlockProducersMining { get; set; } = 0;
+        public decimal BlockProducersTotal { get; set; } = 0;
     }
 }
