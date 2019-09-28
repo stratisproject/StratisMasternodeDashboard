@@ -10,9 +10,5 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Models
         public string BlockProducerHits { get; set; }
 
         public decimal BlockProducerHitsValue { get; set; }
-
-        public int BlockProducersMining { get; set; }
-
-        public int BlockProducersTotal { get; set; }
     }
 }

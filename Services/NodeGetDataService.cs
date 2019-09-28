@@ -307,10 +307,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                             decimal.TryParse(secondValueString, out decimal secondValue))
                         {
                             if (secondValue == 0) nodeDashboardStats.BlockProducerHitsValue = 0;
-                            nodeDashboardStats.BlockProducerHitsValue = Math.Round(100 * (firstValue / secondValue), 2);
-
-                            nodeDashboardStats.BlockProducersMining = firstValue;
-                            nodeDashboardStats.BlockProducersTotal = secondValue;
+                            nodeDashboardStats.BlockProducerHitsValue = Math.Round(100 * (firstValue / secondValue), 2);                            
                         }
                     }
                     
