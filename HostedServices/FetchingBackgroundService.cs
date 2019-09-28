@@ -175,7 +175,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                     this.nodeDataServiceSidechain.NodeDashboardStats?.BlockProducerHits ?? string.Empty;
                 sidechainNode.BlockProducerHitsValue = this.nodeDataServiceSidechain.NodeDashboardStats?.BlockProducerHitsValue ?? 0;
                 sidechainNode.ConfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.confirmedBalance;
-                sidechainNode.UnconfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.unconfirmedBalance;                
+                sidechainNode.UnconfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.unconfirmedBalance;
                 dashboardModel.SidechainNode = sidechainNode;
             }
             catch (Exception e)
