@@ -57,6 +57,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard
             services.AddHostedService<FetchingBackgroundService>();
 
             services.AddMvc();
+          //  services.AddControllers(options => options.EnableEndpointRouting = false);
 
             services.AddSignalR();
         }
@@ -85,12 +86,12 @@ namespace Stratis.FederatedSidechains.AdminDashboard
             {
                 routes.MapHub<DataUpdaterHub>("/ws-updater");
             });
-
-            app.UseMvc(routes =>
+            
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }
