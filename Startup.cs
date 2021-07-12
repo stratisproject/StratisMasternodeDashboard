@@ -9,20 +9,22 @@ using Stratis.FederatedSidechains.AdminDashboard.Hubs;
 using Stratis.FederatedSidechains.AdminDashboard.HostedServices;
 using Stratis.FederatedSidechains.AdminDashboard.Settings;
 using Stratis.FederatedSidechains.AdminDashboard.Services;
+using Microsoft.Extensions.Hosting;
 
 namespace Stratis.FederatedSidechains.AdminDashboard
 {
     public class Startup
     {
         public IConfiguration Configuration { get; }
-
-        public Startup(IConfiguration configuration)
+        public IWebHostEnvironment Environment { get; }
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             this.Configuration = configuration;
+            Environment = environment;
         }
 
         public void ConfigureServices(IServiceCollection services)
-        {
+        {            
             IConfigurationSection defaultEndpoints = this.Configuration.GetSection("DefaultEndpoints");
             var defaultEndpointsSettings = new DefaultEndpointsSettings
             {
@@ -57,13 +59,13 @@ namespace Stratis.FederatedSidechains.AdminDashboard
             services.AddHostedService<FetchingBackgroundService>();
 
             services.AddMvc();
-
             services.AddSignalR();
+           
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
+            if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -72,25 +74,22 @@ namespace Stratis.FederatedSidechains.AdminDashboard
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            var cachePeriod = env.IsDevelopment() ? "600" : "604800";
+            var cachePeriod = Environment.IsDevelopment() ? "600" : "604800";
             app.UseStaticFiles(new StaticFileOptions
             {
                 OnPrepareResponse = ctx =>
                 {
                     ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={cachePeriod}");
                 }
-            });
+            });            
+            app.UseRouting();
 
-            app.UseSignalR(routes =>
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapHub<DataUpdaterHub>("/ws-updater");
-            });
-
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
+                endpoints.MapHub<DataUpdaterHub>("/ws-updater");
+                endpoints.MapControllerRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }
