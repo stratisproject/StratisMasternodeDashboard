@@ -176,9 +176,9 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             string walletName = String.Empty;
             try
             {
-                ApiResponse responseFiles = await _apiRequester.GetRequestAsync(_endpoint, "/api/Wallet/files");
+                ApiResponse responseFiles = await _apiRequester.GetRequestAsync(_endpoint, "​/api/Wallet/list-wallets");
 
-                string firstWalletName = responseFiles.Content.walletsFiles[0].ToString().Split(".")[0];
+                string firstWalletName = responseFiles.Content.walletNames[0].ToString().Split(".")[0];
 
                 ApiResponse responseBalance = await _apiRequester.GetRequestAsync(_endpoint, "/api/Wallet/balance", $"WalletName={firstWalletName}");
 
