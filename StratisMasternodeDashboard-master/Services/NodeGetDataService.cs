@@ -232,8 +232,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
             try
             {
-                ApiResponse responsePending = await _apiRequester.GetRequestAsync(_endpoint, "/api/DefaultVoting/pendingpolls");
-                ApiResponse responseApproved = await _apiRequester.GetRequestAsync(_endpoint, "/api/DefaultVoting/whitelistedhashes");
+                ApiResponse responsePending = await _apiRequester.GetRequestAsync(_endpoint, "/api/Voting/polls/pending");
+                ApiResponse responseApproved = await _apiRequester.GetRequestAsync(_endpoint, "/api/Voting/whitelistedhashes");
 
                 pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responsePending.Content.ToString());
                 approvedPolls = JsonConvert.DeserializeObject<List<ApprovedPoll>>(responseApproved.Content.ToString());
@@ -264,7 +264,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         {
             try
             {
-                ApiResponse response = await _apiRequester.GetRequestAsync(_endpoint, "/api/DefaultVoting/fedmembers");
+                ApiResponse response = await _apiRequester.GetRequestAsync(_endpoint, "/api/Federation/members");
                 var token = JToken.Parse(response.Content.ToString());
                 return token.Count;
             }
