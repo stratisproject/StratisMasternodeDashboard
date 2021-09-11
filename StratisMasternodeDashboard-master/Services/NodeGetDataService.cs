@@ -15,7 +15,7 @@ using Stratis.FederatedSidechains.AdminDashboard.Settings;
 using NBitcoin;
 using NBitcoin.DataEncoders;
 using Newtonsoft.Json.Linq;
-using RestSharp;
+
 namespace Stratis.FederatedSidechains.AdminDashboard.Services
 {
     public abstract class NodeGetDataService
@@ -93,7 +93,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                 string runningTime = StatusResponse.Content.runningTime;
                 string[] parseTime = runningTime.Split('.');
                 parseTime = parseTime.Take(parseTime.Length - 1).ToArray();
-                nodeStatus.Uptime = string.Join(".", parseTime);
+                nodeStatus.Uptime = string.Join(".",parseTime);
                 nodeStatus.State = StatusResponse.Content.state;
             }
             catch (Exception ex)
@@ -176,12 +176,14 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             string walletName = String.Empty;
             try
             {
-                ApiResponse responseWallet = await _apiRequester.GetRequestAsync(_endpoint, "/api/Wallet/list-wallets");
-                string firstWalletName = responseWallet.Content.walletNames[0].ToString();
+                ApiResponse responseFiles = await _apiRequester.GetRequestAsync(_endpoint, "/api/Wallet/files");
+
+                string firstWalletName = responseFiles.Content.walletsFiles[0].ToString().Split(".")[0];
+
                 ApiResponse responseBalance = await _apiRequester.GetRequestAsync(_endpoint, "/api/Wallet/balance", $"WalletName={firstWalletName}");
+
                 Double.TryParse(responseBalance.Content.balances[0].amountConfirmed.ToString(), out confirmed);
                 Double.TryParse(responseBalance.Content.balances[0].amountUnconfirmed.ToString(), out unconfirmed);
-
             }
             catch (Exception ex)
             {
@@ -230,13 +232,12 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
             try
             {
-
-                ApiResponse responseApproved = await _apiRequester.GetRequestAsync(_endpoint, "/api/Voting/whitelistedhashes");
-                approvedPolls = JsonConvert.DeserializeObject<List<ApprovedPoll>>(responseApproved.Content.ToString());
-                ApiResponse responsePending = await _apiRequester.GetRequestAsync(_endpoint, "/api/Voting/polls/pending", $"voteType=2");
+                ApiResponse responsePending = await _apiRequester.GetRequestAsync(_endpoint, "/api/DefaultVoting/pendingpolls");
+                ApiResponse responseApproved = await _apiRequester.GetRequestAsync(_endpoint, "/api/DefaultVoting/whitelistedhashes");
 
                 pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responsePending.Content.ToString());
-               
+                approvedPolls = JsonConvert.DeserializeObject<List<ApprovedPoll>>(responseApproved.Content.ToString());
+
                 pendingPolls = pendingPolls.FindAll(x => x.VotingDataString.Contains("WhitelistHash"));
 
                 if (approvedPolls == null || approvedPolls.Count == 0) return pendingPolls;
@@ -258,18 +259,14 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
             return pendingPolls;
         }
-
+        
         protected async Task<int> UpdateFedMemberCount()
         {
             try
             {
-                ApiResponse response = await _apiRequester.GetRequestAsync(_endpoint, "/api/Federation/members");
-                if (response.IsSuccess)
-                {
-                    var token = JToken.Parse(response.Content.ToString());
-                    return token.Count;
-                }
-                
+                ApiResponse response = await _apiRequester.GetRequestAsync(_endpoint, "/api/DefaultVoting/fedmembers");
+                var token = JToken.Parse(response.Content.ToString());
+                return token.Count;
             }
             catch (Exception ex)
             {
@@ -312,7 +309,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                             nodeDashboardStats.BlockProducerHitsValue = Math.Round(100 * (firstValue / secondValue), 2);
                         }
                     }
-
+                    
                     if (int.TryParse(headerHeight.Match(response).Groups[1].Value, out var headerHeightValue))
                     {
                         nodeDashboardStats.HeaderHeight = headerHeightValue;
