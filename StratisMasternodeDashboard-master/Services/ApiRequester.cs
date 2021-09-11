@@ -26,6 +26,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         /// <returns>An ApiResponse object</returns>
         public async Task<ApiResponse> GetRequestAsync(string endpoint, string path, string query = null)
         {
+            var urlTest = UriHelper.BuildUri(endpoint, path, query);
             var restClient = new RestClient(UriHelper.BuildUri(endpoint, path, query));
             var restRequest = new RestRequest(Method.GET);
             IRestResponse restResponse = await restClient.ExecuteTaskAsync(restRequest);
