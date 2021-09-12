@@ -15,7 +15,6 @@ using Stratis.FederatedSidechains.AdminDashboard.Settings;
 using NBitcoin;
 using NBitcoin.DataEncoders;
 using Newtonsoft.Json.Linq;
-using RestSharp;
 namespace Stratis.FederatedSidechains.AdminDashboard.Services
 {
     public abstract class NodeGetDataService
