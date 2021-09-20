@@ -80,11 +80,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             this.ViewBag.LogRules = new LogRulesModel().LoadRules(dashboardModel.StratisNode.LogRules, dashboardModel.SidechainNode.LogRules);
             this.ViewBag.PendingPolls = dashboardModel.SidechainNode.PoAPendingPolls;
             this.ViewBag.Status = "OK";
-            //this.ViewBag.Vote = new Vote { Polls = dashboardModel.SidechainNode.PoAPendingPolls, FedMemberCount = dashboardModel.SidechainNode.FedMemberCount };
             this.ViewBag.Vote = new Vote { Polls = dashboardModel.SidechainNode.PoAPendingPolls, FedMemberCount = dashboardModel.SidechainNode.FedMemberCount, KickFedMemPolls = dashboardModel.SidechainNode.PoAKickFedMemPendingPolls };
 
-            //this.ViewBag.KickFedMemPendingPolls = dashboardModel.SidechainNode.PoAKickFedMemPendingPolls;
-           
             return View("Dashboard", dashboardModel);
         }
 
