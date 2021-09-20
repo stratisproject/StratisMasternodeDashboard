@@ -86,7 +86,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             if (string.IsNullOrEmpty(vote?.Hash))
                 return this.BadRequest("Hash is required");
             
-            ApiResponse response = await this.apiRequester.PostRequestAsync(this.defaultEndpointsSettings.SidechainNode, "/api/DefaultVoting/schedulevote-whitelisthash", new { hash = vote.Hash });
+            ApiResponse response = await this.apiRequester.PostRequestAsync(this.defaultEndpointsSettings.SidechainNode, "/api/Voting/schedulevote-whitelisthash", new { hash = vote.Hash });
 
             if (response.IsSuccess) return this.Ok();
             if (response.Content?.errors != null)
