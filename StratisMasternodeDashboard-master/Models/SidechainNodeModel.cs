@@ -10,5 +10,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Models
         public string BlockProducerHits { get; set; }
 
         public decimal BlockProducerHitsValue { get; set; }
+        public List<PendingPoll> PoAKickFedMemPendingPolls { get; set; }
     }
 }

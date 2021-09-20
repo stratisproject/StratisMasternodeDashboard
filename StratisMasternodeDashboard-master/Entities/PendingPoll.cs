@@ -45,6 +45,49 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Entities
                 return hashTokens.Length < 2 ? string.Empty : hashTokens[1].Replace("'", string.Empty);
             }
         }
+        [JsonIgnore]
+        public string PubKey
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(this.VotingDataString)) return string.Empty;
+                string[] tokens = this.VotingDataString.Split(',');
+                if (tokens.Length < 1) return string.Empty;
+                string hashToken = tokens.FirstOrDefault(t => t.Contains("pubkey", StringComparison.OrdinalIgnoreCase));
+                if (hashToken == null) return string.Empty;
+                string[] hashTokens = hashToken.Split(':');
+                return hashTokens.Length < 2 ? string.Empty : hashTokens[2].Replace("'", string.Empty);
+            }
+        }
+        [JsonIgnore]
+        public string CollateralAmount
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(this.VotingDataString)) return string.Empty;
+                string[] tokens = this.VotingDataString.Split(',');
+                if (tokens.Length < 1) return string.Empty;
+                string hashToken = tokens.FirstOrDefault(t => t.Contains("collateralamount", StringComparison.OrdinalIgnoreCase));
+                if (hashToken == null) return string.Empty;
+                string[] hashTokens = hashToken.Split(':');
+                return hashTokens.Length < 2 ? string.Empty : hashTokens[1].Replace("'", string.Empty);
+            }
+        }
+        [JsonIgnore]
+        public string CollateralAddress
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(this.VotingDataString)) return string.Empty;
+                string[] tokens = this.VotingDataString.Split(',');
+                if (tokens.Length < 1) return string.Empty;
+                string hashToken = tokens.FirstOrDefault(t => t.Contains("collateralmainchainaddress", StringComparison.OrdinalIgnoreCase));
+                if (hashToken == null) return string.Empty;
+                string[] hashTokens = hashToken.Split(':');
+                return hashTokens.Length < 2 ? string.Empty : hashTokens[1].Replace("'", string.Empty);
+            }
+        }
+
     }
 
     public class ApprovedPoll

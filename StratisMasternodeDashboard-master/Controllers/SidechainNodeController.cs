@@ -96,5 +96,25 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             
             return this.BadRequest($"Failed to whitelist hash. Reason: {response.Content}");
         }
+        
+        [Ajax]
+        [HttpPost]
+        [Route("kick")]
+        public async Task<IActionResult> Kick(Vote vote)
+        {
+            if (string.IsNullOrEmpty(vote?.PubKey))
+                return this.BadRequest("PubKey is required");
+
+            var kickResult = await this.apiRequester.CheckAndKickFeberationMember(this.defaultEndpointsSettings.SidechainNode, vote.PubKey);
+            if (!kickResult.IsValidKey) return this.BadRequest("Please Provide Valid PubKey");
+            if (kickResult.IsResponseSuccess) return this.Ok();
+            if (kickResult.Message != null)
+            {
+                return this.BadRequest($"Failed to Kick IDGB Member. Reason: {kickResult.Message}");
+            }
+
+            return this.BadRequest($"Failed to Kick IDGB Member.");
+        }
+
     }
 }
