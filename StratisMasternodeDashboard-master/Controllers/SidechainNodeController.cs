@@ -95,16 +95,19 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             }
 
             return this.BadRequest($"Failed to whitelist hash. Reason: {response.Content}");
-        }        
+        }
 
         [HttpPost]
         [Route("schedulekick")]
         public async Task<IActionResult> ScheduleKick([FromBody] string pubKey)
         {
-            if (string.IsNullOrEmpty(pubKey)) return this.BadRequest("Member key is required");
+            if (string.IsNullOrEmpty(pubKey))
+                return this.BadRequest("Member key is required");
             ApiResponse response = await this.apiRequester.PostRequestAsync(this.defaultEndpointsSettings.SidechainNode, "/api/Voting/schedulevote-kickmember", new { pubkey = pubKey });
-            if (response.IsSuccess) return this.Ok();
-            if (!response.IsSuccess) return this.BadRequest(response.Content);
+            if (response.IsSuccess)
+                return this.Ok();
+            if (!response.IsSuccess)
+                return this.BadRequest(response.Content);
             if (response.Content?.errors != null)
             {
                 return this.BadRequest($"An error occurred trying to schedule a kick federation member vote: {response.Content?.errors[0].message}");
