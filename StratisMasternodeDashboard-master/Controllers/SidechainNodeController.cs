@@ -79,13 +79,13 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         }
 
         [Ajax]
-        [HttpPost] 
+        [HttpPost]
         [Route("vote")]
         public async Task<IActionResult> Vote(Vote vote)
         {
             if (string.IsNullOrEmpty(vote?.Hash))
                 return this.BadRequest("Hash is required");
-            
+
             ApiResponse response = await this.apiRequester.PostRequestAsync(this.defaultEndpointsSettings.SidechainNode, "/api/Voting/schedulevote-whitelisthash", new { hash = vote.Hash });
 
             if (response.IsSuccess) return this.Ok();
@@ -93,28 +93,23 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             {
                 return this.BadRequest($"Failed to whitelist hash. Reason: {response.Content?.errors[0].message}");
             }
-            
+
             return this.BadRequest($"Failed to whitelist hash. Reason: {response.Content}");
-        }
-        
-        [Ajax]
+        }        
+
         [HttpPost]
-        [Route("kick")]
-        public async Task<IActionResult> Kick(Vote vote)
+        [Route("schedulekick")]
+        public async Task<IActionResult> ScheduleKick([FromBody] string pubKey)
         {
-            if (string.IsNullOrEmpty(vote?.PubKey))
-                return this.BadRequest("PubKey is required");
-
-            var kickResult = await this.apiRequester.CheckAndKickFeberationMember(this.defaultEndpointsSettings.SidechainNode, vote.PubKey);
-            if (!kickResult.IsValidKey) return this.BadRequest("Please Provide Valid PubKey");
-            if (kickResult.IsResponseSuccess) return this.Ok();
-            if (kickResult.Message != null)
+            if (string.IsNullOrEmpty(pubKey)) return this.BadRequest("Member key is required");
+            ApiResponse response = await this.apiRequester.PostRequestAsync(this.defaultEndpointsSettings.SidechainNode, "/api/Voting/schedulevote-kickmember", new { pubkey = pubKey });
+            if (response.IsSuccess) return this.Ok();
+            if (!response.IsSuccess) return this.BadRequest(response.Content);
+            if (response.Content?.errors != null)
             {
-                return this.BadRequest($"Failed to Kick IDGB Member. Reason: {kickResult.Message}");
+                return this.BadRequest($"An error occurred trying to schedule a kick federation member vote: {response.Content?.errors[0].message}");
             }
-
-            return this.BadRequest($"Failed to Kick IDGB Member.");
+            return this.BadRequest($"An error occurred trying to schedule a kick federation member vote.");
         }
-
     }
 }

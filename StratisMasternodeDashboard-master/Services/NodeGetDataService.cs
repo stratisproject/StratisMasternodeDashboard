@@ -26,7 +26,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         public ApiResponse StatusResponse { get; set; }
         public ApiResponse FedInfoResponse { get; set; }
         public List<PendingPoll> PendingPolls { get; set; }
-        public List<PendingPoll> KickFedMemPendingPolls { get; set; }
+        public List<PendingPoll> KickFederationMememberPendingPolls { get; set; }
         public int FedMemberCount { get; set; }
         public (double confirmedBalance, double unconfirmedBalance) WalletBalance { get; set; } = (0, 0);
         public NodeDashboardStats NodeDashboardStats { get; set; }
@@ -259,7 +259,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             return pendingPolls;
         }     
 
-        protected async Task<List<PendingPoll>> UpdateKickFedMemberPolls()
+        protected async Task<List<PendingPoll>> UpdateKickFederationMemberPolls()
         {
             List<PendingPoll> pendingPolls = new List<PendingPoll>();        
 
@@ -267,8 +267,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             {
                 ApiResponse responseKickFedMemPending = await _apiRequester.GetRequestAsync(_endpoint, "/api/Voting/polls/pending", $"voteType=0");
                 pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responseKickFedMemPending.Content.ToString());
-                // pendingPolls = responseKickFedMemPending.FindAll(x => x.VotingDataString.Contains("KickFederationMember"));
-                 return pendingPolls;               
+                return pendingPolls;               
             }
             catch (Exception ex)
             {
@@ -416,7 +415,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             WalletHistory = await UpdateHistory();
             FedAddress = await UpdateFedInfo();
             PendingPolls = await UpdatePolls();
-            KickFedMemPendingPolls = await UpdateKickFedMemberPolls();
+            KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls();
             FedMemberCount = await UpdateFedMemberCount();
             return this;
         }
@@ -438,7 +437,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             BestHash = await UpdateBestHash();
             WalletBalance = await UpdateMiningWalletBalance();
             PendingPolls = await UpdatePolls();
-            KickFedMemPendingPolls = await UpdateKickFedMemberPolls();
+            KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls();
             FedMemberCount = await UpdateFedMemberCount();
             return this;
         }
