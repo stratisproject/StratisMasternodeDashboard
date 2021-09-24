@@ -26,6 +26,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         public ApiResponse StatusResponse { get; set; }
         public ApiResponse FedInfoResponse { get; set; }
         public List<PendingPoll> PendingPolls { get; set; }
+        public List<PendingPoll> KickFederationMememberPendingPolls { get; set; }
         public int FedMemberCount { get; set; }
         public (double confirmedBalance, double unconfirmedBalance) WalletBalance { get; set; } = (0, 0);
         public NodeDashboardStats NodeDashboardStats { get; set; }
@@ -256,8 +257,25 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             }
 
             return pendingPolls;
-        }
+        }     
 
+        protected async Task<List<PendingPoll>> UpdateKickFederationMemberPolls()
+        {
+            List<PendingPoll> pendingPolls = new List<PendingPoll>();        
+
+            try
+            {
+                ApiResponse responseKickFedMemPending = await _apiRequester.GetRequestAsync(_endpoint, "/api/Voting/polls/pending", $"voteType=0");
+                pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responseKickFedMemPending.Content.ToString());
+                return pendingPolls;               
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Failed to update Kicked Federation Member polls");
+            }
+            return pendingPolls;
+        }
+        
         protected async Task<int> UpdateFedMemberCount()
         {
             try
@@ -397,6 +415,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             WalletHistory = await UpdateHistory();
             FedAddress = await UpdateFedInfo();
             PendingPolls = await UpdatePolls();
+            KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls();
             FedMemberCount = await UpdateFedMemberCount();
             return this;
         }
@@ -418,6 +437,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             BestHash = await UpdateBestHash();
             WalletBalance = await UpdateMiningWalletBalance();
             PendingPolls = await UpdatePolls();
+            KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls();
             FedMemberCount = await UpdateFedMemberCount();
             return this;
         }

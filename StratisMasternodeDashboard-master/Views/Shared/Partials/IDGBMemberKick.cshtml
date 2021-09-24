@@ -1,0 +1,104 @@
+﻿@model Vote
+
+<script type="text/javascript">
+    function submitKick() {         
+        var pubKey = $("#kick").val();
+        $.ajax({
+            type: 'POST',
+            url: '/sidechain-node/schedulekick',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify(pubKey),
+        })
+            .done(function (data) {
+                $("#kickError").hide();
+                var pubKey = $("#kick").val();
+                $("#kick").val("");
+                $("#kickLabel").text(pubKey);
+                $("#federationVotesIDGBKick").modal('hide');
+                $("#confirmationModalIDGBKick").modal('show');
+            })
+            .fail(function (result) {
+                if (!!result.responseText) {
+                    $("#kickError").text(result.responseText);
+                    $("#kickError").show();
+                    return;
+                }
+                $("#kickError").text("Failed to kick. Unknown error. Please try again and make sure nodes are running.");
+                $("#kickError").show();
+            });
+    }
+</script>
+<div class="modal fade right" id="federationVotesIDGBKick" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="width: 950px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">IDGB Kick Federation Member</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" role="alert" style="display: none;" id="kickError">
+                </div>
+                <form id="kickForm" novalidate class="needs-validation">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">IDGB Member Key</label>
+                        <input asp-for="PubKey" type="text" class="form-control" id="kick" aria-describedby="hashHelp" placeholder="Enter IDGB Member key" required>
+                        <small id="hashHelp" class="form-text text-muted">Paste IDGB Member Key.</small>
+                        <div class="invalid-feedback">
+                            Please provide a member Key.
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="submitKick()">Submit</button>
+                </form>
+
+                <div>
+                    <label class="mt-3"><strong>IDGB Member Kicking </strong></label>
+                    <table class="table table-sm table-striped table-bordered" id="kickfedmem-polls-table">
+                        <thead>
+                            <tr>
+                                <th class="text-left">ID</th>
+                                <th class="text-center">Public Key</th>
+                                <th class="text-center">Collateral Address</th>
+                                <th class="text-center">Votes In Favour</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{ int ordinalKick = 0; }
+                            @foreach (var poll in Model?.KickFederationMemberPolls ?? new List<PendingPoll>())
+                            {
+                                <tr>
+                                    <td class="text-left">@(ordinalKick++)</td>
+                                    <td class="text-left ellipsis" style="min-width: 350px;" title="@poll.PubKey">@poll.PubKey</td>
+                                    <td class="text-center ellipsis" style="min-width: 250px;" title="@poll.CollateralAddress">@poll.CollateralAddress</td>                                   
+                                    <td class="text-center ellipsis">@(poll.IsExecuted ? "51%" : poll.PubKeysHexVotedInFavor.Count.ToString())</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirmationModalIDGBKick" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel1">Pub Key submitted</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                You have successfully submitted <b id="kickLabel"></b> Pub Key.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
