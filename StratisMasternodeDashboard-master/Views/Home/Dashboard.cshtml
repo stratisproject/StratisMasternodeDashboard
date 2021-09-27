@@ -1,4 +1,4 @@
-@using Microsoft.Extensions.Options
+﻿@using Microsoft.Extensions.Options
 @using Stratis.FederatedSidechains.AdminDashboard.Settings
 @inject DefaultEndpointsSettings defaultEndpointsSettings;
 @model DashboardModel
@@ -348,7 +348,7 @@
                                     <li class="list-inline-item">@Model.SidechainNode.Peers.Count  /  @Model.SidechainNode.Peers.Where(p => p.Type == "inbound").Count()  /  @Model.SidechainNode.Peers.Where(p => p.Type == "outbound").Count() </li>
                                 </ul>
                             </li>
-                        </ul>                        
+                        </ul>
                         <label class="mt-3"><strong>Peers :</strong></label>
                         <table class="table table-sm table-striped" id="sidechain-peers">
                             <thead>

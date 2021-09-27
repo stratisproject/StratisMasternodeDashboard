@@ -170,7 +170,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 sidechainNode.HeaderHeight = this.nodeDataServiceSidechain.NodeDashboardStats?.HeaderHeight ?? 0;
                 sidechainNode.AsyncLoops = this.nodeDataServiceSidechain.NodeDashboardStats?.AsyncLoops ?? string.Empty;
                 sidechainNode.OrphanSize = this.nodeDataServiceSidechain.NodeDashboardStats?.OrphanSize ?? string.Empty;
-                sidechainNode.FedMemberCount = this.nodeDataServiceSidechain.FedMemberCount;
+                sidechainNode.FederationMemberCount = this.nodeDataServiceSidechain.FederationMemberCount;
                 sidechainNode.BlockProducerHits =
                     this.nodeDataServiceSidechain.NodeDashboardStats?.BlockProducerHits ?? string.Empty;
                 sidechainNode.BlockProducerHitsValue = this.nodeDataServiceSidechain.NodeDashboardStats?.BlockProducerHitsValue ?? 0;

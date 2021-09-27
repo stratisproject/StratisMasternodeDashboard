@@ -13,6 +13,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Models
         public List<PendingPoll> KickFederationMemberPolls { get; set; }
         public string PubKey { get; set; }
         public string Message { get; set; }
-        public int FedMemberCount { get; set; }
+        public int FederationMemberCount { get; set; }
     }
 }

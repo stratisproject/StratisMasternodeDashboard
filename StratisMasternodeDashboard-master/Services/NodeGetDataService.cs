@@ -27,7 +27,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         public ApiResponse FedInfoResponse { get; set; }
         public List<PendingPoll> PendingPolls { get; set; }
         public List<PendingPoll> KickFederationMememberPendingPolls { get; set; }
-        public int FedMemberCount { get; set; }
+        public int FederationMemberCount { get; set; }
         public (double confirmedBalance, double unconfirmedBalance) WalletBalance { get; set; } = (0, 0);
         public NodeDashboardStats NodeDashboardStats { get; set; }
         public string MiningPubKey { get; set; }
@@ -276,7 +276,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             return pendingPolls;
         }
         
-        protected async Task<int> UpdateFedMemberCount()
+        protected async Task<int> UpdateFederationMemberCount()
         {
             try
             {
@@ -416,7 +416,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             FedAddress = await UpdateFedInfo();
             PendingPolls = await UpdatePolls();
             KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls();
-            FedMemberCount = await UpdateFedMemberCount();
+            FederationMemberCount = await UpdateFederationMemberCount();
             return this;
         }
     }
@@ -438,7 +438,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             WalletBalance = await UpdateMiningWalletBalance();
             PendingPolls = await UpdatePolls();
             KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls();
-            FedMemberCount = await UpdateFedMemberCount();
+            FederationMemberCount = await UpdateFederationMemberCount();
             return this;
         }
     }
