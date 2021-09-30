@@ -3,7 +3,7 @@
 <script type="text/javascript">
     function submitVote() {
         $.post("/sidechain-node/vote", $("#voteForm").serialize())
-            .done(function(data) {
+            .done(function (data) {
                 $("#voteError").hide();
                 var hash = $("#vote").val();
                 $("#vote").val("");
@@ -11,7 +11,7 @@
                 $("#federationVotes").modal('hide');
                 $("#confirmationModal").modal('show');
             })
-            .fail(function(result) {
+            .fail(function (result) {
                 if (!!result.responseText) {
                     $("#voteError").text(result.responseText);
                     $("#voteError").show();
@@ -26,7 +26,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document" style="width: 950px">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Federation Votes (PoA)</h5>            
+                <h5 class="modal-title">Federation Votes (PoA)</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -65,19 +65,17 @@
                                 <td class="text-left ellipsis" style="min-width: 350px;" title="@poll.Hash">@poll.Hash</td>
                                 <td class="text-center">@(poll.IsExecuted ? "Yes" : "No")</td>
                                 <td class="text-center ellipsis">@(poll.IsExecuted ? "51%" : poll.PubKeysHexVotedInFavor.Count.ToString())</td>
-                                <td class="text-center ellipsis">@Model.FedMemberCount</td>
+                                <td class="text-center ellipsis">@Model.FederationMemberCount</td>
                             </tr>
                         }
                     </tbody>
                 </table>
-
             </div>
-          
         </div>
     </div>
 </div>
 
-<<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
