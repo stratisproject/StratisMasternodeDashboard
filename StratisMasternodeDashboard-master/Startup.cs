@@ -1,15 +1,15 @@
-﻿using System;
-using System.Linq;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Stratis.FederatedSidechains.AdminDashboard.Hubs;
-using Stratis.FederatedSidechains.AdminDashboard.HostedServices;
-using Stratis.FederatedSidechains.AdminDashboard.Settings;
-using Stratis.FederatedSidechains.AdminDashboard.Services;
 using Microsoft.Extensions.Hosting;
+using Stratis.FederatedSidechains.AdminDashboard.HostedServices;
+using Stratis.FederatedSidechains.AdminDashboard.Hubs;
+using Stratis.FederatedSidechains.AdminDashboard.Services;
+using Stratis.FederatedSidechains.AdminDashboard.Settings;
+using System;
+using System.Linq;
 
 namespace Stratis.FederatedSidechains.AdminDashboard
 {
@@ -24,7 +24,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard
         }
 
         public void ConfigureServices(IServiceCollection services)
-        {            
+        {
             IConfigurationSection defaultEndpoints = this.Configuration.GetSection("DefaultEndpoints");
             var defaultEndpointsSettings = new DefaultEndpointsSettings
             {
@@ -51,6 +51,11 @@ namespace Stratis.FederatedSidechains.AdminDashboard
                     : NodeEnv.MainNet;
             }
 
+            if (!string.IsNullOrEmpty(this.Configuration["datadir"]))
+            {
+                defaultEndpointsSettings.DataFolder = this.Configuration["datadir"];
+            }
+
             services.AddSingleton(defaultEndpointsSettings);
             services.AddDistributedMemoryCache();
 
@@ -60,7 +65,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard
 
             services.AddMvc();
             services.AddSignalR();
-           
         }
 
         public void Configure(IApplicationBuilder app)
@@ -81,7 +85,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard
                 {
                     ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={cachePeriod}");
                 }
-            });            
+            });
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
