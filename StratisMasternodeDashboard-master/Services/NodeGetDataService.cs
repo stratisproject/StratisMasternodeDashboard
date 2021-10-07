@@ -27,6 +27,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         public int FederationMemberCount { get; set; }
         public (double confirmedBalance, double unconfirmedBalance) WalletBalance { get; set; } = (0, 0);
         public NodeDashboardStats NodeDashboardStats { get; set; }
+        public SidechainMinerStats SidechainMinerStats { get; set; }
         public string MiningPubKey { get; set; }
 
         protected const int STRATOSHI = 100_000_000;
@@ -91,6 +92,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             {
                 StatusResponse = await apiRequester.GetRequestAsync(endpoint, "/api/Node/status");
                 nodeStatus.BlockStoreHeight = StatusResponse.Content.blockStoreHeight;
+                nodeStatus.HeaderHeight = StatusResponse.Content.headerHeight;
                 nodeStatus.ConsensusHeight = StatusResponse.Content.consensusHeight;
                 string runningTime = StatusResponse.Content.runningTime;
                 string[] parseTime = runningTime.Split('.');
@@ -209,20 +211,40 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             return history;
         }
 
-        protected async Task<string> UpdateFedInfo()
+        protected async Task<string> UpdateFederationGatewayInfo()
         {
-            string fedAddress = string.Empty;
+            string multiSigAddress = string.Empty;
+
             try
             {
-                FedInfoResponse = await apiRequester.GetRequestAsync(endpoint, "/api/FederationGateway/info");
-                fedAddress = FedInfoResponse.Content.multisigAddress;
+                FedInfoResponse = await apiRequester.GetRequestAsync(endpoint, "/api/FederationGateway/info").ConfigureAwait(false);
+                multiSigAddress = FedInfoResponse.Content.multisigAddress;
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Failed to fed info");
+                this.logger.LogError(ex, "Failed to update federation gateway info.");
             }
 
-            return fedAddress;
+            return multiSigAddress;
+        }
+
+        protected async Task<SidechainMinerStats> UpdateFederationMemberInfo()
+        {
+            SidechainMinerStats sidechainMinerStats = new SidechainMinerStats();
+
+            try
+            {
+                var response = await apiRequester.GetRequestAsync(endpoint, "/api/Federation/members/current").ConfigureAwait(false);
+                sidechainMinerStats.BlockProducerHits = response.Content.miningStatistics.minerHits;
+                sidechainMinerStats.BlockProducerHitsValue = response.Content.miningStatistics.minerHits / (float)response.Content.miningStatistics.federationSize;
+                sidechainMinerStats.ProducedBlockInLastRound = (bool)response.Content.miningStatistics.producedBlockInLastRound;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Failed to update federation member info.");
+            }
+
+            return sidechainMinerStats;
         }
 
         protected async Task<List<PendingPoll>> UpdatePolls()
@@ -300,14 +322,9 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             return 0;
         }
 
-        Regex headerHeight = new Regex("Headers\\.Height:\\s+([0-9]+)", RegexOptions.Compiled);
-        Regex walletHeight = new Regex("Wallet(\\[SC\\])*\\.Height:\\s+([0-9]+)", RegexOptions.Compiled);
-        Regex orphanSize = new Regex("OrphanSize:\\s+([0-9]+)", RegexOptions.Compiled);
-        Regex miningHistory = new Regex(@"at the timestamp he was supposed to\.[\r\n|\n|\r]+(.*)\.\.\.", RegexOptions.IgnoreCase);
+        Regex orphanSize = new Regex("Orphan Size:\\s+([0-9]+)", RegexOptions.Compiled);
         Regex asyncLoopStats = new Regex("====== Async loops ======   (.*)", RegexOptions.Compiled);
         Regex addressIndexer = new Regex("AddressIndexer\\.Height:\\s+([0-9]+)", RegexOptions.Compiled);
-        Regex blockProducers = new Regex("Block producers hits      : (.*)", RegexOptions.Compiled);
-        Regex blockProducersValues = new Regex(@"([\d]+) of ([\d]+).*", RegexOptions.Compiled);
 
         protected async Task<NodeDashboardStats> UpdateDashboardStats()
         {
@@ -319,39 +336,13 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                 {
                     response = await client.GetStringAsync($"{endpoint}/api/Dashboard/Stats").ConfigureAwait(false);
                     nodeDashboardStats.OrphanSize = orphanSize.Match(response).Groups[1].Value;
-                    nodeDashboardStats.BlockProducerHits = this.blockProducers.Match(response).Groups[1].Value;
-                    var matches = blockProducersValues.Match(nodeDashboardStats.BlockProducerHits);
-                    if (matches.Success && matches.Groups.Count > 2)
-                    {
-                        string firstValueString = matches.Groups[1].Value;
-                        string secondValueString = matches.Groups[2].Value;
 
-                        if (decimal.TryParse(firstValueString, out decimal firstValue) &&
-                            decimal.TryParse(secondValueString, out decimal secondValue))
-                        {
-                            if (secondValue == 0) nodeDashboardStats.BlockProducerHitsValue = 0;
-                            nodeDashboardStats.BlockProducerHitsValue = Math.Round(100 * (firstValue / secondValue), 2);
-                        }
-                    }
-
-                    if (int.TryParse(headerHeight.Match(response).Groups[1].Value, out var headerHeightValue))
-                    {
-                        nodeDashboardStats.HeaderHeight = headerHeightValue;
-                    }
                     if (int.TryParse(this.addressIndexer.Match(response).Groups[1].Value, out var height))
                     {
                         nodeDashboardStats.AddressIndexerHeight = height;
                     }
 
                     nodeDashboardStats.AsyncLoops = asyncLoopStats.Match(response).Groups[1].Value.Replace("[", "").Replace("]", "").Replace(" ", "").Replace("Running", "R").Replace("Faulted", ", F");
-                    var hitOrMiss = miningHistory.Match(response).Groups[1].Value.Split("-".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                    nodeDashboardStats.MissCount = Array.FindAll(hitOrMiss, x => x.Contains("MISS")).Length;
-
-                    if (!string.IsNullOrEmpty(MiningPubKey))
-                    {
-                        nodeDashboardStats.LastMinedIndex = Array.IndexOf(hitOrMiss, $"[█████]") + 1;
-                        nodeDashboardStats.IsMining = 0 < nodeDashboardStats.LastMinedIndex;
-                    }
                 }
             }
             catch (Exception ex)
@@ -385,14 +376,14 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
         protected async Task<NodeGetDataService> UpdateMultiSig()
         {
-            NodeDashboardStats = await UpdateDashboardStats();
-            NodeStatus = await UpdateNodeStatus();
-            LogRules = await UpdateLogRules();
-            RawMempool = await UpdateMempool();
-            BestHash = await UpdateBestHash();
-            FedWalletBalance = await this.UpdateWalletBalance();
-            WalletHistory = await this.UpdateHistory();
-            FedAddress = await this.UpdateFedInfo();
+            NodeDashboardStats = await UpdateDashboardStats().ConfigureAwait(false);
+            NodeStatus = await UpdateNodeStatus().ConfigureAwait(false);
+            LogRules = await UpdateLogRules().ConfigureAwait(false);
+            RawMempool = await UpdateMempool().ConfigureAwait(false);
+            BestHash = await UpdateBestHash().ConfigureAwait(false);
+            FedWalletBalance = await this.UpdateWalletBalance().ConfigureAwait(false);
+            WalletHistory = await this.UpdateHistory().ConfigureAwait(false);
+            FedAddress = await this.UpdateFederationGatewayInfo().ConfigureAwait(false);
 
             return this;
         }
@@ -407,7 +398,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
         public override async Task<NodeGetDataService> Update()
         {
-            await UpdateMultiSig();
+            await UpdateMultiSig().ConfigureAwait(false);
 
             return this;
         }
@@ -425,10 +416,11 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             await UpdateMultiSig();
 
             // Sidechain related updates.
-            WalletBalance = await UpdateMiningWalletBalance();
-            PendingPolls = await UpdatePolls();
-            KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls();
-            FederationMemberCount = await UpdateFederationMemberCount();
+            WalletBalance = await UpdateMiningWalletBalance().ConfigureAwait(false);
+            PendingPolls = await UpdatePolls().ConfigureAwait(false);
+            KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls().ConfigureAwait(false);
+            FederationMemberCount = await UpdateFederationMemberCount().ConfigureAwait(false);
+            SidechainMinerStats = await UpdateFederationMemberInfo().ConfigureAwait(false);
 
             return this;
         }
@@ -443,15 +435,16 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
         public override async Task<NodeGetDataService> Update()
         {
-            NodeDashboardStats = await UpdateDashboardStats();
-            NodeStatus = await UpdateNodeStatus();
-            LogRules = await UpdateLogRules();
-            RawMempool = await UpdateMempool();
-            BestHash = await UpdateBestHash();
-            WalletBalance = await UpdateMiningWalletBalance();
-            PendingPolls = await UpdatePolls();
-            KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls();
-            FederationMemberCount = await UpdateFederationMemberCount();
+            NodeDashboardStats = await UpdateDashboardStats().ConfigureAwait(false);
+            NodeStatus = await UpdateNodeStatus().ConfigureAwait(false);
+            LogRules = await UpdateLogRules().ConfigureAwait(false);
+            RawMempool = await UpdateMempool().ConfigureAwait(false);
+            BestHash = await UpdateBestHash().ConfigureAwait(false);
+            WalletBalance = await UpdateMiningWalletBalance().ConfigureAwait(false);
+            PendingPolls = await UpdatePolls().ConfigureAwait(false);
+            KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls().ConfigureAwait(false);
+            FederationMemberCount = await UpdateFederationMemberCount().ConfigureAwait(false);
+            SidechainMinerStats = await UpdateFederationMemberInfo().ConfigureAwait(false);
 
             return this;
         }
