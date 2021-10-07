@@ -349,11 +349,9 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
                     if (!string.IsNullOrEmpty(MiningPubKey))
                     {
-                        nodeDashboardStats.LastMinedIndex = Array.IndexOf(hitOrMiss, $"[{MiningPubKey.Substring(0, 4)}]") + 1;
+                        nodeDashboardStats.LastMinedIndex = Array.IndexOf(hitOrMiss, $"[█████]") + 1;
                         nodeDashboardStats.IsMining = 0 < nodeDashboardStats.LastMinedIndex;
                     }
-
-
                 }
             }
             catch (Exception ex)
