@@ -235,9 +235,9 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             try
             {
                 var response = await apiRequester.GetRequestAsync(endpoint, "/api/Federation/members/current").ConfigureAwait(false);
-                sidechainMinerStats.BlockProducerHits = response.Content.miningStatistics.minerHits;
-                sidechainMinerStats.BlockProducerHitsValue = response.Content.miningStatistics.minerHits / (float)response.Content.miningStatistics.federationSize;
-                sidechainMinerStats.ProducedBlockInLastRound = (bool)response.Content.miningStatistics.producedBlockInLastRound;
+                sidechainMinerStats.BlockProducerHits = response.Content.miningStats.minerHits;
+                sidechainMinerStats.BlockProducerHitsValue = response.Content.miningStats.minerHits / (float)response.Content.miningStats.federationSize;
+                sidechainMinerStats.ProducedBlockInLastRound = (bool)response.Content.miningStats.producedBlockInLastRound;
             }
             catch (Exception ex)
             {
@@ -332,18 +332,16 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             try
             {
                 string response;
-                using (HttpClient client = new HttpClient())
+                using HttpClient client = new HttpClient();
+                response = await client.GetStringAsync($"{endpoint}/api/Dashboard/Stats").ConfigureAwait(false);
+                nodeDashboardStats.OrphanSize = orphanSize.Match(response).Groups[1].Value;
+
+                if (int.TryParse(this.addressIndexer.Match(response).Groups[1].Value, out var height))
                 {
-                    response = await client.GetStringAsync($"{endpoint}/api/Dashboard/Stats").ConfigureAwait(false);
-                    nodeDashboardStats.OrphanSize = orphanSize.Match(response).Groups[1].Value;
-
-                    if (int.TryParse(this.addressIndexer.Match(response).Groups[1].Value, out var height))
-                    {
-                        nodeDashboardStats.AddressIndexerHeight = height;
-                    }
-
-                    nodeDashboardStats.AsyncLoops = asyncLoopStats.Match(response).Groups[1].Value.Replace("[", "").Replace("]", "").Replace(" ", "").Replace("Running", "R").Replace("Faulted", ", F");
+                    nodeDashboardStats.AddressIndexerHeight = height;
                 }
+
+                nodeDashboardStats.AsyncLoops = asyncLoopStats.Match(response).Groups[1].Value.Replace("[", "").Replace("]", "").Replace(" ", "").Replace("Running", "R").Replace("Faulted", ", F");
             }
             catch (Exception ex)
             {
