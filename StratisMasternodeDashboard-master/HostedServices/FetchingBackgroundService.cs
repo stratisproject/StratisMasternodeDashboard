@@ -133,12 +133,12 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 stratisNode.FederationMembers = stratisFederationMembers;
                 stratisNode.BlockHash = nodeDataServiceMainchain.BestHash;
                 stratisNode.BlockHeight = (int)nodeDataServiceMainchain.NodeStatus.BlockStoreHeight;
+                stratisNode.HeaderHeight = (int)nodeDataServiceMainchain.NodeStatus.HeaderHeight;
                 stratisNode.MempoolSize = nodeDataServiceMainchain.RawMempool;
 
                 stratisNode.CoinTicker = "STRAT";
                 stratisNode.LogRules = nodeDataServiceMainchain.LogRules;
                 stratisNode.Uptime = nodeDataServiceMainchain.NodeStatus.Uptime;
-                stratisNode.IsMining = this.nodeDataServiceMainchain.NodeDashboardStats?.IsMining ?? false;
                 stratisNode.AddressIndexer = this.nodeDataServiceMainchain.NodeDashboardStats?.AddressIndexerHeight ?? 0;
                 stratisNode.HeaderHeight = this.nodeDataServiceMainchain.NodeDashboardStats?.HeaderHeight ?? 0;
                 stratisNode.AsyncLoops = this.nodeDataServiceMainchain.NodeDashboardStats?.AsyncLoops ?? string.Empty;
@@ -159,24 +159,27 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 sidechainNode.FederationMembers = sidechainFederationMembers;
                 sidechainNode.BlockHash = nodeDataServiceSidechain.BestHash;
                 sidechainNode.BlockHeight = (int)nodeDataServiceSidechain.NodeStatus.BlockStoreHeight;
+                sidechainNode.HeaderHeight = (int)nodeDataServiceSidechain.NodeStatus.HeaderHeight;
                 sidechainNode.MempoolSize = nodeDataServiceSidechain.RawMempool;
 
                 sidechainNode.CoinTicker = "CRS";
                 sidechainNode.LogRules = nodeDataServiceSidechain.LogRules;
                 sidechainNode.PoAPendingPolls = nodeDataServiceSidechain.PendingPolls;
                 sidechainNode.Uptime = nodeDataServiceSidechain.NodeStatus.Uptime;
-                sidechainNode.IsMining = this.nodeDataServiceSidechain.NodeDashboardStats?.IsMining ?? false;
+
+                sidechainNode.BlockProducerHits = this.nodeDataServiceSidechain.SidechainMinerStats?.BlockProducerHits ?? string.Empty;
+                sidechainNode.BlockProducerHitsValue = this.nodeDataServiceSidechain.SidechainMinerStats?.BlockProducerHitsValue ?? 0;
+                sidechainNode.IsMining = this.nodeDataServiceSidechain.SidechainMinerStats?.ProducedBlockInLastRound ?? false;
+
                 sidechainNode.AddressIndexer = this.nodeDataServiceSidechain.NodeDashboardStats?.AddressIndexerHeight ?? 0;
                 sidechainNode.HeaderHeight = this.nodeDataServiceSidechain.NodeDashboardStats?.HeaderHeight ?? 0;
                 sidechainNode.AsyncLoops = this.nodeDataServiceSidechain.NodeDashboardStats?.AsyncLoops ?? string.Empty;
                 sidechainNode.OrphanSize = this.nodeDataServiceSidechain.NodeDashboardStats?.OrphanSize ?? string.Empty;
                 sidechainNode.FederationMemberCount = this.nodeDataServiceSidechain.FederationMemberCount;
-                sidechainNode.BlockProducerHits =
-                    this.nodeDataServiceSidechain.NodeDashboardStats?.BlockProducerHits ?? string.Empty;
-                sidechainNode.BlockProducerHitsValue = this.nodeDataServiceSidechain.NodeDashboardStats?.BlockProducerHitsValue ?? 0;
                 sidechainNode.ConfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.confirmedBalance;
                 sidechainNode.UnconfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.unconfirmedBalance;
                 sidechainNode.KickFederationMemberPolls = nodeDataServiceSidechain.KickFederationMememberPendingPolls;
+
                 dashboardModel.SidechainNode = sidechainNode;
             }
             catch (Exception e)
