@@ -42,6 +42,10 @@
     </div>
     <partial name="Partials/ProofOfAuthority" model="@(ViewBag.Vote)"></partial>
     <partial name="Partials/IDGBMemberKick" model="@(ViewBag.Vote)"></partial>
+
+    <partial name="Partials/SDAProposalVote" model="@ViewBag.SDAVote"></partial>
+    @*<partial name="Partials/SDAProposalVote" ></partial>*@
+
     <partial name="Partials/MiningPubKeys" model="@(ViewBag.MiningPubKeys)"></partial>
     <partial name="Partials/LogLevels" model="@(ViewBag.LogRules)"></partial>
     <nav class="navbar navbar-dark bg-purple fixed-top">
@@ -95,6 +99,9 @@
 
         <div class="navbar-text p-0 d-inline ml-auto">
             <ul class="list-inline mb-0 d-flex align-items-center">
+                <li class="list-inline-item">
+                    <a data-toggle="modal" href="#sDAProposalVotes"><i class="fas fa-vote-yea"></i>&nbsp; SDA Vote</a>
+                </li>
                 <li class="list-inline-item">
                     <a data-toggle="modal" href="#federationVotesIDGBKick"><i class="fas fa-vote-yea"></i>&nbsp; IDGB Member Kicking</a>
                 </li>

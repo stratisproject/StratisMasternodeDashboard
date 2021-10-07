@@ -1,3 +1,4 @@
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -116,6 +117,38 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             }
 
             return this.BadRequest($"An error occurred trying to schedule a kick federation member vote: {response.Content}");
+        }
+
+        [HttpPost]
+        [Route("sdavote")]
+        public async Task<IActionResult> VoteSDAProposal([FromBody] SDAVoteModel sDAVote)
+        {
+            if (!ModelState.IsValid)
+                return this.BadRequest("Please enter all required value");
+
+            ApiResponse response = await this.apiRequester.VoteSDAProposalSmartContractCall(this.defaultEndpointsSettings.SidechainNode, sDAVote);
+
+            if (response.IsSuccess && response.Content.transactionId != null)
+            {
+                ApiResponse responseReceipt = await this.apiRequester.GetRequestAsync(this.defaultEndpointsSettings.SidechainNode, "/api/SmartContracts/receipt", $"txHash={response.Content.transactionId}");
+
+                if (responseReceipt.IsSuccess)
+                    return this.Ok();
+
+                if (responseReceipt.Content?.errors != null)
+                {
+                    return this.BadRequest($"An error occurred trying to vote SDA proposal Reason: {responseReceipt.Content?.errors[0].message}");
+                }
+
+                return this.BadRequest($"An error occurred trying to vote SDA proposal Reason: {responseReceipt.Content}");
+            }
+
+            if (response.Content?.errors != null)
+            {
+                return this.BadRequest($"An error occurred trying to vote SDA proposal Reason: {response.Content?.errors[0].message}");
+            }
+
+            return this.BadRequest($"An error occurred trying to vote SDA proposal Reason: {response.Content}");
         }
     }
 }

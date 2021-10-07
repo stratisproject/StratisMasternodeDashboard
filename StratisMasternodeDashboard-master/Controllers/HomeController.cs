@@ -81,7 +81,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             this.ViewBag.PendingPolls = dashboardModel.SidechainNode.PoAPendingPolls;
             this.ViewBag.Status = "OK";
             this.ViewBag.Vote = new Vote { Polls = dashboardModel.SidechainNode.PoAPendingPolls, FederationMemberCount = dashboardModel.SidechainNode.FederationMemberCount, KickFederationMemberPolls = dashboardModel.SidechainNode.KickFederationMemberPolls };
-
+            this.ViewBag.SDAVote = new SDAVoteModel { };
             return View("Dashboard", dashboardModel);
         }
 
