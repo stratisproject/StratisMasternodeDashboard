@@ -1,20 +1,17 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using NBitcoin;
+using NBitcoin.DataEncoders;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Stratis.FederatedSidechains.AdminDashboard.Entities;
+using Stratis.FederatedSidechains.AdminDashboard.Settings;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection.Metadata;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using NUglify.Helpers;
-using Stratis.FederatedSidechains.AdminDashboard.Entities;
-using Stratis.FederatedSidechains.AdminDashboard.Settings;
-using NBitcoin;
-using NBitcoin.DataEncoders;
-using Newtonsoft.Json.Linq;
 namespace Stratis.FederatedSidechains.AdminDashboard.Services
 {
     public abstract class NodeGetDataService
@@ -22,7 +19,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         public NodeStatus NodeStatus { get; set; }
         public List<LogRule> LogRules { get; set; }
         public int RawMempool { get; set; } = 0;
-        public string BestHash { get; set; } = String.Empty;
+        public string BestHash { get; set; } = string.Empty;
         public ApiResponse StatusResponse { get; set; }
         public ApiResponse FedInfoResponse { get; set; }
         public List<PendingPoll> PendingPolls { get; set; }
@@ -33,33 +30,38 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         public string MiningPubKey { get; set; }
 
         protected const int STRATOSHI = 100_000_000;
-        protected readonly string miningKeyFile = String.Empty;
-        private ApiRequester _apiRequester;
-        private string _endpoint;
+        protected readonly string miningKeyFile = string.Empty;
+        private readonly ApiRequester apiRequester;
+        private readonly string endpoint;
         private readonly ILogger<NodeGetDataService> logger;
         protected readonly bool isMainnet = true;
 
-        public NodeGetDataService(ApiRequester apiRequester, string endpoint, ILoggerFactory loggerFactory, string env)
+        public NodeGetDataService(ApiRequester apiRequester, string endpoint, ILoggerFactory loggerFactory, string env, string dataFolder)
         {
-            _apiRequester = apiRequester;
-            _endpoint = endpoint;
+            this.apiRequester = apiRequester;
+            this.endpoint = endpoint;
             this.logger = loggerFactory.CreateLogger<NodeGetDataService>();
             this.isMainnet = env != NodeEnv.TestNet;
 
             try
             {
-                miningKeyFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    "StratisNode", "cirrus", this.isMainnet ? "CirrusMain" : "CirrusTest",
-                    "federationKey.dat");
+                string path;
+
+                if (string.IsNullOrEmpty(dataFolder))
+                    path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "StratisNode", "cirrus", this.isMainnet ? "CirrusMain" : "CirrusTest");
+                else
+                    path = dataFolder;
+
+                miningKeyFile = Path.Combine(path, "federationKey.dat");
+
                 try
                 {
-                    using (FileStream readStream = File.OpenRead(miningKeyFile))
-                    {
-                        var privateKey = new Key();
-                        var stream = new BitcoinStream(readStream, false);
-                        stream.ReadWrite(ref privateKey);
-                        this.MiningPubKey = Encoders.Hex.EncodeData(privateKey.PubKey.ToBytes());
-                    }
+                    using FileStream readStream = File.OpenRead(miningKeyFile);
+
+                    var privateKey = new Key();
+                    var stream = new BitcoinStream(readStream, false);
+                    stream.ReadWrite(ref privateKey);
+                    this.MiningPubKey = Encoders.Hex.EncodeData(privateKey.PubKey.ToBytes());
                 }
                 catch (Exception ex)
                 {
@@ -87,7 +89,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             NodeStatus nodeStatus = new NodeStatus();
             try
             {
-                StatusResponse = await _apiRequester.GetRequestAsync(_endpoint, "/api/Node/status");
+                StatusResponse = await apiRequester.GetRequestAsync(endpoint, "/api/Node/status");
                 nodeStatus.BlockStoreHeight = StatusResponse.Content.blockStoreHeight;
                 nodeStatus.ConsensusHeight = StatusResponse.Content.consensusHeight;
                 string runningTime = StatusResponse.Content.runningTime;
@@ -109,7 +111,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             List<LogRule> responseLog = new List<LogRule>();
             try
             {
-                ApiResponse response = await _apiRequester.GetRequestAsync(_endpoint, "/api/Node/logrules");
+                ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/Node/logrules");
                 responseLog = JsonConvert.DeserializeObject<List<LogRule>>(response.Content.ToString());
             }
             catch (Exception ex)
@@ -125,7 +127,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             int mempoolSize = 0;
             try
             {
-                ApiResponse response = await _apiRequester.GetRequestAsync(_endpoint, "/api/Mempool/getrawmempool");
+                ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/Mempool/getrawmempool");
                 mempoolSize = response.Content.Count;
             }
             catch (Exception ex)
@@ -138,10 +140,10 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
         protected async Task<string> UpdateBestHash()
         {
-            string hash = String.Empty;
+            string hash = string.Empty;
             try
             {
-                ApiResponse response = await _apiRequester.GetRequestAsync(_endpoint, "/api/Consensus/getbestblockhash");
+                ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/Consensus/getbestblockhash");
                 hash = response.Content;
             }
             catch (Exception ex)
@@ -158,9 +160,9 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             double unconfirmed = 0;
             try
             {
-                ApiResponse response = await _apiRequester.GetRequestAsync(_endpoint, "/api/FederationWallet/balance");
-                Double.TryParse(response.Content.balances[0].amountConfirmed.ToString(), out confirmed);
-                Double.TryParse(response.Content.balances[0].amountUnconfirmed.ToString(), out unconfirmed);
+                ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/FederationWallet/balance");
+                double.TryParse(response.Content.balances[0].amountConfirmed.ToString(), out confirmed);
+                double.TryParse(response.Content.balances[0].amountUnconfirmed.ToString(), out unconfirmed);
             }
             catch (Exception ex)
             {
@@ -173,14 +175,14 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         {
             double confirmed = 0;
             double unconfirmed = 0;
-            string walletName = String.Empty;
+
             try
             {
-                ApiResponse responseWallet = await _apiRequester.GetRequestAsync(_endpoint, "/api/Wallet/list-wallets");
+                ApiResponse responseWallet = await apiRequester.GetRequestAsync(endpoint, "/api/Wallet/list-wallets");
                 string firstWalletName = responseWallet.Content.walletNames[0].ToString();
-                ApiResponse responseBalance = await _apiRequester.GetRequestAsync(_endpoint, "/api/Wallet/balance", $"WalletName={firstWalletName}");
-                Double.TryParse(responseBalance.Content.balances[0].amountConfirmed.ToString(), out confirmed);
-                Double.TryParse(responseBalance.Content.balances[0].amountUnconfirmed.ToString(), out unconfirmed);
+                ApiResponse responseBalance = await apiRequester.GetRequestAsync(endpoint, "/api/Wallet/balance", $"WalletName={firstWalletName}");
+                double.TryParse(responseBalance.Content.balances[0].amountConfirmed.ToString(), out confirmed);
+                double.TryParse(responseBalance.Content.balances[0].amountUnconfirmed.ToString(), out unconfirmed);
 
             }
             catch (Exception ex)
@@ -190,13 +192,13 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             return (confirmed / STRATOSHI, unconfirmed / STRATOSHI);
         }
 
-        protected async Task<Object> UpdateHistory()
+        protected async Task<object> UpdateHistory()
         {
-            object history = new Object();
+            object history = new object();
 
             try
             {
-                ApiResponse response = await _apiRequester.GetRequestAsync(_endpoint, "/api/FederationWallet/history", "maxEntriesToReturn=30");
+                ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/FederationWallet/history", "maxEntriesToReturn=30");
                 history = response.Content;
             }
             catch (Exception ex)
@@ -209,10 +211,10 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
         protected async Task<string> UpdateFedInfo()
         {
-            string fedAddress = String.Empty;
+            string fedAddress = string.Empty;
             try
             {
-                FedInfoResponse = await _apiRequester.GetRequestAsync(_endpoint, "/api/FederationGateway/info");
+                FedInfoResponse = await apiRequester.GetRequestAsync(endpoint, "/api/FederationGateway/info");
                 fedAddress = FedInfoResponse.Content.multisigAddress;
             }
             catch (Exception ex)
@@ -231,22 +233,24 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             try
             {
 
-                ApiResponse responseApproved = await _apiRequester.GetRequestAsync(_endpoint, "/api/Voting/whitelistedhashes");
+                ApiResponse responseApproved = await apiRequester.GetRequestAsync(endpoint, "/api/Voting/whitelistedhashes");
                 approvedPolls = JsonConvert.DeserializeObject<List<ApprovedPoll>>(responseApproved.Content.ToString());
-                ApiResponse responsePending = await _apiRequester.GetRequestAsync(_endpoint, "/api/Voting/polls/pending", $"voteType=2");
+                ApiResponse responsePending = await apiRequester.GetRequestAsync(endpoint, "/api/Voting/polls/pending", $"voteType=2");
 
                 pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responsePending.Content.ToString());
-               
+
                 pendingPolls = pendingPolls.FindAll(x => x.VotingDataString.Contains("WhitelistHash"));
 
                 if (approvedPolls == null || approvedPolls.Count == 0) return pendingPolls;
 
                 foreach (var vote in approvedPolls)
                 {
-                    PendingPoll pp = new PendingPoll();
-                    pp.IsPending = false;
-                    pp.IsExecuted = true;
-                    pp.VotingDataString = $"Action: 'WhitelistHash',Hash: '{vote.Hash}'";
+                    PendingPoll pp = new PendingPoll
+                    {
+                        IsPending = false,
+                        IsExecuted = true,
+                        VotingDataString = $"Action: 'WhitelistHash',Hash: '{vote.Hash}'"
+                    };
                     pendingPolls.RemoveAll(x => x.Hash == vote.Hash);
                     pendingPolls.Add(pp);
                 }
@@ -257,17 +261,17 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             }
 
             return pendingPolls;
-        }     
+        }
 
         protected async Task<List<PendingPoll>> UpdateKickFederationMemberPolls()
         {
-            List<PendingPoll> pendingPolls = new List<PendingPoll>();        
+            List<PendingPoll> pendingPolls = new List<PendingPoll>();
 
             try
             {
-                ApiResponse responseKickFedMemPending = await _apiRequester.GetRequestAsync(_endpoint, "/api/Voting/polls/pending", $"voteType=0");
+                ApiResponse responseKickFedMemPending = await apiRequester.GetRequestAsync(endpoint, "/api/Voting/polls/pending", $"voteType=0");
                 pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responseKickFedMemPending.Content.ToString());
-                return pendingPolls;               
+                return pendingPolls;
             }
             catch (Exception ex)
             {
@@ -275,18 +279,18 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             }
             return pendingPolls;
         }
-        
+
         protected async Task<int> UpdateFederationMemberCount()
         {
             try
             {
-                ApiResponse response = await _apiRequester.GetRequestAsync(_endpoint, "/api/Federation/members");
+                ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/Federation/members");
                 if (response.IsSuccess)
                 {
                     var token = JToken.Parse(response.Content.ToString());
                     return token.Count;
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -313,7 +317,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                 string response;
                 using (HttpClient client = new HttpClient())
                 {
-                    response = await client.GetStringAsync($"{_endpoint}/api/Dashboard/Stats").ConfigureAwait(false);
+                    response = await client.GetStringAsync($"{endpoint}/api/Dashboard/Stats").ConfigureAwait(false);
                     nodeDashboardStats.OrphanSize = orphanSize.Match(response).Groups[1].Value;
                     nodeDashboardStats.BlockProducerHits = this.blockProducers.Match(response).Groups[1].Value;
                     var matches = blockProducersValues.Match(nodeDashboardStats.BlockProducerHits);
@@ -361,45 +365,81 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         }
     }
 
-    public class NodeGetDataServiceMainchainMiner : NodeGetDataService
+    public sealed class NodeGetDataServiceMainchainMiner : NodeGetDataService
     {
-        public NodeGetDataServiceMainchainMiner(ApiRequester apiRequester, string endpoint, ILoggerFactory loggerFactory, string env) : base(apiRequester,
-            endpoint, loggerFactory, env)
+        public NodeGetDataServiceMainchainMiner(ApiRequester apiRequester, DefaultEndpointsSettings defaultEndpointSettings, ILoggerFactory loggerFactory)
+            : base(apiRequester, defaultEndpointSettings.StratisNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
         {
 
         }
     }
 
-    public class NodeGetDataServiceMultisig : NodeGetDataService
+    public abstract class NodeDataServiceMultisig : NodeGetDataService
     {
         public (double confirmedBalance, double unconfirmedBalance) FedWalletBalance { get; set; } = (0, 0);
         public object WalletHistory { get; set; }
         public string FedAddress { get; set; }
 
-        public NodeGetDataServiceMultisig(ApiRequester apiRequester, string endpoint, ILoggerFactory loggerFactory, string env) : base(apiRequester,
-            endpoint, loggerFactory, env)
+        public NodeDataServiceMultisig(ApiRequester apiRequester, string endpoint, ILoggerFactory loggerFactory, string environment, string dataFolder)
+            : base(apiRequester, endpoint, loggerFactory, environment, dataFolder)
         {
-
         }
 
-        public override async Task<NodeGetDataService> Update()
+        protected async Task<NodeGetDataService> UpdateMultiSig()
         {
             NodeDashboardStats = await UpdateDashboardStats();
-            NodeStatus = await this.UpdateNodeStatus();
-            LogRules = await this.UpdateLogRules();
-            RawMempool = await this.UpdateMempool();
-            BestHash = await this.UpdateBestHash();
+            NodeStatus = await UpdateNodeStatus();
+            LogRules = await UpdateLogRules();
+            RawMempool = await UpdateMempool();
+            BestHash = await UpdateBestHash();
             FedWalletBalance = await this.UpdateWalletBalance();
             WalletHistory = await this.UpdateHistory();
             FedAddress = await this.UpdateFedInfo();
+
             return this;
         }
     }
 
-    public class NodeDataServiceSidechainMultisig : NodeGetDataServiceMultisig
+    public sealed class NodeDataServiceMainChainMultisig : NodeDataServiceMultisig
     {
-        public NodeDataServiceSidechainMultisig(ApiRequester apiRequester, string endpoint, ILoggerFactory loggerFactory, string env) : base(apiRequester,
-            endpoint, loggerFactory, env)
+        public NodeDataServiceMainChainMultisig(ApiRequester apiRequester, DefaultEndpointsSettings defaultEndpointSettings, ILoggerFactory loggerFactory)
+            : base(apiRequester, defaultEndpointSettings.StratisNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
+        {
+        }
+
+        public override async Task<NodeGetDataService> Update()
+        {
+            await UpdateMultiSig();
+
+            return this;
+        }
+    }
+
+    public sealed class NodeDataServiceSidechainMultisig : NodeDataServiceMultisig
+    {
+        public NodeDataServiceSidechainMultisig(ApiRequester apiRequester, DefaultEndpointsSettings defaultEndpointSettings, ILoggerFactory loggerFactory)
+            : base(apiRequester, defaultEndpointSettings.SidechainNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
+        {
+        }
+
+        public override async Task<NodeGetDataService> Update()
+        {
+            await UpdateMultiSig();
+
+            // Sidechain related updates.
+            WalletBalance = await UpdateMiningWalletBalance();
+            PendingPolls = await UpdatePolls();
+            KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls();
+            FederationMemberCount = await UpdateFederationMemberCount();
+
+            return this;
+        }
+    }
+
+    public sealed class NodeDataServicesSidechainMiner : NodeGetDataService
+    {
+        public NodeDataServicesSidechainMiner(ApiRequester apiRequester, DefaultEndpointsSettings defaultEndpointSettings, ILoggerFactory loggerFactory)
+            : base(apiRequester, defaultEndpointSettings.SidechainNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
         {
         }
 
@@ -410,35 +450,11 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             LogRules = await UpdateLogRules();
             RawMempool = await UpdateMempool();
             BestHash = await UpdateBestHash();
-            FedWalletBalance = await UpdateWalletBalance();
-            WalletBalance = await UpdateMiningWalletBalance();
-            WalletHistory = await UpdateHistory();
-            FedAddress = await UpdateFedInfo();
-            PendingPolls = await UpdatePolls();
-            KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls();
-            FederationMemberCount = await UpdateFederationMemberCount();
-            return this;
-        }
-    }
-
-    public class NodeDataServicesSidechainMiner : NodeGetDataService
-    {
-        public NodeDataServicesSidechainMiner(ApiRequester apiRequester, string endpoint, ILoggerFactory loggerFactory, string env) : base(apiRequester,
-            endpoint, loggerFactory, env)
-        {
-        }
-
-        public override async Task<NodeGetDataService> Update()
-        {
-            NodeDashboardStats = await UpdateDashboardStats();
-            NodeStatus = await UpdateNodeStatus();
-            LogRules = await UpdateLogRules();
-            RawMempool = await UpdateMempool();
-            BestHash = await UpdateBestHash();
             WalletBalance = await UpdateMiningWalletBalance();
             PendingPolls = await UpdatePolls();
             KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls();
             FederationMemberCount = await UpdateFederationMemberCount();
+
             return this;
         }
     }
