@@ -140,7 +140,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 stratisNode.CoinTicker = "STRAX";
                 stratisNode.LogRules = nodeDataServiceMainchain.LogRules;
                 stratisNode.Uptime = nodeDataServiceMainchain.NodeStatus.Uptime;
-                stratisNode.AddressIndexer = this.nodeDataServiceMainchain.NodeDashboardStats?.AddressIndexerHeight ?? 0;
+                stratisNode.AddressIndexer = this.nodeDataServiceMainchain.AddressIndexerHeight;
                 stratisNode.AsyncLoops = this.nodeDataServiceMainchain.NodeDashboardStats?.AsyncLoops ?? string.Empty;
                 stratisNode.OrphanSize = this.nodeDataServiceMainchain.NodeDashboardStats?.OrphanSize ?? string.Empty;
 
@@ -171,7 +171,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 sidechainNode.BlockProducerHitsValue = this.nodeDataServiceSidechain.SidechainMinerStats?.BlockProducerHitsValue ?? 0;
                 sidechainNode.IsMining = this.nodeDataServiceSidechain.SidechainMinerStats?.ProducedBlockInLastRound ?? false;
 
-                sidechainNode.AddressIndexer = this.nodeDataServiceSidechain.NodeDashboardStats?.AddressIndexerHeight ?? 0;
                 sidechainNode.AsyncLoops = this.nodeDataServiceSidechain.NodeDashboardStats?.AsyncLoops ?? string.Empty;
                 sidechainNode.OrphanSize = this.nodeDataServiceSidechain.NodeDashboardStats?.OrphanSize ?? string.Empty;
                 sidechainNode.FederationMemberCount = this.nodeDataServiceSidechain.FederationMemberCount;

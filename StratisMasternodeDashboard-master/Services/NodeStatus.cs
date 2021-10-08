@@ -14,7 +14,6 @@
     {
         public int HeaderHeight { get; set; } = 0;
         public string AsyncLoops { get; set; } = string.Empty;
-        public int AddressIndexerHeight { get; set; } = 0;
         public string OrphanSize { get; set; } = string.Empty;
     }
 

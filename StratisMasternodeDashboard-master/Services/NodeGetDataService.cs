@@ -16,6 +16,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 {
     public abstract class NodeGetDataService
     {
+        public int AddressIndexerHeight { get; set; } = 0;
         public NodeStatus NodeStatus { get; set; }
         public List<LogRule> LogRules { get; set; }
         public int RawMempool { get; set; } = 0;
@@ -77,11 +78,12 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
         public virtual async Task<NodeGetDataService> Update()
         {
+            BestHash = await UpdateBestHash();
+            LogRules = await UpdateLogRules();
             NodeDashboardStats = await UpdateDashboardStats();
             NodeStatus = await UpdateNodeStatus();
-            LogRules = await UpdateLogRules();
             RawMempool = await UpdateMempool();
-            BestHash = await UpdateBestHash();
+
             return this;
         }
 
@@ -247,6 +249,23 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             return sidechainMinerStats;
         }
 
+        protected async Task<int> UpdateAddressIndexerTipAsync()
+        {
+            int tip = 0;
+
+            try
+            {
+                var response = await apiRequester.GetRequestAsync(endpoint, "/api/BlockStore/addressindexertip").ConfigureAwait(false);
+                tip = response.Content.tipHeight;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Failed to update the address indexer tip.");
+            }
+
+            return tip;
+        }
+
         protected async Task<List<PendingPoll>> UpdatePolls()
         {
             List<PendingPoll> pendingPolls = new List<PendingPoll>();
@@ -324,7 +343,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
         Regex orphanSize = new Regex("Orphan Size:\\s+([0-9]+)", RegexOptions.Compiled);
         Regex asyncLoopStats = new Regex("====== Async loops ======   (.*)", RegexOptions.Compiled);
-        Regex addressIndexer = new Regex("AddressIndexer\\.Height:\\s+([0-9]+)", RegexOptions.Compiled);
 
         protected async Task<NodeDashboardStats> UpdateDashboardStats()
         {
@@ -335,12 +353,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                 using HttpClient client = new HttpClient();
                 response = await client.GetStringAsync($"{endpoint}/api/Dashboard/Stats").ConfigureAwait(false);
                 nodeDashboardStats.OrphanSize = orphanSize.Match(response).Groups[1].Value;
-
-                if (int.TryParse(this.addressIndexer.Match(response).Groups[1].Value, out var height))
-                {
-                    nodeDashboardStats.AddressIndexerHeight = height;
-                }
-
                 nodeDashboardStats.AsyncLoops = asyncLoopStats.Match(response).Groups[1].Value.Replace("[", "").Replace("]", "").Replace(" ", "").Replace("Running", "R").Replace("Faulted", ", F");
             }
             catch (Exception ex)
@@ -357,7 +369,14 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         public NodeGetDataServiceMainchainMiner(ApiRequester apiRequester, DefaultEndpointsSettings defaultEndpointSettings, ILoggerFactory loggerFactory)
             : base(apiRequester, defaultEndpointSettings.StratisNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
         {
+        }
 
+        public override async Task<NodeGetDataService> Update()
+        {
+            await base.Update().ConfigureAwait(false);
+            AddressIndexerHeight = await UpdateAddressIndexerTipAsync().ConfigureAwait(false);
+
+            return this;
         }
     }
 
@@ -374,11 +393,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
         protected async Task<NodeGetDataService> UpdateMultiSig()
         {
-            NodeDashboardStats = await UpdateDashboardStats().ConfigureAwait(false);
-            NodeStatus = await UpdateNodeStatus().ConfigureAwait(false);
-            LogRules = await UpdateLogRules().ConfigureAwait(false);
-            RawMempool = await UpdateMempool().ConfigureAwait(false);
-            BestHash = await UpdateBestHash().ConfigureAwait(false);
+            await base.Update().ConfigureAwait(false);
+
             FedWalletBalance = await this.UpdateWalletBalance().ConfigureAwait(false);
             WalletHistory = await this.UpdateHistory().ConfigureAwait(false);
             FedAddress = await this.UpdateFederationGatewayInfo().ConfigureAwait(false);
@@ -397,6 +413,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         public override async Task<NodeGetDataService> Update()
         {
             await UpdateMultiSig().ConfigureAwait(false);
+            AddressIndexerHeight = await UpdateAddressIndexerTipAsync().ConfigureAwait(false);
 
             return this;
         }
@@ -433,11 +450,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
         public override async Task<NodeGetDataService> Update()
         {
-            NodeDashboardStats = await UpdateDashboardStats().ConfigureAwait(false);
-            NodeStatus = await UpdateNodeStatus().ConfigureAwait(false);
-            LogRules = await UpdateLogRules().ConfigureAwait(false);
-            RawMempool = await UpdateMempool().ConfigureAwait(false);
-            BestHash = await UpdateBestHash().ConfigureAwait(false);
+            await base.Update().ConfigureAwait(false);
+
             WalletBalance = await UpdateMiningWalletBalance().ConfigureAwait(false);
             PendingPolls = await UpdatePolls().ConfigureAwait(false);
             KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls().ConfigureAwait(false);
