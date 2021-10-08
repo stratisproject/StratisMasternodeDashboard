@@ -1,17 +1,17 @@
-﻿using Microsoft.Extensions.Logging;
-using NBitcoin;
-using NBitcoin.DataEncoders;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Stratis.FederatedSidechains.AdminDashboard.Entities;
-using Stratis.FederatedSidechains.AdminDashboard.Settings;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using NBitcoin;
+using NBitcoin.DataEncoders;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Stratis.FederatedSidechains.AdminDashboard.Entities;
+using Stratis.FederatedSidechains.AdminDashboard.Settings;
 namespace Stratis.FederatedSidechains.AdminDashboard.Services
 {
     public abstract class NodeGetDataService
@@ -236,7 +236,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             {
                 var response = await apiRequester.GetRequestAsync(endpoint, "/api/Federation/members/current").ConfigureAwait(false);
                 sidechainMinerStats.BlockProducerHits = response.Content.miningStats.minerHits;
-                sidechainMinerStats.BlockProducerHitsValue = response.Content.miningStats.minerHits / (float)response.Content.miningStats.federationSize;
+                sidechainMinerStats.BlockProducerHitsValue = (int)(response.Content.miningStats.minerHits / (float)response.Content.miningStats.federationSize * 100);
                 sidechainMinerStats.ProducedBlockInLastRound = (bool)response.Content.miningStats.producedBlockInLastRound;
             }
             catch (Exception ex)

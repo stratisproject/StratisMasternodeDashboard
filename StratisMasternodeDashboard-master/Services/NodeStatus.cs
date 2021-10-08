@@ -22,6 +22,6 @@
     {
         public bool ProducedBlockInLastRound { get; set; }
         public string BlockProducerHits { get; set; }
-        public decimal BlockProducerHitsValue { get; set; }
+        public int BlockProducerHitsValue { get; set; }
     }
 }
