@@ -124,7 +124,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         public async Task<IActionResult> VoteSDAProposal([FromBody] SDAVoteModel sDAVote)
         {
             if (!ModelState.IsValid)
-                return this.BadRequest("Please enter all required value");
+                return this.BadRequest("Please enter all required value.");
 
             ApiResponse response = await this.apiRequester.VoteSDAProposalSmartContractCall(this.defaultEndpointsSettings.SidechainNode, sDAVote);
 
@@ -135,20 +135,17 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
                 if (responseReceipt.IsSuccess)
                     return this.Ok();
 
-                if (responseReceipt.Content?.errors != null)
-                {
-                    return this.BadRequest($"An error occurred trying to vote SDA proposal Reason: {responseReceipt.Content?.errors[0].message}");
-                }
-
-                return this.BadRequest($"An error occurred trying to vote SDA proposal Reason: {responseReceipt.Content}");
+                return this.BadRequest(GetBadResponseMessage(responseReceipt));
             }
-
-            if (response.Content?.errors != null)
+            return this.BadRequest(GetBadResponseMessage(response));
+        }
+        private string GetBadResponseMessage(ApiResponse apiResponse)
+        {
+            if (apiResponse.Content?.errors != null)
             {
-                return this.BadRequest($"An error occurred trying to vote SDA proposal Reason: {response.Content?.errors[0].message}");
+                return $"An error occurred trying to vote on the SDA proposal Reason: {apiResponse.Content?.errors[0].message}";
             }
-
-            return this.BadRequest($"An error occurred trying to vote SDA proposal Reason: {response.Content}");
+            return $"An error occurred trying to vote on the SDA proposal Reason: {apiResponse.Content}";
         }
     }
 }

@@ -66,14 +66,13 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
         #region SDA Proposal Voting
         private SDAVoteContractCall sDAVoteContractCall;
-        private string accountName = "account 0";
         public async Task<ApiResponse> VoteSDAProposalSmartContractCall(string endpoint, SDAVoteModel sDAVote)
         {
             string senderAddress = null;
             List<WalletAddress> walletAddresses = new List<WalletAddress>();
             try
             {
-                ApiResponse responseWalletAddress = await GetRequestAsync(endpoint, "/api/Wallet/addresses", $"WalletName={sDAVote.WalletName}" + "&" + $"AccountName={accountName}");
+                ApiResponse responseWalletAddress = await GetRequestAsync(endpoint, "/api/Wallet/addresses", $"WalletName={sDAVote.WalletName}" + "&" + $"AccountName=account 0");
                 if (responseWalletAddress.IsSuccess)
                 {
                     var items = JsonConvert.DeserializeObject(responseWalletAddress.Content.addresses.ToString());
@@ -91,7 +90,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                         Amount = 0,
                         FeeAmount = 0.001,
                         MethodName = "Vote",
-                        AccountName = accountName,
+                        AccountName = "account 0",
                         ContractAddress = "tSSDFN88s3mLpQbHVMA3GYhwjWah6gW8ss",
                         Sender = senderAddress,
                         Parameters = new string[] { "5#" + sDAVote.ProposalId, "1#" + sDAVote.VotingDecision },
@@ -101,15 +100,12 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                 }
                 else
                     return responseWalletAddress;
-
             }
             catch (Exception ex)
             {
-
-                this.logger.LogError(ex, "Failed to vote SDA Proposal");
+                this.logger.LogError(ex, "Failed to vote on the SDA Proposal");
             }
             return null;
-
         }
 
         #endregion
