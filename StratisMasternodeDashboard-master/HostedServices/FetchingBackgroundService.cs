@@ -1,3 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
@@ -11,13 +18,6 @@ using Stratis.FederatedSidechains.AdminDashboard.Hubs;
 using Stratis.FederatedSidechains.AdminDashboard.Models;
 using Stratis.FederatedSidechains.AdminDashboard.Services;
 using Stratis.FederatedSidechains.AdminDashboard.Settings;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
 {
@@ -112,6 +112,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
             }
 
             var dashboardModel = new DashboardModel();
+
             try
             {
                 dashboardModel.Status = true;
@@ -136,11 +137,10 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 stratisNode.HeaderHeight = (int)nodeDataServiceMainchain.NodeStatus.HeaderHeight;
                 stratisNode.MempoolSize = nodeDataServiceMainchain.RawMempool;
 
-                stratisNode.CoinTicker = "STRAT";
+                stratisNode.CoinTicker = "STRAX";
                 stratisNode.LogRules = nodeDataServiceMainchain.LogRules;
                 stratisNode.Uptime = nodeDataServiceMainchain.NodeStatus.Uptime;
                 stratisNode.AddressIndexer = this.nodeDataServiceMainchain.NodeDashboardStats?.AddressIndexerHeight ?? 0;
-                stratisNode.HeaderHeight = this.nodeDataServiceMainchain.NodeDashboardStats?.HeaderHeight ?? 0;
                 stratisNode.AsyncLoops = this.nodeDataServiceMainchain.NodeDashboardStats?.AsyncLoops ?? string.Empty;
                 stratisNode.OrphanSize = this.nodeDataServiceMainchain.NodeDashboardStats?.OrphanSize ?? string.Empty;
 
@@ -172,7 +172,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 sidechainNode.IsMining = this.nodeDataServiceSidechain.SidechainMinerStats?.ProducedBlockInLastRound ?? false;
 
                 sidechainNode.AddressIndexer = this.nodeDataServiceSidechain.NodeDashboardStats?.AddressIndexerHeight ?? 0;
-                sidechainNode.HeaderHeight = this.nodeDataServiceSidechain.NodeDashboardStats?.HeaderHeight ?? 0;
                 sidechainNode.AsyncLoops = this.nodeDataServiceSidechain.NodeDashboardStats?.AsyncLoops ?? string.Empty;
                 sidechainNode.OrphanSize = this.nodeDataServiceSidechain.NodeDashboardStats?.OrphanSize ?? string.Empty;
                 sidechainNode.FederationMemberCount = this.nodeDataServiceSidechain.FederationMemberCount;
