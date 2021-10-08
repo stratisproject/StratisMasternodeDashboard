@@ -35,8 +35,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
         private bool successfullyBuilt;
         private Timer dataRetrieverTimer;
         private readonly bool multiSigNode = true;
-        private readonly NodeGetDataService nodeDataServiceMainchain;
-        private readonly NodeGetDataService nodeDataServiceSidechain;
+        private readonly NodeDataService nodeDataServiceMainchain;
+        private readonly NodeDataService nodeDataServiceSidechain;
 
         public FetchingBackgroundService(IDistributedCache distributedCache, DefaultEndpointsSettings defaultEndpointsSettings, IHubContext<DataUpdaterHub> hubContext, ILoggerFactory loggerFactory, ApiRequester apiRequester, IConfiguration configuration)
         {
@@ -53,13 +53,13 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
             this.logger.LogInformation("Default settings {settings}", defaultEndpointsSettings);
             if (this.multiSigNode)
             {
-                nodeDataServiceMainchain = new NodeDataServiceMainChainMultisig(this.apiRequester, this.defaultEndpointsSettings, this.loggerFactory);
-                nodeDataServiceSidechain = new NodeDataServiceSidechainMultisig(this.apiRequester, this.defaultEndpointsSettings, this.loggerFactory);
+                nodeDataServiceMainchain = new MultiSigMainChainService(this.apiRequester, this.defaultEndpointsSettings, this.loggerFactory);
+                nodeDataServiceSidechain = new MultiSigSideChainService(this.apiRequester, this.defaultEndpointsSettings, this.loggerFactory);
             }
             else
             {
-                nodeDataServiceMainchain = new NodeGetDataServiceMainchainMiner(this.apiRequester, this.defaultEndpointsSettings, this.loggerFactory);
-                nodeDataServiceSidechain = new NodeDataServicesSidechainMiner(this.apiRequester, this.defaultEndpointsSettings, this.loggerFactory);
+                nodeDataServiceMainchain = new MasterNodeMainChainService(this.apiRequester, this.defaultEndpointsSettings, this.loggerFactory);
+                nodeDataServiceSidechain = new MasterNodeSideChainService(this.apiRequester, this.defaultEndpointsSettings, this.loggerFactory);
             }
         }
 
@@ -117,15 +117,15 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
             {
                 dashboardModel.Status = true;
                 dashboardModel.IsCacheBuilt = true;
-                dashboardModel.MainchainWalletAddress = this.multiSigNode ? ((NodeDataServiceMultisig)nodeDataServiceMainchain).FedAddress : string.Empty;
-                dashboardModel.SidechainWalletAddress = this.multiSigNode ? ((NodeDataServiceSidechainMultisig)nodeDataServiceSidechain).FedAddress : string.Empty;
+                dashboardModel.MainchainWalletAddress = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).FedAddress : string.Empty;
+                dashboardModel.SidechainWalletAddress = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).FedAddress : string.Empty;
                 dashboardModel.MiningPublicKeys = nodeDataServiceMainchain.FedInfoResponse?.Content?.federationMultisigPubKeys ?? new JArray();
 
                 var stratisNode = new StratisNodeModel();
 
-                stratisNode.History = this.multiSigNode ? ((NodeDataServiceMultisig)nodeDataServiceMainchain).WalletHistory : new JArray();
-                stratisNode.ConfirmedBalanceFed = this.multiSigNode ? ((NodeDataServiceMultisig)nodeDataServiceMainchain).FedWalletBalance.confirmedBalance : -1;
-                stratisNode.UnconfirmedBalanceFed = this.multiSigNode ? ((NodeDataServiceMultisig)nodeDataServiceMainchain).FedWalletBalance.unconfirmedBalance : -1;
+                stratisNode.History = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).WalletHistory : new JArray();
+                stratisNode.ConfirmedBalanceFed = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).FedWalletBalance.confirmedBalance : -1;
+                stratisNode.UnconfirmedBalanceFed = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).FedWalletBalance.unconfirmedBalance : -1;
 
                 stratisNode.WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/api").ToString();
                 stratisNode.SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/swagger").ToString();
@@ -148,9 +148,9 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
 
                 var sidechainNode = new SidechainNodeModel();
 
-                sidechainNode.History = this.multiSigNode ? ((NodeDataServiceSidechainMultisig)nodeDataServiceSidechain).WalletHistory : new JArray();
-                sidechainNode.ConfirmedBalanceFed = this.multiSigNode ? ((NodeDataServiceSidechainMultisig)nodeDataServiceSidechain).FedWalletBalance.confirmedBalance : -1;
-                sidechainNode.UnconfirmedBalanceFed = this.multiSigNode ? ((NodeDataServiceSidechainMultisig)nodeDataServiceSidechain).FedWalletBalance.unconfirmedBalance : -1;
+                sidechainNode.History = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).WalletHistory : new JArray();
+                sidechainNode.ConfirmedBalanceFed = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).FedWalletBalance.confirmedBalance : -1;
+                sidechainNode.UnconfirmedBalanceFed = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).FedWalletBalance.unconfirmedBalance : -1;
 
                 sidechainNode.WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/api").ToString();
                 sidechainNode.SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/swagger").ToString();
@@ -196,7 +196,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
             this.distributedCache.SetString("DashboardData", JsonConvert.SerializeObject(dashboardModel));
         }
 
-        private void ParsePeers(NodeGetDataService dataService, List<Peer> peers, List<Peer> federationMembers)
+        private void ParsePeers(NodeDataService dataService, List<Peer> peers, List<Peer> federationMembers)
         {
             string fedEndpoints = dataService.FedInfoResponse?.Content?.endpoints?.ToString() ?? string.Empty;
 
@@ -211,7 +211,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
             }
         }
 
-        private void ParsePeers(NodeGetDataService dataService, List<Peer> peers)
+        private void ParsePeers(NodeDataService dataService, List<Peer> peers)
         {
             if (dataService.StatusResponse.Content.outboundPeers is JArray outboundPeers)
             {

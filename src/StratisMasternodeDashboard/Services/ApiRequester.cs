@@ -1,16 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RestSharp;
 using Stratis.FederatedSidechains.AdminDashboard.Entities;
 using Stratis.FederatedSidechains.AdminDashboard.Helpers;
 using Stratis.FederatedSidechains.AdminDashboard.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace Stratis.FederatedSidechains.AdminDashboard.Services
 {
@@ -65,9 +63,10 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         }
 
         #region SDA Proposal Voting
-        private SDAVoteContractCall sDAVoteContractCall;
+
         public async Task<ApiResponse> VoteSDAProposalSmartContractCall(string endpoint, SDAVoteModel sDAVote)
         {
+            SDAVoteContractCall sDAVoteContractCall;
             string senderAddress = null;
             List<WalletAddress> walletAddresses = new List<WalletAddress>();
             try
@@ -105,6 +104,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             {
                 this.logger.LogError(ex, "Failed to vote on the SDA Proposal");
             }
+
             return null;
         }
 

@@ -14,7 +14,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 namespace Stratis.FederatedSidechains.AdminDashboard.Services
 {
-    public abstract class NodeGetDataService
+    public abstract class NodeDataService
     {
         public int AddressIndexerHeight { get; set; } = 0;
         public NodeStatus NodeStatus { get; set; }
@@ -35,14 +35,14 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         protected readonly string miningKeyFile = string.Empty;
         private readonly ApiRequester apiRequester;
         private readonly string endpoint;
-        private readonly ILogger<NodeGetDataService> logger;
+        private readonly ILogger<NodeDataService> logger;
         protected readonly bool isMainnet = true;
 
-        public NodeGetDataService(ApiRequester apiRequester, string endpoint, ILoggerFactory loggerFactory, string env, string dataFolder)
+        public NodeDataService(ApiRequester apiRequester, string endpoint, ILoggerFactory loggerFactory, string env, string dataFolder)
         {
             this.apiRequester = apiRequester;
             this.endpoint = endpoint;
-            this.logger = loggerFactory.CreateLogger<NodeGetDataService>();
+            this.logger = loggerFactory.CreateLogger<NodeDataService>();
             this.isMainnet = env != NodeEnv.TestNet;
 
             try
@@ -76,7 +76,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             }
         }
 
-        public virtual async Task<NodeGetDataService> Update()
+        public virtual async Task<NodeDataService> Update()
         {
             BestHash = await UpdateBestHash();
             LogRules = await UpdateLogRules();
@@ -238,8 +238,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             {
                 var response = await apiRequester.GetRequestAsync(endpoint, "/api/Federation/members/current").ConfigureAwait(false);
                 sidechainMinerStats.BlockProducerHits = response.Content.miningStats.minerHits;
-                sidechainMinerStats.BlockProducerHitsValue = (int)(response.Content.miningStats.minerHits / (float)response.Content.miningStats.federationSize * 100);
-                sidechainMinerStats.ProducedBlockInLastRound = (bool)response.Content.miningStats.producedBlockInLastRound;
+                sidechainMinerStats.BlockProducerHitsValue = (int)(response.Content.miningStats.minerHits / (float)response.Content.federationSize * 100);
+                sidechainMinerStats.ProducedBlockInLastRound = (bool)response.Content.producedBlockInLastRound;
             }
             catch (Exception ex)
             {
@@ -361,104 +361,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             }
 
             return nodeDashboardStats;
-        }
-    }
-
-    public sealed class NodeGetDataServiceMainchainMiner : NodeGetDataService
-    {
-        public NodeGetDataServiceMainchainMiner(ApiRequester apiRequester, DefaultEndpointsSettings defaultEndpointSettings, ILoggerFactory loggerFactory)
-            : base(apiRequester, defaultEndpointSettings.StratisNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
-        {
-        }
-
-        public override async Task<NodeGetDataService> Update()
-        {
-            await base.Update().ConfigureAwait(false);
-            AddressIndexerHeight = await UpdateAddressIndexerTipAsync().ConfigureAwait(false);
-
-            return this;
-        }
-    }
-
-    public abstract class NodeDataServiceMultisig : NodeGetDataService
-    {
-        public (double confirmedBalance, double unconfirmedBalance) FedWalletBalance { get; set; } = (0, 0);
-        public object WalletHistory { get; set; }
-        public string FedAddress { get; set; }
-
-        public NodeDataServiceMultisig(ApiRequester apiRequester, string endpoint, ILoggerFactory loggerFactory, string environment, string dataFolder)
-            : base(apiRequester, endpoint, loggerFactory, environment, dataFolder)
-        {
-        }
-
-        protected async Task<NodeGetDataService> UpdateMultiSig()
-        {
-            await base.Update().ConfigureAwait(false);
-
-            FedWalletBalance = await this.UpdateWalletBalance().ConfigureAwait(false);
-            WalletHistory = await this.UpdateHistory().ConfigureAwait(false);
-            FedAddress = await this.UpdateFederationGatewayInfo().ConfigureAwait(false);
-
-            return this;
-        }
-    }
-
-    public sealed class NodeDataServiceMainChainMultisig : NodeDataServiceMultisig
-    {
-        public NodeDataServiceMainChainMultisig(ApiRequester apiRequester, DefaultEndpointsSettings defaultEndpointSettings, ILoggerFactory loggerFactory)
-            : base(apiRequester, defaultEndpointSettings.StratisNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
-        {
-        }
-
-        public override async Task<NodeGetDataService> Update()
-        {
-            await UpdateMultiSig().ConfigureAwait(false);
-            AddressIndexerHeight = await UpdateAddressIndexerTipAsync().ConfigureAwait(false);
-
-            return this;
-        }
-    }
-
-    public sealed class NodeDataServiceSidechainMultisig : NodeDataServiceMultisig
-    {
-        public NodeDataServiceSidechainMultisig(ApiRequester apiRequester, DefaultEndpointsSettings defaultEndpointSettings, ILoggerFactory loggerFactory)
-            : base(apiRequester, defaultEndpointSettings.SidechainNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
-        {
-        }
-
-        public override async Task<NodeGetDataService> Update()
-        {
-            await UpdateMultiSig();
-
-            // Sidechain related updates.
-            WalletBalance = await UpdateMiningWalletBalance().ConfigureAwait(false);
-            PendingPolls = await UpdatePolls().ConfigureAwait(false);
-            KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls().ConfigureAwait(false);
-            FederationMemberCount = await UpdateFederationMemberCount().ConfigureAwait(false);
-            SidechainMinerStats = await UpdateFederationMemberInfo().ConfigureAwait(false);
-
-            return this;
-        }
-    }
-
-    public sealed class NodeDataServicesSidechainMiner : NodeGetDataService
-    {
-        public NodeDataServicesSidechainMiner(ApiRequester apiRequester, DefaultEndpointsSettings defaultEndpointSettings, ILoggerFactory loggerFactory)
-            : base(apiRequester, defaultEndpointSettings.SidechainNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
-        {
-        }
-
-        public override async Task<NodeGetDataService> Update()
-        {
-            await base.Update().ConfigureAwait(false);
-
-            WalletBalance = await UpdateMiningWalletBalance().ConfigureAwait(false);
-            PendingPolls = await UpdatePolls().ConfigureAwait(false);
-            KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls().ConfigureAwait(false);
-            FederationMemberCount = await UpdateFederationMemberCount().ConfigureAwait(false);
-            SidechainMinerStats = await UpdateFederationMemberInfo().ConfigureAwait(false);
-
-            return this;
         }
     }
 }
