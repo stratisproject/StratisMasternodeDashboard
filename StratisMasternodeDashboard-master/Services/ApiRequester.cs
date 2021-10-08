@@ -1,11 +1,16 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RestSharp;
 using Stratis.FederatedSidechains.AdminDashboard.Entities;
 using Stratis.FederatedSidechains.AdminDashboard.Helpers;
+using Stratis.FederatedSidechains.AdminDashboard.Models;
 
 namespace Stratis.FederatedSidechains.AdminDashboard.Services
 {
@@ -25,7 +30,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         /// <param name="path">URL</param>
         /// <returns>An ApiResponse object</returns>
         public async Task<ApiResponse> GetRequestAsync(string endpoint, string path, string query = null)
-        {            
+        {
             var restClient = new RestClient(UriHelper.BuildUri(endpoint, path, query));
             var restRequest = new RestRequest(Method.GET);
             IRestResponse restResponse = await restClient.ExecuteTaskAsync(restRequest);
@@ -58,5 +63,51 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                 Content = JsonConvert.DeserializeObject(restResponse.Content)
             };
         }
+
+        #region SDA Proposal Voting
+        private SDAVoteContractCall sDAVoteContractCall;
+        public async Task<ApiResponse> VoteSDAProposalSmartContractCall(string endpoint, SDAVoteModel sDAVote)
+        {
+            string senderAddress = null;
+            List<WalletAddress> walletAddresses = new List<WalletAddress>();
+            try
+            {
+                ApiResponse responseWalletAddress = await GetRequestAsync(endpoint, "/api/Wallet/addresses", $"WalletName={sDAVote.WalletName}" + "&" + $"AccountName=account 0");
+                if (responseWalletAddress.IsSuccess)
+                {
+                    var items = JsonConvert.DeserializeObject(responseWalletAddress.Content.addresses.ToString());
+                    walletAddresses = JsonConvert.DeserializeObject<List<WalletAddress>>(responseWalletAddress.Content.addresses.ToString());
+
+                    var usedWalletAddress = walletAddresses.FindAll(x => x.IsUsed).FirstOrDefault();
+
+                    senderAddress = usedWalletAddress.Address;
+                    sDAVoteContractCall = new SDAVoteContractCall
+                    {
+                        GasPrice = 100,
+                        GasLimit = 50000,
+                        WalletName = sDAVote.WalletName,
+                        Password = sDAVote.WalletPassword,
+                        Amount = 0,
+                        FeeAmount = 0.001,
+                        MethodName = "Vote",
+                        AccountName = "account 0",
+                        ContractAddress = "tSSDFN88s3mLpQbHVMA3GYhwjWah6gW8ss",
+                        Sender = senderAddress,
+                        Parameters = new string[] { "5#" + sDAVote.ProposalId, "1#" + sDAVote.VotingDecision },
+                    };
+                    ApiResponse response = await PostRequestAsync(endpoint, "/api/SmartContracts/build-and-send-call", sDAVoteContractCall);
+                    return response;
+                }
+                else
+                    return responseWalletAddress;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Failed to vote on the SDA Proposal");
+            }
+            return null;
+        }
+
+        #endregion
     }
 }

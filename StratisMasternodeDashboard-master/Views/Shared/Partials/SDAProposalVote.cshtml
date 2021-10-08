@@ -1,0 +1,116 @@
+﻿@model SDAVoteModel
+
+<script type="text/javascript">
+    function submitSDAVote() {
+        var formdata = {
+            ProposalId: parseInt($("#proposalId").val()),
+            VotingDecision: $("#votingDecision").val(),
+            WalletName: $("#walletName").val(),
+            WalletPassword: $("#walletPassword").val()
+        }
+        console.log(formdata);
+        $.ajax({
+            type: 'POST',
+            url: '/sidechain-node/sdavote',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(formdata),
+            success: function (response) {
+                $("#sdavoteError").hide();
+                var proposalID = $("#proposalId").val();
+                $("#proposalId").val("");
+                $("#proposalLabel").text(proposalID);
+                $("#sDAProposalVotes").modal('hide');
+                $("#confirmationModalSDAVote").modal('show');
+            },
+            error: function (result) {
+                if (!!result.responseText) {
+                    $("#sdavoteError").text(result.responseText);
+                    $("#sdavoteError").show();
+                    return;
+                }
+                $("#sdavoteError").text("Failed to vote. Unknown error. Please try again and make sure nodes are running.");
+                $("#sdavoteError").show();
+            }
+        });
+    }
+
+</script>
+<div class="modal fade right" id="sDAProposalVotes" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="width: 950px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">SDA Proposal Vote</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" role="alert" style="display: none;" id="sdavoteError">
+                </div>
+                <form id="sdaVoteForm" novalidate class="needs-validation">                   
+                        <div class="form-group">
+                            <div class="align-self-center">
+                                <label for="exampleInputEmail1">SDA Proposal Id* </label>
+                                <input asp-for="ProposalId" type="number" class="form-control" id="proposalId" aria-describedby="hashHelp" placeholder="Enter proposal Id value" required>
+                                <div class="invalid-feedback">
+                                    Please provide a proposal Id.
+                                </div>
+                            </div>
+                        </div>                   
+                   
+                        <div class="form-group">
+                            <div class="align-self-center">
+                                <label>Voting Decision*</label>
+                                <select asp-for="VotingDecision" class="form-control" id="votingDecision">
+                                    <option value="">Choose</option>
+                                    <option value="true">Vote in favour</option>
+                                    <option value="false">Vote in opposition</option>
+                                </select>
+                            </div>
+                        </div>         
+
+                        <div class="form-group">
+                            <div class="align-self-center">
+                                <label for="exampleInputEmail1">Wallet Name*</label>
+                                <input asp-for="WalletName" type="text" class="form-control" id="walletName" aria-describedby="walletName" placeholder="Enter Wallet Name" required>
+                                <div class="invalid-feedback">
+                                    Please provide a Wallet Name.
+                                </div>
+                                <span asp-validation-for="WalletName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="align-self-center">
+                                <label for="exampleInputEmail1">Wallet Password*</label>
+                                <input asp-for="WalletPassword" type="password" class="form-control" id="walletPassword" aria-describedby="walletPassword" placeholder="Enter Wallet Password" required>
+                                <div class="invalid-feedback">
+                                    Please provide a Wallet Password.
+                                </div>
+                            </div>
+                        </div>
+
+                    <button type="button" class="btn btn-primary" onclick="submitSDAVote()">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="confirmationModalSDAVote" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">SDA vote submitted</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                You have successfully submitted the vote for SDA proposal Id: <b id="proposalLabel"></b>.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
