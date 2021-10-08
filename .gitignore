@@ -1,12 +1,11 @@
-
 .vs/src/StratisMasternodeDashboard/DesignTimeBuild/.dtbcache.v2
 .vs/src/StratisMasternodeDashboard/config/applicationhost.config
 .vs/src/StratisMasternodeDashboard/v16/.suo
 *.testlog
 *.manifest
-/.vs/VSWorkspaceState.json
-/.vs/slnx.sqlite
-/.vs/ProjectSettings.json
+/.vs/src/VSWorkspaceState.json
+/.vs/src/slnx.sqlite
+/.vs/src/ProjectSettings.json
 .vs/src/StratisMasternodeDashboard/v16/.suo
 .vs/src/StratisMasternodeDashboard/v16/.suo
 .vs/src/StratisMasternodeDashboard/v16/.suo
