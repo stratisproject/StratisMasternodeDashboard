@@ -139,6 +139,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             }
             return this.BadRequest(GetBadResponseMessage(response));
         }
+
         private string GetBadResponseMessage(ApiResponse apiResponse)
         {
             if (apiResponse.Content?.errors != null)
