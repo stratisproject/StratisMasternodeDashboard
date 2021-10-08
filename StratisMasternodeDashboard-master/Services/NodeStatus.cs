@@ -2,7 +2,14 @@
 {
     public class NodeStatus
     {
-        public float SyncingProgress => ConsensusHeight > 0 ? (BlockStoreHeight / ConsensusHeight) * 100 : 0;
+        public float SyncingProgress
+        {
+            get
+            {
+                return ConsensusHeight > 0 ? (BlockStoreHeight / HeaderHeight) * 100 : 0;
+            }
+        }
+
         public float BlockStoreHeight { get; set; } = 0;
         public float HeaderHeight { get; set; } = 0;
         public float ConsensusHeight { get; set; } = 0;
