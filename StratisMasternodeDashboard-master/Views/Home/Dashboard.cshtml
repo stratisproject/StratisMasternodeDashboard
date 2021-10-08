@@ -30,8 +30,7 @@
                 $(".loader").fadeOut(function () {
                     $("#loading-content").fadeIn();
                 });
-            },
-                500);
+            }, 500);
         });
     </script>
     <div class="row my-2">
@@ -45,7 +44,7 @@
                         <ul class="list-inline float-right d-flex align-items-center">
                             <li class="list-inline-item">
                                 <span class="badge badge-@(Model.StratisNode.SyncingStatus >= 100 ? "success" : "warning")">
-                                    <i class="material-icons">sync</i> @(Model.StratisNode.SyncingStatus >= 100 ? "Synced" : "Syncing") @Model.StratisNode.SyncingStatus.ToString("N0")%
+                                    <i class="material-icons">sync</i> @(Model.StratisNode.SyncingStatus >= 100 ? "Synced" : "Syncing") @Model.StratisNode.SyncingStatus.ToString("N2")%
                                 </span>
                             </li>
                         </ul>
@@ -233,7 +232,7 @@
                         <ul class="list-inline float-right d-flex align-items-center">
                             <li class="list-inline-item">
                                 <span class="badge badge-@(Model.SidechainNode.SyncingStatus >= 100 ? "success" : "warning")">
-                                    <i class="material-icons">sync</i> @(Model.SidechainNode.SyncingStatus >= 100 ? "Synced" : "Syncing") @Model.SidechainNode.SyncingStatus.ToString("N0")%
+                                    <i class="material-icons">sync</i> @(Model.SidechainNode.SyncingStatus >= 100 ? "Synced" : "Syncing") @Model.SidechainNode.SyncingStatus.ToString("N2")%
                                 </span>
                             </li>
                         </ul>
