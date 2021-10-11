@@ -15,3 +15,4 @@ src/.vs/StratisMasternodeDashboard/v16/Server/sqlite3/db.lock
 src/.vs/StratisMasternodeDashboard/v16/Server/sqlite3/storage.ide
 src/.vs/StratisMasternodeDashboard/v16/Server/sqlite3/storage.ide-shm
 src/.vs/StratisMasternodeDashboard/v16/Server/sqlite3/storage.ide-wal
+src/.vs/StratisMasternodeDashboard/config/applicationhost.config
