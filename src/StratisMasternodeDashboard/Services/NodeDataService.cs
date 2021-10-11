@@ -326,7 +326,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         }
 
         Regex orphanSize = new Regex("Orphan Size:\\s+([0-9]+)", RegexOptions.Compiled);
-        Regex asyncLoopStats = new Regex("====== Async loops ======   (.*)", RegexOptions.Compiled);
 
         protected async Task<NodeDashboardStats> UpdateDashboardStats()
         {
@@ -337,7 +336,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                 using HttpClient client = new HttpClient();
                 response = await client.GetStringAsync($"{endpoint}/api/Dashboard/Stats").ConfigureAwait(false);
                 nodeDashboardStats.OrphanSize = orphanSize.Match(response).Groups[1].Value;
-                nodeDashboardStats.AsyncLoops = asyncLoopStats.Match(response).Groups[1].Value.Replace("[", "").Replace("]", "").Replace(" ", "").Replace("Running", "R").Replace("Faulted", ", F");
             }
             catch (Exception ex)
             {

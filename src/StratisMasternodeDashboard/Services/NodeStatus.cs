@@ -20,7 +20,6 @@
     public class NodeDashboardStats
     {
         public int HeaderHeight { get; set; } = 0;
-        public string AsyncLoops { get; set; } = string.Empty;
         public string OrphanSize { get; set; } = string.Empty;
     }
 

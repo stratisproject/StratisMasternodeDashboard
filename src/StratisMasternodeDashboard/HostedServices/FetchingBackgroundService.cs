@@ -140,7 +140,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                     LogRules = nodeDataServiceMainchain.LogRules,
                     Uptime = nodeDataServiceMainchain.NodeStatus.Uptime,
                     AddressIndexer = this.nodeDataServiceMainchain.AddressIndexerHeight,
-                    AsyncLoops = this.nodeDataServiceMainchain.NodeDashboardStats?.AsyncLoops ?? string.Empty,
                     OrphanSize = this.nodeDataServiceMainchain.NodeDashboardStats?.OrphanSize ?? string.Empty
                 };
 
@@ -173,7 +172,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                     IsMining = this.nodeDataServiceSidechain.SidechainMinerStats?.ProducedBlockInLastRound ?? false,
                     SidechainMiningAddress = this.nodeDataServiceSidechain.SidechainMinerStats?.MiningAddress ?? string.Empty,
 
-                    AsyncLoops = this.nodeDataServiceSidechain.NodeDashboardStats?.AsyncLoops ?? string.Empty,
                     OrphanSize = this.nodeDataServiceSidechain.NodeDashboardStats?.OrphanSize ?? string.Empty,
                     FederationMemberCount = this.nodeDataServiceSidechain.FederationMemberCount,
                     ConfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.confirmedBalance,
