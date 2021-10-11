@@ -32,7 +32,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard
                 EnvType = defaultEndpoints["EnvType"],
                 SidechainNodeType = this.Configuration["nodetype"] ?? defaultEndpoints["SidechainNodeType"],
                 SidechainNode = !string.IsNullOrEmpty(this.Configuration["sidechainport"]) ? $"http://localhost:{this.Configuration["sidechainport"]}" : defaultEndpoints["SidechainNode"],
-                IntervalTime = defaultEndpoints["IntervalTime"]
+                IntervalTime = defaultEndpoints["IntervalTime"],
+                SDADaoContractAddress = defaultEndpoints["sdadaocontractaddress"]
             };
 
             if (!string.IsNullOrEmpty(this.Configuration["nodetype"]))
@@ -51,10 +52,11 @@ namespace Stratis.FederatedSidechains.AdminDashboard
                     : NodeEnv.MainNet;
             }
 
+            if (!string.IsNullOrEmpty(this.Configuration["sdadaocontractaddress"]))
+                defaultEndpointsSettings.SDADaoContractAddress = this.Configuration["sdadaocontractaddress"];
+
             if (!string.IsNullOrEmpty(this.Configuration["datadir"]))
-            {
                 defaultEndpointsSettings.DataFolder = this.Configuration["datadir"];
-            }
 
             services.AddSingleton(defaultEndpointsSettings);
             services.AddDistributedMemoryCache();

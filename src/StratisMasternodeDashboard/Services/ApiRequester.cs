@@ -4,6 +4,7 @@ using RestSharp;
 using Stratis.FederatedSidechains.AdminDashboard.Entities;
 using Stratis.FederatedSidechains.AdminDashboard.Helpers;
 using Stratis.FederatedSidechains.AdminDashboard.Models;
+using Stratis.FederatedSidechains.AdminDashboard.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,14 +65,14 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
         #region SDA Proposal Voting
 
-        public async Task<ApiResponse> VoteSDAProposalSmartContractCall(string endpoint, SDAVoteModel sDAVote)
+        public async Task<ApiResponse> VoteSDAProposalSmartContractCall(DefaultEndpointsSettings settings, SDAVoteModel sDAVote)
         {
-            SDAVoteContractCall sDAVoteContractCall;
-            string senderAddress = null;
-            List<WalletAddress> walletAddresses = new List<WalletAddress>();
             try
             {
-                ApiResponse responseWalletAddress = await GetRequestAsync(endpoint, "/api/Wallet/addresses", $"WalletName={sDAVote.WalletName}" + "&" + $"AccountName=account 0");
+                List<WalletAddress> walletAddresses = new List<WalletAddress>();
+
+                ApiResponse responseWalletAddress = await GetRequestAsync(settings.SidechainNode, "/api/Wallet/addresses", $"WalletName={sDAVote.WalletName}" + "&" + $"AccountName=account 0");
+
                 if (responseWalletAddress.IsSuccess)
                 {
                     var items = JsonConvert.DeserializeObject(responseWalletAddress.Content.addresses.ToString());
@@ -79,8 +80,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
                     var usedWalletAddress = walletAddresses.FindAll(x => x.IsUsed).FirstOrDefault();
 
-                    senderAddress = usedWalletAddress.Address;
-                    sDAVoteContractCall = new SDAVoteContractCall
+                    var sDAVoteContractCall = new SDAVoteContractCall
                     {
                         GasPrice = 100,
                         GasLimit = 50000,
@@ -90,11 +90,17 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                         FeeAmount = 0.001,
                         MethodName = "Vote",
                         AccountName = "account 0",
-                        ContractAddress = "tSSDFN88s3mLpQbHVMA3GYhwjWah6gW8ss",
-                        Sender = senderAddress,
+                        ContractAddress = settings.SDADaoContractAddress,
+                        Sender = usedWalletAddress.Address,
                         Parameters = new string[] { "5#" + sDAVote.ProposalId, "1#" + sDAVote.VotingDecision },
                     };
-                    ApiResponse response = await PostRequestAsync(endpoint, "/api/SmartContracts/build-and-send-call", sDAVoteContractCall);
+
+                    this.logger.LogInformation($"Voting with address: {usedWalletAddress.Address}");
+
+                    ApiResponse response = await PostRequestAsync(settings.SidechainNode, "/api/SmartContracts/build-and-send-call", sDAVoteContractCall).ConfigureAwait(false);
+
+                    this.logger.LogInformation($"Voting response transaction id: {response.Content.transactionId}");
+
                     return response;
                 }
                 else

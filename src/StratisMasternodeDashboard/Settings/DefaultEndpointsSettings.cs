@@ -2,12 +2,13 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Settings
 {
     public class DefaultEndpointsSettings
     {
+        public string DataFolder { get; set; }
+        public string EnvType { get; set; }
+        public string IntervalTime { get; set; }
+        public string SDADaoContractAddress { get; set; }
         public string StratisNode { get; set; }
         public string SidechainNode { get; set; }
         public string SidechainNodeType { get; set; }
-        public string EnvType { get; set; }
-        public string IntervalTime { get; set; }
-        public string DataFolder { get; set; }
 
         public override string ToString()
         {

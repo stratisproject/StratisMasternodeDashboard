@@ -1,12 +1,10 @@
-using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Stratis.FederatedSidechains.AdminDashboard.Entities;
 using Stratis.FederatedSidechains.AdminDashboard.Filters;
 using Stratis.FederatedSidechains.AdminDashboard.Models;
 using Stratis.FederatedSidechains.AdminDashboard.Services;
 using Stratis.FederatedSidechains.AdminDashboard.Settings;
+using System.Threading.Tasks;
 
 namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
 {
@@ -126,7 +124,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             if (!ModelState.IsValid)
                 return this.BadRequest("Please enter all required value.");
 
-            ApiResponse response = await this.apiRequester.VoteSDAProposalSmartContractCall(this.defaultEndpointsSettings.SidechainNode, sDAVote);
+            ApiResponse response = await this.apiRequester.VoteSDAProposalSmartContractCall(this.defaultEndpointsSettings, sDAVote);
 
             if (response.IsSuccess && response.Content.transactionId != null)
             {
