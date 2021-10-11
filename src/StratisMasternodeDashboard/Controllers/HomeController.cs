@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using QRCoder;
 using Stratis.FederatedSidechains.AdminDashboard.Entities;
 using Stratis.FederatedSidechains.AdminDashboard.Filters;
-using Stratis.FederatedSidechains.AdminDashboard.Helpers;
 using Stratis.FederatedSidechains.AdminDashboard.Hubs;
 using Stratis.FederatedSidechains.AdminDashboard.Models;
 using Stratis.FederatedSidechains.AdminDashboard.Services;
 using Stratis.FederatedSidechains.AdminDashboard.Settings;
+using System;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
 {
@@ -66,16 +62,15 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
 
             DashboardModel dashboardModel = JsonConvert.DeserializeObject<DashboardModel>(this.distributedCache.GetString("DashboardData"));
             this.ViewBag.DisplayLoader = true;
-            this.ViewBag.History = dashboardModel?.StratisNode?.History == null || dashboardModel?.SidechainNode?.History == null 
+            this.ViewBag.History = dashboardModel?.StratisNode?.History == null || dashboardModel?.SidechainNode?.History == null
                         ? new[] {
                             dashboardModel.StratisNode.History,
                             dashboardModel.SidechainNode.History
-                        } 
+                        }
                         : null;
             this.ViewBag.StratisTicker = dashboardModel.StratisNode.CoinTicker;
             this.ViewBag.SidechainTicker = dashboardModel.SidechainNode.CoinTicker;
-            this.ViewBag.MainchainMultisigAddress = dashboardModel.MainchainWalletAddress;
-            this.ViewBag.SidechainMultisigAddress = dashboardModel.SidechainWalletAddress;
+            this.ViewBag.SidechainMiningAddress = dashboardModel.SidechainMiningAddress;
             this.ViewBag.MiningPubKeys = dashboardModel.MiningPublicKeys;
             this.ViewBag.LogRules = new LogRulesModel().LoadRules(dashboardModel.StratisNode.LogRules, dashboardModel.SidechainNode.LogRules);
             this.ViewBag.PendingPolls = dashboardModel.SidechainNode.PoAPendingPolls;

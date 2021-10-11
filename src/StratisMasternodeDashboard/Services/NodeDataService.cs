@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NBitcoin;
 using NBitcoin.DataEncoders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Stratis.FederatedSidechains.AdminDashboard.Entities;
 using Stratis.FederatedSidechains.AdminDashboard.Settings;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 namespace Stratis.FederatedSidechains.AdminDashboard.Services
 {
     public abstract class NodeDataService
@@ -213,23 +213,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             return history;
         }
 
-        protected async Task<string> UpdateFederationGatewayInfo()
-        {
-            string multiSigAddress = string.Empty;
-
-            try
-            {
-                FedInfoResponse = await apiRequester.GetRequestAsync(endpoint, "/api/FederationGateway/info").ConfigureAwait(false);
-                multiSigAddress = FedInfoResponse.Content.multisigAddress;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Failed to update federation gateway info.");
-            }
-
-            return multiSigAddress;
-        }
-
         protected async Task<SidechainMinerStats> UpdateFederationMemberInfo()
         {
             SidechainMinerStats sidechainMinerStats = new SidechainMinerStats();
@@ -239,6 +222,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                 var response = await apiRequester.GetRequestAsync(endpoint, "/api/Federation/members/current").ConfigureAwait(false);
                 sidechainMinerStats.BlockProducerHits = response.Content.miningStats.minerHits;
                 sidechainMinerStats.BlockProducerHitsValue = (int)(response.Content.miningStats.minerHits / (float)response.Content.federationSize * 100);
+                sidechainMinerStats.MiningAddress = response.Content.miningStats.miningAddress;
                 sidechainMinerStats.ProducedBlockInLastRound = (bool)response.Content.miningStats.producedBlockInLastRound;
             }
             catch (Exception ex)

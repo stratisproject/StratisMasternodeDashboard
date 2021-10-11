@@ -24,10 +24,11 @@
         public string OrphanSize { get; set; } = string.Empty;
     }
 
-    public class SidechainMinerStats
+    public sealed class SidechainMinerStats
     {
-        public bool ProducedBlockInLastRound { get; set; }
         public string BlockProducerHits { get; set; }
         public int BlockProducerHitsValue { get; set; }
+        public string MiningAddress { get; set; }
+        public bool ProducedBlockInLastRound { get; set; }
     }
 }

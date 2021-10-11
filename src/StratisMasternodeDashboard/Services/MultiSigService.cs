@@ -8,7 +8,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
     {
         public (double confirmedBalance, double unconfirmedBalance) FedWalletBalance { get; set; } = (0, 0);
         public object WalletHistory { get; set; }
-        public string FedAddress { get; set; }
 
         public MultiSigService(ApiRequester apiRequester, string endpoint, ILoggerFactory loggerFactory, string environment, string dataFolder)
             : base(apiRequester, endpoint, loggerFactory, environment, dataFolder)
@@ -21,7 +20,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
             FedWalletBalance = await this.UpdateWalletBalance().ConfigureAwait(false);
             WalletHistory = await this.UpdateHistory().ConfigureAwait(false);
-            FedAddress = await this.UpdateFederationGatewayInfo().ConfigureAwait(false);
 
             return this;
         }
