@@ -70,7 +70,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
                         : null;
             this.ViewBag.StratisTicker = dashboardModel.StratisNode.CoinTicker;
             this.ViewBag.SidechainTicker = dashboardModel.SidechainNode.CoinTicker;
-            this.ViewBag.SidechainMiningAddress = dashboardModel.SidechainMiningAddress;
+            this.ViewBag.SidechainMiningAddress = dashboardModel.SidechainNode.SidechainMiningAddress;
             this.ViewBag.MiningPubKeys = dashboardModel.MiningPublicKeys;
             this.ViewBag.LogRules = new LogRulesModel().LoadRules(dashboardModel.StratisNode.LogRules, dashboardModel.SidechainNode.LogRules);
             this.ViewBag.PendingPolls = dashboardModel.SidechainNode.PoAPendingPolls;
