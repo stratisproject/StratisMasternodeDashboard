@@ -155,8 +155,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
                     return this.BadRequest((string)responseReceipt.Content.error);
 
             } while (true);
-
-            return this.BadRequest(GetBadResponseMessage(responseReceipt));
         }
 
         private string GetBadResponseMessage(ApiResponse apiResponse)
