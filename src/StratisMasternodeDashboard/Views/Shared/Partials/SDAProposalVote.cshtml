@@ -8,6 +8,8 @@
             WalletName: $("#walletName").val(),
             WalletPassword: $("#walletPassword").val()
         }
+        $("#submitSDAVoteBtn").text('Is Busy...'); 
+        $("#submitSDAVoteBtn").attr('disabled', true); 
         console.log(formdata);
         $.ajax({
             type: 'POST',
@@ -21,15 +23,22 @@
                 $("#proposalLabel").text(proposalID);
                 $("#sDAProposalVotes").modal('hide');
                 $("#confirmationModalSDAVote").modal('show');
+                $("#submitSDAVoteBtn").text('Submit');
+                $("#submitSDAVoteBtn").attr('disabled', false);
+
             },
             error: function (result) {
                 if (!!result.responseText) {
                     $("#sdavoteError").text(result.responseText);
                     $("#sdavoteError").show();
+                    $("#submitSDAVoteBtn").text('Submit');
+                    $("#submitSDAVoteBtn").attr('disabled', false);
                     return;
                 }
                 $("#sdavoteError").text("Failed to vote. Unknown error. Please try again and make sure nodes are running.");
                 $("#sdavoteError").show();
+                $("#submitSDAVoteBtn").text('Submit');
+                $("#submitSDAVoteBtn").attr('disabled', false);
             }
         });
     }
@@ -89,7 +98,7 @@
                             </div>
                         </div>
 
-                    <button type="button" class="btn btn-primary" onclick="submitSDAVote()">Submit</button>
+                    <button type="button" id="submitSDAVoteBtn" class="btn btn-primary" onclick="submitSDAVote()">Submit</button>
                 </form>
             </div>
         </div>
