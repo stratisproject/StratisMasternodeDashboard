@@ -98,16 +98,6 @@
                             </li>
                             <li class="col-12 col-xl-6">
                                 <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Async Loops :</strong></li>
-                                    <li class="list-inline-item text-muted">
-                                        <span class="badge badge-@(Model.StratisNode.HasAsyncLoopsErrors ? "danger" : "success")">
-                                            @Model.StratisNode.AsyncLoops
-                                        </span>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
                                     <li class="list-inline-item"><strong>Address Indexer height :</strong></li>
                                     <li class="list-inline-item">@Model.StratisNode.AddressIndexer</li>
                                 </ul>
@@ -302,16 +292,6 @@
                                         <div class="inline-flex progress" style="width: 100px;">
                                             <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: @Model.SidechainNode.BlockProducerHitsValue%;" aria-valuenow="@Model.SidechainNode.BlockProducerHitsValue" aria-valuemin="0" aria-valuemax="100">@Model.SidechainNode.BlockProducerHitsValue%</div>
                                         </div>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Async Loops :</strong></li>
-                                    <li class="list-inline-item text-muted">
-                                        <span class="badge badge-@(Model.SidechainNode.HasAsyncLoopsErrors ? "danger" : "success")">
-                                            @Model.SidechainNode.AsyncLoops
-                                        </span>
                                     </li>
                                 </ul>
                             </li>

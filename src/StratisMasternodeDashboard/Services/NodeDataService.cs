@@ -213,23 +213,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             return history;
         }
 
-        protected async Task<string> UpdateFederationGatewayInfo()
-        {
-            string multiSigAddress = string.Empty;
-
-            try
-            {
-                FedInfoResponse = await apiRequester.GetRequestAsync(endpoint, "/api/FederationGateway/info").ConfigureAwait(false);
-                multiSigAddress = FedInfoResponse.Content.multisigAddress;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Failed to update federation gateway info.");
-            }
-
-            return multiSigAddress;
-        }
-
         protected async Task<SidechainMinerStats> UpdateFederationMemberInfo()
         {
             SidechainMinerStats sidechainMinerStats = new SidechainMinerStats();
@@ -239,7 +222,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                 var response = await apiRequester.GetRequestAsync(endpoint, "/api/Federation/members/current").ConfigureAwait(false);
                 sidechainMinerStats.BlockProducerHits = response.Content.miningStats.minerHits;
                 sidechainMinerStats.BlockProducerHitsValue = (int)(response.Content.miningStats.minerHits / (float)response.Content.federationSize * 100);
-                sidechainMinerStats.ProducedBlockInLastRound = (bool)response.Content.producedBlockInLastRound;
+                sidechainMinerStats.MiningAddress = response.Content.miningStats.miningAddress;
+                sidechainMinerStats.ProducedBlockInLastRound = (bool)response.Content.miningStats.producedBlockInLastRound;
             }
             catch (Exception ex)
             {
@@ -342,7 +326,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         }
 
         Regex orphanSize = new Regex("Orphan Size:\\s+([0-9]+)", RegexOptions.Compiled);
-        Regex asyncLoopStats = new Regex("====== Async loops ======   (.*)", RegexOptions.Compiled);
 
         protected async Task<NodeDashboardStats> UpdateDashboardStats()
         {
@@ -353,7 +336,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                 using HttpClient client = new HttpClient();
                 response = await client.GetStringAsync($"{endpoint}/api/Dashboard/Stats").ConfigureAwait(false);
                 nodeDashboardStats.OrphanSize = orphanSize.Match(response).Groups[1].Value;
-                nodeDashboardStats.AsyncLoops = asyncLoopStats.Match(response).Groups[1].Value.Replace("[", "").Replace("]", "").Replace(" ", "").Replace("Running", "R").Replace("Faulted", ", F");
             }
             catch (Exception ex)
             {

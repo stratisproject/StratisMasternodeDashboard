@@ -1,12 +1,12 @@
-using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Stratis.FederatedSidechains.AdminDashboard.Entities;
 using Stratis.FederatedSidechains.AdminDashboard.Filters;
 using Stratis.FederatedSidechains.AdminDashboard.Models;
 using Stratis.FederatedSidechains.AdminDashboard.Services;
 using Stratis.FederatedSidechains.AdminDashboard.Settings;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
 {
@@ -126,26 +126,42 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             if (!ModelState.IsValid)
                 return this.BadRequest("Please enter all required value.");
 
-            ApiResponse response = await this.apiRequester.VoteSDAProposalSmartContractCall(this.defaultEndpointsSettings.SidechainNode, sDAVote);
+            ApiResponse response = await this.apiRequester.VoteSDAProposalSmartContractCall(this.defaultEndpointsSettings, sDAVote);
 
-            if (response.IsSuccess && response.Content.transactionId != null)
+            if (!response.IsSuccess || response.IsSuccess && response.Content.transactionId == null)
+                return this.BadRequest(GetBadResponseMessage(response));
+
+            var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+
+            ApiResponse responseReceipt;
+
+            do
             {
-                ApiResponse responseReceipt = await this.apiRequester.GetRequestAsync(this.defaultEndpointsSettings.SidechainNode, "/api/SmartContracts/receipt", $"txHash={response.Content.transactionId}");
+                responseReceipt = await this.apiRequester.GetRequestAsync(this.defaultEndpointsSettings.SidechainNode, "/api/SmartContracts/receipt", $"txHash={response.Content.transactionId}");
 
-                if (responseReceipt.IsSuccess)
+                if (!responseReceipt.IsSuccess)
+                {
+                    if (cancellation.IsCancellationRequested)
+                        return this.BadRequest($"The request time out getting receipt for '{response.Content.transactionId}'");
+
+                    await Task.Delay(TimeSpan.FromSeconds(5));
+
+                    continue;
+                }
+
+                if ((bool)responseReceipt.Content.success)
                     return this.Ok();
+                else
+                    return this.BadRequest((string)responseReceipt.Content.error);
 
-                return this.BadRequest(GetBadResponseMessage(responseReceipt));
-            }
-            return this.BadRequest(GetBadResponseMessage(response));
+            } while (true);
         }
 
         private string GetBadResponseMessage(ApiResponse apiResponse)
         {
             if (apiResponse.Content?.errors != null)
-            {
                 return $"An error occurred trying to vote on the SDA proposal Reason: {apiResponse.Content?.errors[0].message}";
-            }
+
             return $"An error occurred trying to vote on the SDA proposal Reason: {apiResponse.Content}";
         }
     }

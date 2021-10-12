@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Stratis.FederatedSidechains.AdminDashboard.Models
 {
@@ -10,10 +6,13 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Models
     {
         [Required]
         public long ProposalId { get; set; }
+
         [Required]
         public string VotingDecision { get; set; }
+
         [Required]
         public string WalletName { get; set; }
+
         [Required]
         public string WalletPassword { get; set; }
     }

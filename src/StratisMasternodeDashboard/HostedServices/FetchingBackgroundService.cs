@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
@@ -18,6 +11,13 @@ using Stratis.FederatedSidechains.AdminDashboard.Hubs;
 using Stratis.FederatedSidechains.AdminDashboard.Models;
 using Stratis.FederatedSidechains.AdminDashboard.Services;
 using Stratis.FederatedSidechains.AdminDashboard.Settings;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
 {
@@ -117,66 +117,67 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
             {
                 dashboardModel.Status = true;
                 dashboardModel.IsCacheBuilt = true;
-                dashboardModel.MainchainWalletAddress = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).FedAddress : string.Empty;
-                dashboardModel.SidechainWalletAddress = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).FedAddress : string.Empty;
                 dashboardModel.MiningPublicKeys = nodeDataServiceMainchain.FedInfoResponse?.Content?.federationMultisigPubKeys ?? new JArray();
 
-                var stratisNode = new StratisNodeModel();
+                // Mainchain Node
+                var mainchainNode = new StratisNodeModel
+                {
+                    History = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).WalletHistory : new JArray(),
+                    ConfirmedBalanceFed = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).FedWalletBalance.confirmedBalance : -1,
+                    UnconfirmedBalanceFed = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).FedWalletBalance.unconfirmedBalance : -1,
 
-                stratisNode.History = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).WalletHistory : new JArray();
-                stratisNode.ConfirmedBalanceFed = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).FedWalletBalance.confirmedBalance : -1;
-                stratisNode.UnconfirmedBalanceFed = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).FedWalletBalance.unconfirmedBalance : -1;
+                    WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/api").ToString(),
+                    SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/swagger").ToString(),
+                    SyncingStatus = nodeDataServiceMainchain.NodeStatus.SyncingProgress,
+                    Peers = stratisPeers,
+                    FederationMembers = stratisFederationMembers,
+                    BlockHash = nodeDataServiceMainchain.BestHash,
+                    BlockHeight = (int)nodeDataServiceMainchain.NodeStatus.BlockStoreHeight,
+                    HeaderHeight = (int)nodeDataServiceMainchain.NodeStatus.HeaderHeight,
+                    MempoolSize = nodeDataServiceMainchain.RawMempool,
 
-                stratisNode.WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/api").ToString();
-                stratisNode.SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/swagger").ToString();
-                stratisNode.SyncingStatus = nodeDataServiceMainchain.NodeStatus.SyncingProgress;
-                stratisNode.Peers = stratisPeers;
-                stratisNode.FederationMembers = stratisFederationMembers;
-                stratisNode.BlockHash = nodeDataServiceMainchain.BestHash;
-                stratisNode.BlockHeight = (int)nodeDataServiceMainchain.NodeStatus.BlockStoreHeight;
-                stratisNode.HeaderHeight = (int)nodeDataServiceMainchain.NodeStatus.HeaderHeight;
-                stratisNode.MempoolSize = nodeDataServiceMainchain.RawMempool;
+                    CoinTicker = "STRAX",
+                    LogRules = nodeDataServiceMainchain.LogRules,
+                    Uptime = nodeDataServiceMainchain.NodeStatus.Uptime,
+                    AddressIndexer = this.nodeDataServiceMainchain.AddressIndexerHeight,
+                    OrphanSize = this.nodeDataServiceMainchain.NodeDashboardStats?.OrphanSize ?? string.Empty
+                };
 
-                stratisNode.CoinTicker = "STRAX";
-                stratisNode.LogRules = nodeDataServiceMainchain.LogRules;
-                stratisNode.Uptime = nodeDataServiceMainchain.NodeStatus.Uptime;
-                stratisNode.AddressIndexer = this.nodeDataServiceMainchain.AddressIndexerHeight;
-                stratisNode.AsyncLoops = this.nodeDataServiceMainchain.NodeDashboardStats?.AsyncLoops ?? string.Empty;
-                stratisNode.OrphanSize = this.nodeDataServiceMainchain.NodeDashboardStats?.OrphanSize ?? string.Empty;
+                dashboardModel.StratisNode = mainchainNode;
 
-                dashboardModel.StratisNode = stratisNode;
+                // Sidechain Node
+                var sidechainNode = new SidechainNodeModel
+                {
+                    History = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).WalletHistory : new JArray(),
+                    ConfirmedBalanceFed = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).FedWalletBalance.confirmedBalance : -1,
+                    UnconfirmedBalanceFed = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).FedWalletBalance.unconfirmedBalance : -1,
 
-                var sidechainNode = new SidechainNodeModel();
+                    WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/api").ToString(),
+                    SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/swagger").ToString(),
+                    SyncingStatus = nodeDataServiceSidechain.NodeStatus.SyncingProgress,
+                    Peers = sidechainPeers,
+                    FederationMembers = sidechainFederationMembers,
+                    BlockHash = nodeDataServiceSidechain.BestHash,
+                    BlockHeight = (int)nodeDataServiceSidechain.NodeStatus.BlockStoreHeight,
+                    HeaderHeight = (int)nodeDataServiceSidechain.NodeStatus.HeaderHeight,
+                    MempoolSize = nodeDataServiceSidechain.RawMempool,
 
-                sidechainNode.History = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).WalletHistory : new JArray();
-                sidechainNode.ConfirmedBalanceFed = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).FedWalletBalance.confirmedBalance : -1;
-                sidechainNode.UnconfirmedBalanceFed = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).FedWalletBalance.unconfirmedBalance : -1;
+                    CoinTicker = "CRS",
+                    LogRules = nodeDataServiceSidechain.LogRules,
+                    PoAPendingPolls = nodeDataServiceSidechain.PendingPolls,
+                    Uptime = nodeDataServiceSidechain.NodeStatus.Uptime,
 
-                sidechainNode.WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/api").ToString();
-                sidechainNode.SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/swagger").ToString();
-                sidechainNode.SyncingStatus = nodeDataServiceSidechain.NodeStatus.SyncingProgress;
-                sidechainNode.Peers = sidechainPeers;
-                sidechainNode.FederationMembers = sidechainFederationMembers;
-                sidechainNode.BlockHash = nodeDataServiceSidechain.BestHash;
-                sidechainNode.BlockHeight = (int)nodeDataServiceSidechain.NodeStatus.BlockStoreHeight;
-                sidechainNode.HeaderHeight = (int)nodeDataServiceSidechain.NodeStatus.HeaderHeight;
-                sidechainNode.MempoolSize = nodeDataServiceSidechain.RawMempool;
+                    BlockProducerHits = this.nodeDataServiceSidechain.SidechainMinerStats?.BlockProducerHits ?? string.Empty,
+                    BlockProducerHitsValue = this.nodeDataServiceSidechain.SidechainMinerStats?.BlockProducerHitsValue ?? 0,
+                    IsMining = this.nodeDataServiceSidechain.SidechainMinerStats?.ProducedBlockInLastRound ?? false,
+                    SidechainMiningAddress = this.nodeDataServiceSidechain.SidechainMinerStats?.MiningAddress ?? string.Empty,
 
-                sidechainNode.CoinTicker = "CRS";
-                sidechainNode.LogRules = nodeDataServiceSidechain.LogRules;
-                sidechainNode.PoAPendingPolls = nodeDataServiceSidechain.PendingPolls;
-                sidechainNode.Uptime = nodeDataServiceSidechain.NodeStatus.Uptime;
-
-                sidechainNode.BlockProducerHits = this.nodeDataServiceSidechain.SidechainMinerStats?.BlockProducerHits ?? string.Empty;
-                sidechainNode.BlockProducerHitsValue = this.nodeDataServiceSidechain.SidechainMinerStats?.BlockProducerHitsValue ?? 0;
-                sidechainNode.IsMining = this.nodeDataServiceSidechain.SidechainMinerStats?.ProducedBlockInLastRound ?? false;
-
-                sidechainNode.AsyncLoops = this.nodeDataServiceSidechain.NodeDashboardStats?.AsyncLoops ?? string.Empty;
-                sidechainNode.OrphanSize = this.nodeDataServiceSidechain.NodeDashboardStats?.OrphanSize ?? string.Empty;
-                sidechainNode.FederationMemberCount = this.nodeDataServiceSidechain.FederationMemberCount;
-                sidechainNode.ConfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.confirmedBalance;
-                sidechainNode.UnconfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.unconfirmedBalance;
-                sidechainNode.KickFederationMemberPolls = nodeDataServiceSidechain.KickFederationMememberPendingPolls;
+                    OrphanSize = this.nodeDataServiceSidechain.NodeDashboardStats?.OrphanSize ?? string.Empty,
+                    FederationMemberCount = this.nodeDataServiceSidechain.FederationMemberCount,
+                    ConfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.confirmedBalance,
+                    UnconfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.unconfirmedBalance,
+                    KickFederationMemberPolls = nodeDataServiceSidechain.KickFederationMememberPendingPolls
+                };
 
                 dashboardModel.SidechainNode = sidechainNode;
             }
