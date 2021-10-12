@@ -8,8 +8,8 @@
             WalletName: $("#walletName").val(),
             WalletPassword: $("#walletPassword").val()
         }
-        $("#submitSDAVoteBtn").text('Is Busy...'); 
-        $("#submitSDAVoteBtn").attr('disabled', true); 
+        $("#submitSDAVoteBtn").text('Is Busy...');
+        $("#submitSDAVoteBtn").attr('disabled', true);
         console.log(formdata);
         $.ajax({
             type: 'POST',
@@ -56,47 +56,51 @@
             <div class="modal-body">
                 <div class="alert alert-danger" role="alert" style="display: none;" id="sdavoteError">
                 </div>
-                <form id="sdaVoteForm" novalidate class="needs-validation">                   
-                        <div class="form-group">
-                            <div class="align-self-center">
-                                <label for="exampleInputEmail1">SDA Proposal Id* </label>
-                                <input asp-for="ProposalId" type="number" class="form-control" id="proposalId" aria-describedby="hashHelp" placeholder="Enter proposal Id value" required>
-                                <div class="invalid-feedback">
-                                    Please provide a proposal Id.
-                                </div>
+                <form id="sdaVoteForm" novalidate class="needs-validation">
+                    <div class="form-group">
+                        <div class="align-self-center">
+                            <label for="exampleInputEmail1">SDA Proposal Id* </label>
+                            <input asp-for="ProposalId" type="number" class="form-control" id="proposalId" aria-describedby="hashHelp" placeholder="Enter proposal Id value" required>
+                            <div class="invalid-feedback">
+                                Please provide a proposal Id.
                             </div>
-                        </div>                   
-                   
-                        <div class="form-group">
-                            <div class="align-self-center">
-                                <label>Voting Decision*</label>
-                                <select asp-for="VotingDecision" class="form-control" id="votingDecision">
-                                    <option value="">Choose</option>
-                                    <option value="true">Vote in favour</option>
-                                    <option value="false">Vote in opposition</option>
-                                </select>
-                            </div>
-                        </div>         
+                        </div>
+                    </div>
 
-                        <div class="form-group">
-                            <div class="align-self-center">
-                                <label for="exampleInputEmail1">Wallet Name*</label>
-                                <input asp-for="WalletName" type="text" class="form-control" id="walletName" aria-describedby="walletName" placeholder="Enter Wallet Name" required>
-                                <div class="invalid-feedback">
-                                    Please provide a Wallet Name.
-                                </div>
-                                <span asp-validation-for="WalletName" class="text-danger"></span>
+                    <div class="form-group">
+                        <div class="align-self-center">
+                            <label>Voting Decision*</label>
+                            <select asp-for="VotingDecision" class="form-control" id="votingDecision">
+                                <option value="">Choose</option>
+                                <option value="true">Vote in favour</option>
+                                <option value="false">Vote in opposition</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="align-self-center">
+                            <label for="exampleInputEmail1">Wallet Name*</label>
+                            <input asp-for="WalletName" type="text" class="form-control" id="walletName" aria-describedby="walletName" placeholder="Enter Wallet Name" required>
+                            <div class="invalid-feedback">
+                                Please provide a Wallet Name.
+                            </div>
+                            <span asp-validation-for="WalletName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="align-self-center">
+                            <label for="exampleInputEmail1">Wallet Password*</label>
+                            <input asp-for="WalletPassword" type="password" class="form-control" id="walletPassword" aria-describedby="walletPassword" placeholder="Enter Wallet Password" required>
+                            <div class="invalid-feedback">
+                                Please provide a Wallet Password.
                             </div>
                         </div>
-                        <div class="form-group">
-                            <div class="align-self-center">
-                                <label for="exampleInputEmail1">Wallet Password*</label>
-                                <input asp-for="WalletPassword" type="password" class="form-control" id="walletPassword" aria-describedby="walletPassword" placeholder="Enter Wallet Password" required>
-                                <div class="invalid-feedback">
-                                    Please provide a Wallet Password.
-                                </div>
-                            </div>
-                        </div>
+                    </div>
+
+                    <div>
+                        <label style="font-weight:bold;">Depending on the size of your wallet, the voting request might take some time to complete. It might be beneficial to consolidate your wallet first.</label>
+                    </div>
 
                     <button type="button" id="submitSDAVoteBtn" class="btn btn-primary" onclick="submitSDAVote()">Submit</button>
                 </form>

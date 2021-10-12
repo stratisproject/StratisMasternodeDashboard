@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Stratis.FederatedSidechains.AdminDashboard.Services
@@ -50,17 +51,23 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         /// <returns>An ApiResponse object</returns>
         public async Task<ApiResponse> PostRequestAsync(string endpoint, string path, object body, Method method = Method.POST)
         {
-            var restClient = new RestClient(UriHelper.BuildUri(endpoint, path));
-            var restRequest = new RestRequest(method);
-            restRequest.AddHeader("Content-type", "application/json");
-            restRequest.AddJsonBody(body);
-            IRestResponse restResponse = await restClient.ExecuteTaskAsync(restRequest);
-            var isSuccess = restResponse.StatusCode.Equals(HttpStatusCode.OK);
-            return new ApiResponse
+            using (var cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(5)))
             {
-                IsSuccess = isSuccess,
-                Content = JsonConvert.DeserializeObject(restResponse.Content)
-            };
+                var restClient = new RestClient(UriHelper.BuildUri(endpoint, path));
+                var restRequest = new RestRequest(method);
+                restRequest.AddHeader("Content-type", "application/json");
+                restRequest.AddJsonBody(body);
+
+                IRestResponse restResponse = await restClient.ExecuteTaskAsync(restRequest, cancellationToken.Token).ConfigureAwait(false);
+
+                var isSuccess = restResponse.StatusCode.Equals(HttpStatusCode.OK);
+
+                return new ApiResponse
+                {
+                    IsSuccess = isSuccess,
+                    Content = JsonConvert.DeserializeObject(restResponse.Content)
+                };
+            }
         }
 
         #region SDA Proposal Voting

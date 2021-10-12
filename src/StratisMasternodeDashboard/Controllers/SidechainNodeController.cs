@@ -107,14 +107,12 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             if (string.IsNullOrEmpty(pubKey))
                 return this.BadRequest("Member key is required");
 
-            ApiResponse response = await this.apiRequester.PostRequestAsync(this.defaultEndpointsSettings.SidechainNode, "/api/Voting/schedulevote-kickmember", new { pubkey = pubKey });
+            ApiResponse response = await this.apiRequester.PostRequestAsync(this.defaultEndpointsSettings.SidechainNode, "/api/Voting/schedulevote-kickmember", new { pubkey = pubKey }).ConfigureAwait(false);
             if (response.IsSuccess)
                 return this.Ok();
 
             if (response.Content?.errors != null)
-            {
                 return this.BadRequest($"An error occurred trying to schedule a kick federation member vote: {response.Content?.errors[0].message}");
-            }
 
             return this.BadRequest($"An error occurred trying to schedule a kick federation member vote: {response.Content}");
         }
@@ -128,7 +126,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
 
             ApiResponse response = await this.apiRequester.VoteSDAProposalSmartContractCall(this.defaultEndpointsSettings, sDAVote);
 
-            if (response == null)
+            if (response == null || response.Content == null)
                 return this.BadRequest("An error occurred trying to vote, please try again.");
 
             if (!response.IsSuccess || response.IsSuccess && response.Content.transactionId == null)
@@ -140,12 +138,12 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
 
             do
             {
-                responseReceipt = await this.apiRequester.GetRequestAsync(this.defaultEndpointsSettings.SidechainNode, "/api/SmartContracts/receipt", $"txHash={response.Content.transactionId}");
+                responseReceipt = await this.apiRequester.GetRequestAsync(this.defaultEndpointsSettings.SidechainNode, "/api/SmartContracts/receipt", $"txHash={response.Content.transactionId}").ConfigureAwait(false);
 
                 if (!responseReceipt.IsSuccess)
                 {
                     if (cancellation.IsCancellationRequested)
-                        return this.BadRequest($"The request time out getting receipt for '{response.Content.transactionId}'");
+                        return this.BadRequest($"The request timed out getting receipt for '{response.Content.transactionId}'");
 
                     await Task.Delay(TimeSpan.FromSeconds(5));
 
@@ -164,6 +162,9 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         {
             if (apiResponse.Content?.errors != null)
                 return $"An error occurred trying to vote on the SDA proposal Reason: {apiResponse.Content?.errors[0].message}";
+
+            if (apiResponse.Content?.message != null)
+                return $"An error occurred trying to vote on the SDA proposal Reason: {apiResponse.Content?.message}";
 
             return $"An error occurred trying to vote on the SDA proposal Reason: {apiResponse.Content}";
         }
