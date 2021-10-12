@@ -95,11 +95,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                         Parameters = new string[] { "5#" + sDAVote.ProposalId, "1#" + sDAVote.VotingDecision },
                     };
 
-                    this.logger.LogInformation($"Voting with address: {usedWalletAddress.Address}");
-
                     ApiResponse response = await PostRequestAsync(settings.SidechainNode, "/api/SmartContracts/build-and-send-call", sDAVoteContractCall).ConfigureAwait(false);
-
-                    this.logger.LogInformation($"Voting response transaction id: {response.Content.transactionId}");
 
                     return response;
                 }

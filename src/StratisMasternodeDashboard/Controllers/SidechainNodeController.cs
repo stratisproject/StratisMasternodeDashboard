@@ -124,14 +124,17 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         public async Task<IActionResult> VoteSDAProposal([FromBody] SDAVoteModel sDAVote)
         {
             if (!ModelState.IsValid)
-                return this.BadRequest("Please enter all required value.");
+                return this.BadRequest("Please enter all the required values.");
 
             ApiResponse response = await this.apiRequester.VoteSDAProposalSmartContractCall(this.defaultEndpointsSettings, sDAVote);
+
+            if (response == null)
+                return this.BadRequest("An error occurred trying to vote, please try again.");
 
             if (!response.IsSuccess || response.IsSuccess && response.Content.transactionId == null)
                 return this.BadRequest(GetBadResponseMessage(response));
 
-            var cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+            var cancellation = new CancellationTokenSource(TimeSpan.FromMinutes(5));
 
             ApiResponse responseReceipt;
 
