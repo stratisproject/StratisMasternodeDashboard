@@ -93,9 +93,16 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             try
             {
                 StatusResponse = await apiRequester.GetRequestAsync(endpoint, "/api/Node/status");
+                if (StatusResponse.Content == null)
+                    return nodeStatus;
+
                 nodeStatus.BlockStoreHeight = StatusResponse.Content.blockStoreHeight;
                 nodeStatus.HeaderHeight = StatusResponse.Content.headerHeight;
-                nodeStatus.ConsensusHeight = StatusResponse.Content.consensusHeight;
+
+                float parsed = 0;
+                if (StatusResponse.Content.consensusHeight != null && float.TryParse(StatusResponse.Content.consensusHeight, out parsed))
+                    nodeStatus.ConsensusHeight = parsed;
+
                 string runningTime = StatusResponse.Content.runningTime;
                 string[] parseTime = runningTime.Split('.');
                 parseTime = parseTime.Take(parseTime.Length - 1).ToArray();
@@ -183,6 +190,9 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             try
             {
                 ApiResponse responseWallet = await apiRequester.GetRequestAsync(endpoint, "/api/Wallet/list-wallets").ConfigureAwait(false);
+                if (responseWallet.Content == null)
+                    return (0, 0);
+
                 string firstWalletName = responseWallet.Content.walletNames[0].ToString();
                 ApiResponse responseBalance = await apiRequester.GetRequestAsync(endpoint, "/api/Wallet/balance", $"WalletName={firstWalletName}").ConfigureAwait(false);
                 double.TryParse(responseBalance.Content.balances[0].amountConfirmed.ToString(), out confirmed);
@@ -272,6 +282,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             try
             {
                 ApiResponse whitelistedHashesResponse = await apiRequester.GetRequestAsync(endpoint, "/api/Voting/whitelistedhashes").ConfigureAwait(false);
+                if (whitelistedHashesResponse.Content == null)
+                    return pendingPolls;
 
                 var approvedPolls = JsonConvert.DeserializeObject<List<ApprovedPoll>>(whitelistedHashesResponse.Content.ToString());
                 ApiResponse responsePending = await apiRequester.GetRequestAsync(endpoint, "/api/Voting/polls/pending", $"voteType=2").ConfigureAwait(false);
