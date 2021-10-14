@@ -100,7 +100,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                 nodeStatus.HeaderHeight = StatusResponse.Content.headerHeight;
 
                 float parsed = 0;
-                if (StatusResponse.Content.consensusHeight != null && float.TryParse(StatusResponse.Content.consensusHeight, out parsed))
+                if (StatusResponse.Content.consensusHeight != null && float.TryParse((string)StatusResponse.Content.consensusHeight, out parsed))
                     nodeStatus.ConsensusHeight = parsed;
 
                 string runningTime = StatusResponse.Content.runningTime;
