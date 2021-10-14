@@ -1,6 +1,7 @@
 ﻿using McMaster.Extensions.CommandLineUtils;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Stratis.FederatedSidechains.AdminDashboard
 {
@@ -25,7 +26,14 @@ namespace Stratis.FederatedSidechains.AdminDashboard
 
             app.OnExecute(() =>
             {
-                IWebHostBuilder webHostBuilder = WebHost.CreateDefaultBuilder(args);
+                IWebHostBuilder webHostBuilder = WebHost.CreateDefaultBuilder(args)
+                .ConfigureLogging(loggerBuilder =>
+                {
+                    loggerBuilder
+                    .ClearProviders()
+                    .AddConsole(configure => configure.TimestampFormat = "[dd/MM/yy HH:mm:ss:fff] ");
+                });
+
                 IWebHost webHost = webHostBuilder.UseStartup<Startup>().Build();
                 webHost.Run();
             });

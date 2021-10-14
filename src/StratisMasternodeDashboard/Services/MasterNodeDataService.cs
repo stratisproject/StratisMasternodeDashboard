@@ -25,6 +25,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         public MasterNodeSideChainService(ApiRequester apiRequester, DefaultEndpointsSettings defaultEndpointSettings, ILoggerFactory loggerFactory)
             : base(apiRequester, defaultEndpointSettings.SidechainNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
         {
+            SidechainMinerStats = new SidechainMinerStats();
         }
 
         public override async Task<NodeDataService> Update()

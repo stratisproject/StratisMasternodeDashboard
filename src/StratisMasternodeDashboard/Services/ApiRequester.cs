@@ -33,7 +33,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         {
             var restClient = new RestClient(UriHelper.BuildUri(endpoint, path, query));
             var restRequest = new RestRequest(Method.GET);
-            IRestResponse restResponse = await restClient.ExecuteTaskAsync(restRequest);
+            IRestResponse restResponse = await restClient.ExecuteTaskAsync(restRequest).ConfigureAwait(false);
             var isSuccess = restResponse.StatusCode.Equals(HttpStatusCode.OK);
             return new ApiResponse
             {
@@ -78,7 +78,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             {
                 List<WalletAddress> walletAddresses = new List<WalletAddress>();
 
-                ApiResponse responseWalletAddress = await GetRequestAsync(settings.SidechainNode, "/api/Wallet/addresses", $"WalletName={sDAVote.WalletName}" + "&" + $"AccountName=account 0");
+                ApiResponse responseWalletAddress = await GetRequestAsync(settings.SidechainNode, "/api/Wallet/addresses", $"WalletName={sDAVote.WalletName}" + "&" + $"AccountName=account 0").ConfigureAwait(false);
 
                 if (responseWalletAddress.IsSuccess)
                 {

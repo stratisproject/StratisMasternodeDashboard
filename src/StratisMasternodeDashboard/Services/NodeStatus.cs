@@ -25,7 +25,7 @@
 
     public sealed class SidechainMinerStats
     {
-        public string BlockProducerHits { get; set; }
+        public int BlockProducerHits { get; set; }
         public int BlockProducerHitsValue { get; set; }
         public string MiningAddress { get; set; }
         public bool ProducedBlockInLastRound { get; set; }

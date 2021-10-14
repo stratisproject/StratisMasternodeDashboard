@@ -215,15 +215,25 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
         protected async Task<SidechainMinerStats> UpdateFederationMemberInfo()
         {
-            SidechainMinerStats sidechainMinerStats = new SidechainMinerStats();
+            var sidechainMinerStats = new SidechainMinerStats();
 
             try
             {
                 var response = await apiRequester.GetRequestAsync(endpoint, "/api/Federation/members/current").ConfigureAwait(false);
-                sidechainMinerStats.BlockProducerHits = response.Content.miningStats.minerHits;
-                sidechainMinerStats.BlockProducerHitsValue = (int)(response.Content.miningStats.minerHits / (float)response.Content.federationSize * 100);
-                sidechainMinerStats.MiningAddress = response.Content.miningStats.miningAddress;
-                sidechainMinerStats.ProducedBlockInLastRound = (bool)response.Content.miningStats.producedBlockInLastRound;
+
+                if (response.Content != null)
+                {
+                    sidechainMinerStats.BlockProducerHits = response.Content.miningStats?.minerHits ?? 0;
+                    if (sidechainMinerStats.BlockProducerHits != 0)
+                        sidechainMinerStats.BlockProducerHitsValue = (int)(response.Content.miningStats.minerHits / (float)response.Content.federationSize * 100);
+                    else
+                        sidechainMinerStats.BlockProducerHitsValue = 0;
+
+                    sidechainMinerStats.MiningAddress = response.Content.miningStats?.miningAddress ?? "Waiting for block to be mined.";
+
+                    if (response.Content.miningStats != null)
+                        sidechainMinerStats.ProducedBlockInLastRound = (bool)response.Content.miningStats.producedBlockInLastRound;
+                }
             }
             catch (Exception ex)
             {
@@ -253,20 +263,20 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         protected async Task<List<PendingPoll>> UpdatePolls()
         {
             List<PendingPoll> pendingPolls = new List<PendingPoll>();
-            List<ApprovedPoll> approvedPolls = new List<ApprovedPoll>();
 
             try
             {
-
                 ApiResponse responseApproved = await apiRequester.GetRequestAsync(endpoint, "/api/Voting/whitelistedhashes");
-                approvedPolls = JsonConvert.DeserializeObject<List<ApprovedPoll>>(responseApproved.Content.ToString());
+
+                var approvedPolls = JsonConvert.DeserializeObject<List<ApprovedPoll>>(responseApproved.Content.ToString());
                 ApiResponse responsePending = await apiRequester.GetRequestAsync(endpoint, "/api/Voting/polls/pending", $"voteType=2");
 
                 pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responsePending.Content.ToString());
 
                 pendingPolls = pendingPolls.FindAll(x => x.VotingDataString.Contains("WhitelistHash"));
 
-                if (approvedPolls == null || approvedPolls.Count == 0) return pendingPolls;
+                if (approvedPolls == null || approvedPolls.Count == 0)
+                    return pendingPolls;
 
                 foreach (var vote in approvedPolls)
                 {
@@ -295,13 +305,16 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             try
             {
                 ApiResponse responseKickFedMemPending = await apiRequester.GetRequestAsync(endpoint, "/api/Voting/polls/pending", $"voteType=0");
-                pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responseKickFedMemPending.Content.ToString());
+                if (responseKickFedMemPending.Content != null)
+                    pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responseKickFedMemPending.Content.ToString());
+
                 return pendingPolls;
             }
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "Failed to update Kicked Federation Member polls");
             }
+
             return pendingPolls;
         }
 

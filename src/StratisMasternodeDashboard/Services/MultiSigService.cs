@@ -50,7 +50,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
         public override async Task<NodeDataService> Update()
         {
-            await UpdateMultiSig();
+            await UpdateMultiSig().ConfigureAwait(false);
 
             // Sidechain related updates.
             WalletBalance = await UpdateMiningWalletBalance().ConfigureAwait(false);

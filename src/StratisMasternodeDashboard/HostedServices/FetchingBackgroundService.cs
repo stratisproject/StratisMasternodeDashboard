@@ -167,10 +167,10 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                     PoAPendingPolls = nodeDataServiceSidechain.PendingPolls,
                     Uptime = nodeDataServiceSidechain.NodeStatus.Uptime,
 
-                    BlockProducerHits = this.nodeDataServiceSidechain.SidechainMinerStats?.BlockProducerHits ?? string.Empty,
-                    BlockProducerHitsValue = this.nodeDataServiceSidechain.SidechainMinerStats?.BlockProducerHitsValue ?? 0,
-                    IsMining = this.nodeDataServiceSidechain.SidechainMinerStats?.ProducedBlockInLastRound ?? false,
-                    SidechainMiningAddress = this.nodeDataServiceSidechain.SidechainMinerStats?.MiningAddress ?? "Waiting for block to be mined",
+                    BlockProducerHits = this.nodeDataServiceSidechain.SidechainMinerStats.BlockProducerHits,
+                    BlockProducerHitsValue = this.nodeDataServiceSidechain.SidechainMinerStats.BlockProducerHitsValue,
+                    IsMining = this.nodeDataServiceSidechain.SidechainMinerStats.ProducedBlockInLastRound,
+                    SidechainMiningAddress = this.nodeDataServiceSidechain.SidechainMinerStats.MiningAddress,
 
                     OrphanSize = this.nodeDataServiceSidechain.NodeDashboardStats?.OrphanSize ?? string.Empty,
                     FederationMemberCount = this.nodeDataServiceSidechain.FederationMemberCount,
