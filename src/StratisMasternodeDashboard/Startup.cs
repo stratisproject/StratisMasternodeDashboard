@@ -66,7 +66,11 @@ namespace Stratis.FederatedSidechains.AdminDashboard
             services.AddHostedService<FetchingBackgroundService>();
 
             services.AddMvc();
-            services.AddSignalR();
+            services.AddSignalR(options =>
+            {
+                options.EnableDetailedErrors = true;
+                options.ClientTimeoutInterval = TimeSpan.FromMinutes(1);
+            });
         }
 
         public void Configure(IApplicationBuilder app)
