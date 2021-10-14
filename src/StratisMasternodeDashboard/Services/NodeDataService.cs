@@ -164,7 +164,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             double unconfirmed = 0;
             try
             {
-                ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/FederationWallet/balance");
+                ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/FederationWallet/balance").ConfigureAwait(false);
                 double.TryParse(response.Content.balances[0].amountConfirmed.ToString(), out confirmed);
                 double.TryParse(response.Content.balances[0].amountUnconfirmed.ToString(), out unconfirmed);
             }
@@ -182,12 +182,11 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
             try
             {
-                ApiResponse responseWallet = await apiRequester.GetRequestAsync(endpoint, "/api/Wallet/list-wallets");
+                ApiResponse responseWallet = await apiRequester.GetRequestAsync(endpoint, "/api/Wallet/list-wallets").ConfigureAwait(false);
                 string firstWalletName = responseWallet.Content.walletNames[0].ToString();
-                ApiResponse responseBalance = await apiRequester.GetRequestAsync(endpoint, "/api/Wallet/balance", $"WalletName={firstWalletName}");
+                ApiResponse responseBalance = await apiRequester.GetRequestAsync(endpoint, "/api/Wallet/balance", $"WalletName={firstWalletName}").ConfigureAwait(false);
                 double.TryParse(responseBalance.Content.balances[0].amountConfirmed.ToString(), out confirmed);
                 double.TryParse(responseBalance.Content.balances[0].amountUnconfirmed.ToString(), out unconfirmed);
-
             }
             catch (Exception ex)
             {
@@ -202,7 +201,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
             try
             {
-                ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/FederationWallet/history", "maxEntriesToReturn=30");
+                ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/FederationWallet/history", "maxEntriesToReturn=30").ConfigureAwait(false);
                 history = response.Content;
             }
             catch (Exception ex)
@@ -272,10 +271,10 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
             try
             {
-                ApiResponse responseApproved = await apiRequester.GetRequestAsync(endpoint, "/api/Voting/whitelistedhashes");
+                ApiResponse whitelistedHashesResponse = await apiRequester.GetRequestAsync(endpoint, "/api/Voting/whitelistedhashes").ConfigureAwait(false);
 
-                var approvedPolls = JsonConvert.DeserializeObject<List<ApprovedPoll>>(responseApproved.Content.ToString());
-                ApiResponse responsePending = await apiRequester.GetRequestAsync(endpoint, "/api/Voting/polls/pending", $"voteType=2");
+                var approvedPolls = JsonConvert.DeserializeObject<List<ApprovedPoll>>(whitelistedHashesResponse.Content.ToString());
+                ApiResponse responsePending = await apiRequester.GetRequestAsync(endpoint, "/api/Voting/polls/pending", $"voteType=2").ConfigureAwait(false);
 
                 pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responsePending.Content.ToString());
 

@@ -187,6 +187,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 return;
             }
 
+            this.logger.LogInformation("Feed updated...");
+
             if (!string.IsNullOrEmpty(this.distributedCache.GetString("DashboardData")))
                 await this.updaterHub.Clients.All.SendAsync("CacheIsDifferent");
 
