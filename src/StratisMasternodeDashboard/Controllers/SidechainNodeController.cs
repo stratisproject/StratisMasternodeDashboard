@@ -161,12 +161,12 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         private string GetBadResponseMessage(ApiResponse apiResponse)
         {
             if (apiResponse.Content?.errors != null)
-                return $"An error occurred trying to vote on the SDA proposal Reason: {apiResponse.Content?.errors[0].message}";
+                return $"An error occurred: {apiResponse.Content?.errors[0].message}";
 
             if (apiResponse.Content?.message != null)
-                return $"An error occurred trying to vote on the SDA proposal Reason: {apiResponse.Content?.message}";
+                return $"An error occurred: {apiResponse.Content?.message}";
 
-            return $"An error occurred trying to vote on the SDA proposal Reason: {apiResponse.Content}";
+            return $"An error occurred: {apiResponse.Content}";
         }
     }
 }

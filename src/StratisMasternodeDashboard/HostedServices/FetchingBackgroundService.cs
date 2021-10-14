@@ -170,7 +170,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                     BlockProducerHits = this.nodeDataServiceSidechain.SidechainMinerStats?.BlockProducerHits ?? string.Empty,
                     BlockProducerHitsValue = this.nodeDataServiceSidechain.SidechainMinerStats?.BlockProducerHitsValue ?? 0,
                     IsMining = this.nodeDataServiceSidechain.SidechainMinerStats?.ProducedBlockInLastRound ?? false,
-                    SidechainMiningAddress = this.nodeDataServiceSidechain.SidechainMinerStats?.MiningAddress ?? string.Empty,
+                    SidechainMiningAddress = this.nodeDataServiceSidechain.SidechainMinerStats?.MiningAddress ?? "Waiting for block to be mined",
 
                     OrphanSize = this.nodeDataServiceSidechain.NodeDashboardStats?.OrphanSize ?? string.Empty,
                     FederationMemberCount = this.nodeDataServiceSidechain.FederationMemberCount,
@@ -188,12 +188,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
             }
 
             if (!string.IsNullOrEmpty(this.distributedCache.GetString("DashboardData")))
-            {
-                if (JToken.DeepEquals(this.distributedCache.GetString("DashboardData"), JsonConvert.SerializeObject(dashboardModel)) == false)
-                {
-                    await this.updaterHub.Clients.All.SendAsync("CacheIsDifferent");
-                }
-            }
+                await this.updaterHub.Clients.All.SendAsync("CacheIsDifferent");
+
             this.distributedCache.SetString("DashboardData", JsonConvert.SerializeObject(dashboardModel));
         }
 

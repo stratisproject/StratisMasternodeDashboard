@@ -13,7 +13,7 @@
 <div id="@(ViewBag.DisplayLoader == true ? "loading-content" : "")">
     <script type="text/javascript">
         $(function () {
-            var peerSettings = { searching: false, pageLength: 5, "bDestroy": true, lengthChange: true, lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]], stateSave: true };
+            var peerSettings = { searching: false, pageLength: 25, "bDestroy": true, lengthChange: true, lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]], stateSave: true };
             var settings = { searching: false, pageLength: 5, lengthMenu: false, lengthChange: false, "bDestroy": true };
             var settings2 = { searching: false, pageLength: 10, lengthMenu: false, lengthChange: false, "bDestroy": true };
 
@@ -34,6 +34,8 @@
         });
     </script>
     <div class="row my-2">
+
+        <!-- MAIN CHAIN-->
         <div class="col-lg-6 col-12">
             <div class="card mb-4">
                 <div class="card-body">
@@ -212,6 +214,8 @@
                 </div>
             }
         </div>
+
+        <!-- SIDE CHAIN-->
         <div class="col-lg-6 col-12">
             <div class="card mb-4">
                 <div class="card-body">
@@ -233,6 +237,16 @@
                                 <ul class="list-inline">
                                     <li class="list-inline-item"><strong>Swagger :</strong></li>
                                     <li class="list-inline-item"><a target="_blank" href="@Model.SidechainNode.SwaggerUrl">@Model.SidechainNode.SwaggerUrl</a></li>
+                                </ul>
+                            </li>
+                            <li class="col-12 col-xl-6">
+                                <ul class="list-inline">
+                                    <li class="list-inline-item"><strong>Cirrus Mining Address :</strong></li>
+                                    <li class="list-inline-item text-muted">
+                                        <a href="#qrcode" data-toggle="modal" role="qrcode" data-qr="@Model.SidechainNode.SidechainMiningAddress" class="inherit text-muted" id="sidechainMiningAddress">@Model.SidechainNode.SidechainMiningAddress</a>
+                                        <i role="copy" data-id="sidechainMiningAddress" data-message="Cirrus Mining Address successfully copied to clipboard" class="far fa-copy">
+                                        </i>
+                                    </li>
                                 </ul>
                             </li>
                             <li class="col-12 col-xl-6">

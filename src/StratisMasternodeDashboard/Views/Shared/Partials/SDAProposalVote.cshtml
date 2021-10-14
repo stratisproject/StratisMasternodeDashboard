@@ -1,49 +1,5 @@
 ﻿@model SDAVoteModel
 
-<script type="text/javascript">
-    function submitSDAVote() {
-        var formdata = {
-            ProposalId: parseInt($("#proposalId").val()),
-            VotingDecision: $("#votingDecision").val(),
-            WalletName: $("#walletName").val(),
-            WalletPassword: $("#walletPassword").val()
-        }
-        $("#submitSDAVoteBtn").text('Is Busy...');
-        $("#submitSDAVoteBtn").attr('disabled', true);
-        console.log(formdata);
-        $.ajax({
-            type: 'POST',
-            url: '/sidechain-node/sdavote',
-            contentType: 'application/json; charset=utf-8',
-            data: JSON.stringify(formdata),
-            success: function (response) {
-                $("#sdavoteError").hide();
-                var proposalID = $("#proposalId").val();
-                $("#proposalId").val("");
-                $("#proposalLabel").text(proposalID);
-                $("#sDAProposalVotes").modal('hide');
-                $("#confirmationModalSDAVote").modal('show');
-                $("#submitSDAVoteBtn").text('Submit');
-                $("#submitSDAVoteBtn").attr('disabled', false);
-
-            },
-            error: function (result) {
-                if (!!result.responseText) {
-                    $("#sdavoteError").text(result.responseText);
-                    $("#sdavoteError").show();
-                    $("#submitSDAVoteBtn").text('Submit');
-                    $("#submitSDAVoteBtn").attr('disabled', false);
-                    return;
-                }
-                $("#sdavoteError").text("Failed to vote. Unknown error. Please try again and make sure nodes are running.");
-                $("#sdavoteError").show();
-                $("#submitSDAVoteBtn").text('Submit');
-                $("#submitSDAVoteBtn").attr('disabled', false);
-            }
-        });
-    }
-
-</script>
 <div class="modal fade right" id="sDAProposalVotes" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered" role="document" style="width: 950px">
         <div class="modal-content">
@@ -127,3 +83,75 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        EnableSubmitButton = function () {
+            $("#submitSDAVoteBtn").text('Submit');
+            $("#WalletPassword").attr('disabled', false);
+        }
+
+        ClearFields = function () {
+            $("#proposalId").val("");
+            $("#votingDecision").prop('selectedIndex', 0);
+            $("#walletName").val("");
+            $("#walletPassword").val("");
+        }
+
+        submitSDAVote = function () {
+            var formdata = {
+                ProposalId: parseInt($("#proposalId").val()),
+                VotingDecision: $("#votingDecision").val(),
+                WalletName: $("#walletName").val(),
+                WalletPassword: $("#walletPassword").val()
+            }
+
+            $("#submitSDAVoteBtn").text('Submitting...');
+            $("#submitSDAVoteBtn").attr('disabled', true);
+
+            console.log(formdata);
+
+            $.ajax({
+                type: 'POST',
+                url: '/sidechain-node/sdavote',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify(formdata),
+                success: function (response) {
+
+                    $("#sdavoteError").hide();
+
+                    var proposalID = $("#proposalId").val();
+
+                    ClearFields();
+
+                    $("#proposalLabel").text(proposalID);
+
+                    $("#sDAProposalVotes").modal('hide');
+                    $("#confirmationModalSDAVote").modal('show');
+
+                    EnableSubmitButton();
+                },
+                error: function (result) {
+
+                    ClearFields();
+
+                    if (!!result.responseText) {
+                        $("#sdavoteError").text(result.responseText);
+                        $("#sdavoteError").show();
+
+                        EnableSubmitButton();
+
+                        return;
+                    }
+
+                    $("#sdavoteError").text("Failed to vote, please try again and make sure your masternode is running.");
+                    $("#sdavoteError").show();
+
+                    EnableSubmitButton();
+                }
+            });
+        }
+    });
+</script>
