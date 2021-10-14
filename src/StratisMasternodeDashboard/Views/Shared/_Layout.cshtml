@@ -19,6 +19,23 @@
         <link href="~/css/default.min.css" asp-append-version="true" rel="stylesheet" />
         <link href="~/css/default.bundle.min.css" asp-append-version="true" rel="stylesheet" />
     </environment>
+
+    <environment include="Development">
+        <script type="text/javascript" src="~/lib/signalr/dist/browser/signalr.js"></script>
+        <script type="text/javascript" src="~/lib/jquery/dist/jquery.js"></script>
+        <script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+        <script type="text/javascript" src="~/lib/jquery-ajax-unobtrusive/dist/jquery.unobtrusive-ajax.min.js"></script>
+        <script type="text/javascript" src="~/lib/node-snackbar/dist/snackbar.min.js"></script>
+        <script type="text/javascript" src="~/lib/nprogress/nprogress.js"></script>
+        <script type="text/javascript" src="~/lib/datatables/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="~/lib/datatables/js/dataTables.bootstrap4.min.js"></script>
+        <script type="text/javascript" src="~/js/default.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script type="text/javascript" src="~/js/default.bundle.min.js"></script>
+        <script type="text/javascript" src="~/js/default.min.js"></script>
+    </environment>
+
     <link rel="icon" type="image/png" href="~/images/logo.png" />
 </head>
 <body>
@@ -88,21 +105,7 @@
     <section class="container-fluid marginTop" id="container">
         @RenderBody()
     </section>
-    <environment include="Development">
-        <script type="text/javascript" src="~/lib/signalr/dist/browser/signalr.min.js"></script>
-        <script type="text/javascript" src="~/lib/jquery/dist/jquery.min.js"></script>
-        <script type="text/javascript" src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-        <script type="text/javascript" src="~/lib/jquery-ajax-unobtrusive/dist/jquery.unobtrusive-ajax.min.js"></script>
-        <script type="text/javascript" src="~/lib/node-snackbar/dist/snackbar.min.js"></script>
-        <script type="text/javascript" src="~/lib/nprogress/nprogress.js"></script>
-        <script type="text/javascript" src="~/lib/datatables/js/jquery.dataTables.min.js"></script>
-        <script type="text/javascript" src="~/lib/datatables/js/dataTables.bootstrap4.min.js"></script>
-        <script type="text/javascript" src="~/js/default.js"></script>
-    </environment>
-    <environment exclude="Development">
-        <script type="text/javascript" src="~/js/default.bundle.min.js"></script>
-        <script type="text/javascript" src="~/js/default.min.js"></script>
-    </environment>
+
     @RenderSection("Scripts", false)
 </body>
 </html>
