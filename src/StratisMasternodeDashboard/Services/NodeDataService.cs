@@ -229,7 +229,13 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                     else
                         sidechainMinerStats.BlockProducerHitsValue = 0;
 
-                    sidechainMinerStats.MiningAddress = response.Content.miningStats?.miningAddress ?? "Waiting for block to be mined.";
+                    if (response.Content.miningStats != null)
+                    {
+                        if (string.IsNullOrWhiteSpace(response.Content.miningStats.miningAddress))
+                            sidechainMinerStats.MiningAddress = "Waiting for block to be mined.";
+                        else
+                            sidechainMinerStats.MiningAddress = response.Content.miningStats.miningAddress;
+                    }
 
                     if (response.Content.miningStats != null)
                         sidechainMinerStats.ProducedBlockInLastRound = (bool)response.Content.miningStats.producedBlockInLastRound;
