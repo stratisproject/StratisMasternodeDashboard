@@ -231,7 +231,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
                     if (response.Content.miningStats != null)
                     {
-                        if (string.IsNullOrWhiteSpace(response.Content.miningStats.miningAddress))
+                        if (string.IsNullOrWhiteSpace((string)response.Content.miningStats.miningAddress))
                             sidechainMinerStats.MiningAddress = "Waiting for block to be mined.";
                         else
                             sidechainMinerStats.MiningAddress = response.Content.miningStats.miningAddress;
