@@ -57,11 +57,13 @@
             </div>
         </div>
     </div>
-    <partial name="Partials/ProofOfAuthority" model="@(ViewBag.Vote)"></partial>
-    <partial name="Partials/IDGBMemberKick" model="@(ViewBag.Vote)"></partial>
-    <partial name="Partials/SDAProposalVote" model="@ViewBag.SDAVote"></partial>
-    <partial name="Partials/MiningPubKeys" model="@(ViewBag.MiningPubKeys)"></partial>
-    <partial name="Partials/LogLevels" model="@(ViewBag.LogRules)"></partial>
+
+    <partial name="Partials/ProofOfAuthority" model="@(ViewBag.Vote)" />
+    <partial name="Partials/IDGBMemberKick" model="@(ViewBag.Vote)" />
+    <partial name="Partials/SDAProposalVote" model="@ViewBag.SDAVote" />
+    <partial name="Partials/MiningPubKeys" model="@(ViewBag.MiningPubKeys)" />
+    <partial name="Partials/LogLevels" model="@(ViewBag.LogRules)" />
+
     <nav class="navbar navbar-dark bg-purple fixed-top">
         <a class="navbar-brand mr-4" href="https://stratisplatform.com/" target="_blank">
             <img src="~/images/logo_white.svg" width="30" height="30" class="d-inline-block align-top" alt="Stratis" />
@@ -74,16 +76,6 @@
         <span class="badge badge-purple">Status: <span class="status">@(ViewBag.Status ?? "Warning")</span></span>
     </nav>
     <nav class="navbar navbar-light bg-white py-1 fixed-top d-flex align-items-center">
-
-        <div class="navbar-text d-inline">
-            <ul class="list-inline mb-0 ml-5 ml-md-2 d-flex align-items-center">
-                <li class="list-inline-item text-dark">Cirrus Mining Address</li>
-                <li class="list-inline-item text-truncate">
-                    <a href="#qrcode" data-toggle="modal" role="qrcode" data-qr="@ViewBag.SidechainMiningAddress" class="inherit text-muted" id="sidechainMiningAddress">@ViewBag.SidechainMiningAddress</a>
-                    <i role="copy" data-id="sidechainMiningAddress" data-message="Cirrus Mining Address successfully copied to clipboard" class="far fa-copy"></i>
-                </li>
-            </ul>
-        </div>
 
         <div class="navbar-text p-0 d-inline ml-auto">
             <ul class="list-inline mb-0 d-flex align-items-center">
