@@ -22,19 +22,17 @@ $(document).on("click", '[role="qrcode"]', function(data)
 
 $(document).ready(function()
 {
-	var CacheIsDifferent = false;
-
 	// Run SignalR to accept events from the backend
 	NProgress.start();
+
 	var signalrHub =
 		new signalR.HubConnectionBuilder()
 			.withUrl("/ws-updater")
 			.withAutomaticReconnect()
 			.build();
 
-	signalrHub.on("CacheIsDifferent", function () {
+	signalrHub.on("RefreshDashboard", function () {
 		NProgress.start();
-		CacheIsDifferent = true;
 		$("#container").load("/update-dashboard");
 		Snackbar.close();
 		NProgress.done();

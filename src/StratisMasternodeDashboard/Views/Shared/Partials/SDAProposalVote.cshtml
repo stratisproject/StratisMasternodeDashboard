@@ -90,7 +90,7 @@
 
         EnableSubmitButton = function () {
             $("#submitSDAVoteBtn").text('Submit');
-            $("#WalletPassword").attr('disabled', false);
+            $("#submitSDAVoteBtn").prop('disabled', false);
         }
 
         ClearFields = function () {
@@ -109,7 +109,7 @@
             }
 
             $("#submitSDAVoteBtn").text('Submitting...');
-            $("#submitSDAVoteBtn").attr('disabled', true);
+            $("#submitSDAVoteBtn").prop('disabled', true);
 
             console.log(formdata);
 

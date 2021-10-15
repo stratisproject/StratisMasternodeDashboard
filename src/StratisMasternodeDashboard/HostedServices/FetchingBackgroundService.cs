@@ -78,119 +78,158 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
             await Task.CompletedTask;
         }
 
+        private async void DoWorkAsync(object state)
+        {
+            var (mainChainUp, sideChainUp) = this.PerformNodeCheck();
+
+            await this.BuildCacheAsync(mainChainUp, sideChainUp).ConfigureAwait(false);
+
+            if (!mainChainUp && !sideChainUp)
+            {
+                await this.distributedCache.SetStringAsync("NodeUnavailable", "true").ConfigureAwait(false);
+
+                if (this.successfullyBuilt)
+                    await this.updaterHub.Clients.All.SendAsync("NodeUnavailable").ConfigureAwait(false);
+
+                this.successfullyBuilt = false;
+            }
+        }
+
         /// <summary>
         /// Retrieve all node information and store it in IDistributedCache object
         /// </summary>
-        private async Task BuildCacheAsync()
+        private async Task BuildCacheAsync(bool mainChainUp, bool sideChainUp)
         {
             this.logger.LogInformation($"Refresh the Dashboard Data");
 
-            await nodeDataServiceMainchain.Update();
-            await nodeDataServiceSidechain.Update();
+            // Clear the cached dashboard data.
+            await this.distributedCache.RemoveAsync("DashboardData").ConfigureAwait(false);
+
+            var dashboardModel = new DashboardModel
+            {
+                Status = true,
+                MiningPublicKeys = nodeDataServiceMainchain.FedInfoResponse?.Content?.federationMultisigPubKeys ?? new JArray()
+            };
 
             var stratisPeers = new List<Peer>();
             var stratisFederationMembers = new List<Peer>();
             var sidechainPeers = new List<Peer>();
             var sidechainFederationMembers = new List<Peer>();
 
-            try
+            if (mainChainUp)
             {
-                if (this.multiSigNode)
+                await nodeDataServiceMainchain.Update().ConfigureAwait(false);
+
+                try
                 {
-                    this.ParsePeers(nodeDataServiceMainchain, stratisPeers, stratisFederationMembers);
-                    this.ParsePeers(nodeDataServiceSidechain, sidechainPeers, sidechainFederationMembers);
+                    if (this.multiSigNode)
+                        this.ParsePeers(nodeDataServiceMainchain, stratisPeers, stratisFederationMembers);
+                    else
+                        this.ParsePeers(nodeDataServiceMainchain, stratisPeers);
                 }
-                else
+                catch (Exception e)
                 {
-                    this.ParsePeers(nodeDataServiceMainchain, stratisPeers);
-                    this.ParsePeers(nodeDataServiceSidechain, sidechainPeers);
+                    this.logger.LogError(e, "Unable to parse peer data for the mainchain.");
+                }
+
+                try
+                {
+                    var mainchainNode = new StratisNodeModel
+                    {
+                        History = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).WalletHistory : new JArray(),
+                        ConfirmedBalanceFed = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).FedWalletBalance.confirmedBalance : -1,
+                        UnconfirmedBalanceFed = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).FedWalletBalance.unconfirmedBalance : -1,
+
+                        WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/api").ToString(),
+                        SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/swagger").ToString(),
+                        SyncingStatus = nodeDataServiceMainchain.NodeStatus.SyncingProgress,
+                        Peers = stratisPeers,
+                        FederationMembers = stratisFederationMembers,
+                        BlockHash = nodeDataServiceMainchain.BestHash,
+                        BlockHeight = (int)nodeDataServiceMainchain.NodeStatus.BlockStoreHeight,
+                        HeaderHeight = (int)nodeDataServiceMainchain.NodeStatus.HeaderHeight,
+                        MempoolSize = nodeDataServiceMainchain.RawMempool,
+
+                        LogRules = nodeDataServiceMainchain.LogRules,
+                        Uptime = nodeDataServiceMainchain.NodeStatus.Uptime,
+                        AddressIndexer = this.nodeDataServiceMainchain.AddressIndexerHeight,
+                        OrphanSize = this.nodeDataServiceMainchain.NodeDashboardStats?.OrphanSize ?? string.Empty
+                    };
+
+                    dashboardModel.MainchainNode = mainchainNode;
+
+                    this.successfullyBuilt = true;
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex, "Unable to refresh the mainchain feed.");
                 }
             }
-            catch (Exception e)
+
+            if (sideChainUp)
             {
-                this.logger.LogError(e, "Unable to parse feeds");
-            }
+                await nodeDataServiceSidechain.Update().ConfigureAwait(false);
 
-            var dashboardModel = new DashboardModel();
-
-            try
-            {
-                dashboardModel.Status = true;
-                dashboardModel.IsCacheBuilt = true;
-                dashboardModel.MiningPublicKeys = nodeDataServiceMainchain.FedInfoResponse?.Content?.federationMultisigPubKeys ?? new JArray();
-
-                // Mainchain Node
-                var mainchainNode = new StratisNodeModel
+                try
                 {
-                    History = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).WalletHistory : new JArray(),
-                    ConfirmedBalanceFed = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).FedWalletBalance.confirmedBalance : -1,
-                    UnconfirmedBalanceFed = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).FedWalletBalance.unconfirmedBalance : -1,
-
-                    WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/api").ToString(),
-                    SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/swagger").ToString(),
-                    SyncingStatus = nodeDataServiceMainchain.NodeStatus.SyncingProgress,
-                    Peers = stratisPeers,
-                    FederationMembers = stratisFederationMembers,
-                    BlockHash = nodeDataServiceMainchain.BestHash,
-                    BlockHeight = (int)nodeDataServiceMainchain.NodeStatus.BlockStoreHeight,
-                    HeaderHeight = (int)nodeDataServiceMainchain.NodeStatus.HeaderHeight,
-                    MempoolSize = nodeDataServiceMainchain.RawMempool,
-
-                    CoinTicker = "STRAX",
-                    LogRules = nodeDataServiceMainchain.LogRules,
-                    Uptime = nodeDataServiceMainchain.NodeStatus.Uptime,
-                    AddressIndexer = this.nodeDataServiceMainchain.AddressIndexerHeight,
-                    OrphanSize = this.nodeDataServiceMainchain.NodeDashboardStats?.OrphanSize ?? string.Empty
-                };
-
-                dashboardModel.StratisNode = mainchainNode;
-
-                // Sidechain Node
-                var sidechainNode = new SidechainNodeModel
+                    if (this.multiSigNode)
+                        this.ParsePeers(nodeDataServiceSidechain, sidechainPeers, sidechainFederationMembers);
+                    else
+                        this.ParsePeers(nodeDataServiceSidechain, sidechainPeers);
+                }
+                catch (Exception e)
                 {
-                    History = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).WalletHistory : new JArray(),
-                    ConfirmedBalanceFed = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).FedWalletBalance.confirmedBalance : -1,
-                    UnconfirmedBalanceFed = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).FedWalletBalance.unconfirmedBalance : -1,
+                    this.logger.LogError(e, "Unable to parse peer data for the sidechain.");
+                }
 
-                    WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/api").ToString(),
-                    SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/swagger").ToString(),
-                    SyncingStatus = nodeDataServiceSidechain.NodeStatus.SyncingProgress,
-                    Peers = sidechainPeers,
-                    FederationMembers = sidechainFederationMembers,
-                    BlockHash = nodeDataServiceSidechain.BestHash,
-                    BlockHeight = (int)nodeDataServiceSidechain.NodeStatus.BlockStoreHeight,
-                    HeaderHeight = (int)nodeDataServiceSidechain.NodeStatus.HeaderHeight,
-                    MempoolSize = nodeDataServiceSidechain.RawMempool,
+                try
+                {
+                    // Sidechain Node
+                    var sidechainNode = new SidechainNodeModel
+                    {
+                        History = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).WalletHistory : new JArray(),
+                        ConfirmedBalanceFed = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).FedWalletBalance.confirmedBalance : -1,
+                        UnconfirmedBalanceFed = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).FedWalletBalance.unconfirmedBalance : -1,
 
-                    CoinTicker = "CRS",
-                    LogRules = nodeDataServiceSidechain.LogRules,
-                    PoAPendingPolls = nodeDataServiceSidechain.PendingPolls,
-                    Uptime = nodeDataServiceSidechain.NodeStatus.Uptime,
+                        WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/api").ToString(),
+                        SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/swagger").ToString(),
+                        SyncingStatus = nodeDataServiceSidechain.NodeStatus.SyncingProgress,
+                        Peers = sidechainPeers,
+                        FederationMembers = sidechainFederationMembers,
+                        BlockHash = nodeDataServiceSidechain.BestHash,
+                        BlockHeight = (int)nodeDataServiceSidechain.NodeStatus.BlockStoreHeight,
+                        HeaderHeight = (int)nodeDataServiceSidechain.NodeStatus.HeaderHeight,
+                        MempoolSize = nodeDataServiceSidechain.RawMempool,
 
-                    BlockProducerHits = this.nodeDataServiceSidechain.SidechainMinerStats.BlockProducerHits,
-                    BlockProducerHitsValue = this.nodeDataServiceSidechain.SidechainMinerStats.BlockProducerHitsValue,
-                    IsMining = this.nodeDataServiceSidechain.SidechainMinerStats.ProducedBlockInLastRound,
-                    SidechainMiningAddress = this.nodeDataServiceSidechain.SidechainMinerStats.MiningAddress,
+                        LogRules = nodeDataServiceSidechain.LogRules,
+                        PoAPendingPolls = nodeDataServiceSidechain.PendingPolls,
+                        Uptime = nodeDataServiceSidechain.NodeStatus.Uptime,
 
-                    OrphanSize = this.nodeDataServiceSidechain.NodeDashboardStats?.OrphanSize ?? string.Empty,
-                    FederationMemberCount = this.nodeDataServiceSidechain.FederationMemberCount,
-                    ConfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.confirmedBalance,
-                    UnconfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.unconfirmedBalance,
-                    KickFederationMemberPolls = nodeDataServiceSidechain.KickFederationMememberPendingPolls
-                };
+                        BlockProducerHits = this.nodeDataServiceSidechain.SidechainMinerStats.BlockProducerHits,
+                        BlockProducerHitsValue = this.nodeDataServiceSidechain.SidechainMinerStats.BlockProducerHitsValue,
+                        IsMining = this.nodeDataServiceSidechain.SidechainMinerStats.ProducedBlockInLastRound,
+                        SidechainMiningAddress = this.nodeDataServiceSidechain.SidechainMinerStats.MiningAddress,
 
-                dashboardModel.SidechainNode = sidechainNode;
+                        OrphanSize = this.nodeDataServiceSidechain.NodeDashboardStats?.OrphanSize ?? string.Empty,
+                        FederationMemberCount = this.nodeDataServiceSidechain.FederationMemberCount,
+                        ConfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.confirmedBalance,
+                        UnconfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.unconfirmedBalance,
+                        KickFederationMemberPolls = nodeDataServiceSidechain.KickFederationMememberPendingPolls
+                    };
+
+                    dashboardModel.SidechainNode = sidechainNode;
+
+                    this.successfullyBuilt = true;
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex, "Unable to refresh the sidechain feed.");
+                }
             }
-            catch (Exception e)
-            {
-                this.logger.LogError(e, "Unable to fetch feeds.");
-                return;
-            }
 
-            this.logger.LogInformation("Feed updated...");
+            this.logger.LogInformation("Feeds updated...");
 
-            if (!string.IsNullOrEmpty(this.distributedCache.GetString("DashboardData")))
-                await this.updaterHub.Clients.All.SendAsync("CacheIsDifferent");
+            await this.updaterHub.Clients.All.SendAsync("RefreshDashboard").ConfigureAwait(false);
 
             this.distributedCache.SetString("DashboardData", JsonConvert.SerializeObject(dashboardModel));
         }
@@ -272,25 +311,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 $"{endpoint.Address.MapToIPv4()}:{endpointMatches[0].Groups[2].Value}";
         }
 
-        private async void DoWorkAsync(object state)
-        {
-            if (this.PerformNodeCheck())
-            {
-                await this.BuildCacheAsync();
-                this.successfullyBuilt = true;
-            }
-            else
-            {
-                await this.distributedCache.SetStringAsync("NodeUnavailable", "true");
-                if (this.successfullyBuilt)
-                {
-                    await this.updaterHub.Clients.All.SendAsync("NodeUnavailable");
-                }
-                await this.distributedCache.RemoveAsync("DashboardData");
-                this.successfullyBuilt = false;
-            }
-        }
-
         public Task StopAsync(CancellationToken cancellationToken)
         {
             this.logger.LogInformation($"Stopping the Fetching Background Service");
@@ -311,11 +331,11 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
         /// </summary>
         /// <remarks>The ports can be changed in the future</remarks>
         /// <returns>True if the connection are succeed</returns>
-        private bool PerformNodeCheck()
+        private (bool, bool) PerformNodeCheck()
         {
             var mainNodeUp = this.PortCheck(new Uri(this.defaultEndpointsSettings.StratisNode));
             var sidechainsNodeUp = this.PortCheck(new Uri(this.defaultEndpointsSettings.SidechainNode));
-            return mainNodeUp && sidechainsNodeUp;
+            return (mainNodeUp, sidechainsNodeUp);
         }
 
         /// <summary>
