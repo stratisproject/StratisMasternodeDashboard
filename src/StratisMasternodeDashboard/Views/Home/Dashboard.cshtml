@@ -41,144 +41,161 @@
                 <div class="card-body">
                     <div class="pb-3 mb-3">
                         <div class="mr-auto d-inline-block">
-                            <h3>Mainchain Node</h3>
-                        </div>
-                        <ul class="list-inline float-right d-flex align-items-center">
-                            <li class="list-inline-item">
-                                <span class="badge badge-@(Model.StratisNode.SyncingStatus >= 100 ? "success" : "warning")">
-                                    <i class="material-icons">sync</i> @(Model.StratisNode.SyncingStatus >= 100 ? "Synced" : "Syncing") @Model.StratisNode.SyncingStatus.ToString("N2")%
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="card-text">
-                        <ul class="list-inline mb-0 row">
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Swagger :</strong></li>
-                                    <li class="list-inline-item"><a target="_blank" href="@Model.StratisNode.SwaggerUrl">@Model.StratisNode.SwaggerUrl</a></li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Uptime :</strong></li>
-                                    <li class="list-inline-item text-muted">@Model.StratisNode.Uptime</li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Block height :</strong></li>
-                                    <li class="list-inline-item">@Model.StratisNode.BlockHeight</li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Mempool size :</strong></li>
-                                    <li class="list-inline-item text-muted">@Model.StratisNode.MempoolSize</li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline d-flex align-itmes-center">
-                                    <li class="list-inline-item"><strong>Block hash :</strong></li>
-                                    <li class="list-inline-item text-truncate" style="max-width: 150px;">
-                                        <a href="https://chainz.cryptoid.info/strax/block.dws?@(Model.StratisNode.BlockHash).htm" id="stratisBlockHash" target="_blank">@Model.StratisNode.BlockHash</a>
-                                    </li>
-                                    <li class="list-inline-item"><i role="copy" data-id="stratisBlockHash" data-message="Block hash successfully copied to clipboard" class="far fa-copy"></i></li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Orphan size :</strong></li>
-                                    <li class="list-inline-item text-muted">@Model.StratisNode.OrphanSize</li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Header height :</strong></li>
-                                    <li class="list-inline-item">@Model.StratisNode.HeaderHeight</li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Address Indexer height :</strong></li>
-                                    <li class="list-inline-item">@Model.StratisNode.AddressIndexer</li>
-                                </ul>
-                            </li>
-                            @if (fiftyKOnlyFeature)
+                            @if (Model.MainchainNode != null)
                             {
-                                <li class="col-12 col-xl-12">
+                                <h3>Mainchain Node</h3>
+                            }
+                            else
+                            {
+                                <h3>Mainchain Node [OFFLINE]</h3>
+                            }
+                        </div>
+
+                        @if (Model.MainchainNode != null)
+                        {
+                            <ul class="list-inline float-right d-flex align-items-center">
+                                <li class="list-inline-item">
+                                    <span class="badge badge-@(Model.MainchainNode.SyncingStatus >= 100 ? "success" : "warning")">
+                                        <i class="material-icons">sync</i> @(Model.MainchainNode.SyncingStatus >= 100 ? "Synced" : "Syncing") @Model.MainchainNode.SyncingStatus.ToString("N2")%
+                                    </span>
+                                </li>
+                            </ul>
+                        }
+                    </div>
+
+                    @if (Model.MainchainNode != null)
+                    {
+                        <div class="card-text">
+                            <ul class="list-inline mb-0 row">
+                                <li class="col-12 col-xl-6">
                                     <ul class="list-inline">
-                                        <li class="list-inline-item"><strong>Federation Wallet balance :</strong></li>
-                                        <li class="list-inline-item text-green">Confirmed: @Model.StratisNode.ConfirmedBalanceFed.ToString("N8") @Model.StratisNode.CoinTicker</li>
-                                        <li class="list-inline-item text-muted">/</li>
-                                        <li class="list-inline-item text-muted">Unconfirmed: @Model.StratisNode.UnconfirmedBalanceFed.ToString("N8") @Model.StratisNode.CoinTicker</li>
+                                        <li class="list-inline-item"><strong>Swagger :</strong></li>
+                                        <li class="list-inline-item"><a target="_blank" href="@Model.MainchainNode.SwaggerUrl">@Model.MainchainNode.SwaggerUrl</a></li>
                                     </ul>
                                 </li>
-                            }
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Total Peers / In / Out:</strong></li>
-                                    <li class="list-inline-item">@Model.StratisNode.Peers.Count  /  @Model.StratisNode.Peers.Where(p => p.Type == "inbound").Count()  /  @Model.StratisNode.Peers.Where(p => p.Type == "outbound").Count() </li>
-                                </ul>
-                            </li>
-                        </ul>
-                        <label class="mt-3"><strong>Peers :</strong></label>
-                        <table class="table table-sm table-striped" id="stratis-peers">
-                            <thead>
-                                <tr>
-                                    <th>Endpoint</th>
-                                    <th>Type</th>
-                                    <th>Height</th>
-                                    <th>Version</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var peer in Model.StratisNode.Peers)
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Uptime :</strong></li>
+                                        <li class="list-inline-item text-muted">@Model.MainchainNode.Uptime</li>
+                                    </ul>
+                                </li>
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Block height :</strong></li>
+                                        <li class="list-inline-item">@Model.MainchainNode.BlockHeight</li>
+                                    </ul>
+                                </li>
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Mempool size :</strong></li>
+                                        <li class="list-inline-item text-muted">@Model.MainchainNode.MempoolSize</li>
+                                    </ul>
+                                </li>
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline d-flex align-itmes-center">
+                                        <li class="list-inline-item"><strong>Block hash :</strong></li>
+                                        <li class="list-inline-item text-truncate" style="max-width: 150px;">
+                                            <a href="https://chainz.cryptoid.info/strax/block.dws?@(Model.MainchainNode.BlockHash).htm" id="stratisBlockHash" target="_blank">@Model.MainchainNode.BlockHash</a>
+                                        </li>
+                                        <li class="list-inline-item"><i role="copy" data-id="stratisBlockHash" data-message="Block hash successfully copied to clipboard" class="far fa-copy"></i></li>
+                                    </ul>
+                                </li>
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Orphan size :</strong></li>
+                                        <li class="list-inline-item text-muted">@Model.MainchainNode.OrphanSize</li>
+                                    </ul>
+                                </li>
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Header height :</strong></li>
+                                        <li class="list-inline-item">@Model.MainchainNode.HeaderHeight</li>
+                                    </ul>
+                                </li>
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Address Indexer height :</strong></li>
+                                        <li class="list-inline-item">@Model.MainchainNode.AddressIndexer</li>
+                                    </ul>
+                                </li>
+                                @if (fiftyKOnlyFeature)
                                 {
-                                    <tr>
-                                        <td class="text-left">@peer.Endpoint</td>
-                                        <td class="text-center">@peer.Type</td>
-                                        <td class="text-center">height:@peer.Height</td>
-                                        <td style="width: 250px;" nowrap class="text-left">agent:@peer.Version</td>
-                                    </tr>
+                                    <li class="col-12 col-xl-12">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item"><strong>Federation Wallet balance :</strong></li>
+                                            <li class="list-inline-item text-green">Confirmed: @Model.MainchainNode.ConfirmedBalanceFed.ToString("N8") @DashboardModel.MainchainCoinTicker</li>
+                                            <li class="list-inline-item text-muted">/</li>
+                                            <li class="list-inline-item text-muted">Unconfirmed: @Model.MainchainNode.UnconfirmedBalanceFed.ToString("N8") @DashboardModel.MainchainCoinTicker</li>
+                                        </ul>
+                                    </li>
                                 }
-                            </tbody>
-                        </table>
-                        @if (fiftyKOnlyFeature)
-                        {
-                            <label><strong>Multisig Federation members :</strong></label>
-                            <table class="table table-sm table-striped" id="stratis-members">
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Total Peers / In / Out:</strong></li>
+                                        <li class="list-inline-item">@Model.MainchainNode.Peers.Count  /  @Model.MainchainNode.Peers.Where(p => p.Type == "inbound").Count()  /  @Model.MainchainNode.Peers.Where(p => p.Type == "outbound").Count() </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <label class="mt-3"><strong>Peers :</strong></label>
+                            <table class="table table-sm table-striped" id="stratis-peers">
                                 <thead>
                                     <tr>
-                                        <th class="text-left">Endpoint</th>
-                                        <th class="text-center">Type</th>
-                                        <th class="text-center">Height</th>
-                                        <th style="width: 250px;" nowrap class="text-left">Version</th>
+                                        <th>Endpoint</th>
+                                        <th>Type</th>
+                                        <th>Height</th>
+                                        <th>Version</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var member in Model.StratisNode.FederationMembers)
+                                    @foreach (var peer in Model.MainchainNode.Peers)
                                     {
                                         <tr>
-                                            <td class="text-left reveal-on-blur">@member.Endpoint</td>
-                                            <td class="text-center">@member.Type</td>
-                                            <td class="text-center">height:@member.Height</td>
-                                            <td style="width: 250px;" nowrap class="text-left">agent:@member.Version</td>
+                                            <td class="text-left">@peer.Endpoint</td>
+                                            <td class="text-center">@peer.Type</td>
+                                            <td class="text-center">height:@peer.Height</td>
+                                            <td style="width: 250px;" nowrap class="text-left">agent:@peer.Version</td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
-                        }
-                    </div>
+                            @if (fiftyKOnlyFeature)
+                            {
+                                <label><strong>Multisig Federation members :</strong></label>
+                                <table class="table table-sm table-striped" id="stratis-members">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-left">Endpoint</th>
+                                            <th class="text-center">Type</th>
+                                            <th class="text-center">Height</th>
+                                            <th style="width: 250px;" nowrap class="text-left">Version</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var member in Model.MainchainNode.FederationMembers)
+                                        {
+                                            <tr>
+                                                <td class="text-left reveal-on-blur">@member.Endpoint</td>
+                                                <td class="text-center">@member.Type</td>
+                                                <td class="text-center">height:@member.Height</td>
+                                                <td style="width: 250px;" nowrap class="text-left">agent:@member.Version</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                        </div>
+                    }
+
                 </div>
             </div>
+
             @if (fiftyKOnlyFeature)
             {
                 <div class="card mb-4">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-4">
                             <label class="d-flex justify-content-start">
-                                <strong>Federation Wallet History <small class="text-muted">(@(((JArray)Model.StratisNode?.History)?.Count ?? 0))</small></strong>
+                                <strong>Federation Wallet History <small class="text-muted">(@(((JArray)Model.MainchainNode?.History)?.Count ?? 0))</small></strong>
                             </label>
                             <span class="d-flex justify-content-end align-items-center ml-auto">
                                 <a data-toggle="modal" data-target="#stratisHistory" class="btn btn-outline-primary">See all history</a>
@@ -195,16 +212,16 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if (Model.StratisNode.History != null)
+                                @if (Model.MainchainNode.History != null)
                                 {
-                                    foreach (dynamic transaction in ((JArray)Model.StratisNode.History).Take(5).ToList())
+                                    foreach (dynamic transaction in ((JArray)Model.MainchainNode.History).Take(5).ToList())
                                     {
                                         <tr>
                                             <td class="text-center"><i class="material-icons text-green md-18">check_circle</i></td>
                                             <td class="text-center text-truncate"><code>@(transaction.withdrawal.targetAddress)</code></td>
                                             <td class="text-left text-truncate" style="max-width: 110px;"><a href="https://chainz.cryptoid.info/strax/tx.dws?@(transaction.withdrawal.id).htm" target="_blank">@transaction.withdrawal.id</a></td>
                                             <td class="text-center">@transaction.withdrawal.blockNumber</td>
-                                            <td class="text-right">@(((double)transaction.withdrawal.amount / 100000000).ToString("N8")) @Model.StratisNode.CoinTicker</td>
+                                            <td class="text-right">@(((double)transaction.withdrawal.amount / 100000000).ToString("N8")) @DashboardModel.MainchainCoinTicker</td>
                                         </tr>
                                     }
                                 }
@@ -221,146 +238,135 @@
                 <div class="card-body">
                     <div class="pb-3 mb-3">
                         <div class="mr-auto d-inline-block">
-                            <h3>Sidechain Node</h3>
-                        </div>
-                        <ul class="list-inline float-right d-flex align-items-center">
-                            <li class="list-inline-item">
-                                <span class="badge badge-@(Model.SidechainNode.SyncingStatus >= 100 ? "success" : "warning")">
-                                    <i class="material-icons">sync</i> @(Model.SidechainNode.SyncingStatus >= 100 ? "Synced" : "Syncing") @Model.SidechainNode.SyncingStatus.ToString("N2")%
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="card-text">
-                        <ul class="list-inline mb-0 row">
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Swagger :</strong></li>
-                                    <li class="list-inline-item"><a target="_blank" href="@Model.SidechainNode.SwaggerUrl">@Model.SidechainNode.SwaggerUrl</a></li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Cirrus Mining Address :</strong></li>
-                                    <li class="list-inline-item text-muted">
-                                        <a href="#qrcode" data-toggle="modal" role="qrcode" data-qr="@Model.SidechainNode.SidechainMiningAddress" class="inherit text-muted" id="sidechainMiningAddress">@Model.SidechainNode.SidechainMiningAddress</a>
-                                        <i role="copy" data-id="sidechainMiningAddress" data-message="Cirrus Mining Address successfully copied to clipboard" class="far fa-copy">
-                                        </i>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Uptime :</strong></li>
-                                    <li class="list-inline-item text-muted">@Model.SidechainNode.Uptime</li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Block height :</strong></li>
-                                    <li class="list-inline-item">@Model.SidechainNode.BlockHeight</li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Mempool size :</strong></li>
-                                    <li class="list-inline-item text-muted">@Model.SidechainNode.MempoolSize</li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline d-flex align-itmes-center">
-                                    <li class="list-inline-item"><strong>Block hash :</strong></li>
-                                    <li class="list-inline-item text-truncate" style="max-width: 150px;">
-                                        <a href="https://chainz.cryptoid.info/cirrus/block.dws?@(Model.SidechainNode.BlockHash).htm" id="sidechainBlockHash" target="_blank">@Model.SidechainNode.BlockHash</a>
-                                    </li>
-                                    <li class="list-inline-item"><i role="copy" data-id="sidechainBlockHash" data-message="Block hash successfully copied to clipboard" class="far fa-copy"></i></li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Orphan size :</strong></li>
-                                    <li class="list-inline-item text-muted">@Model.SidechainNode.OrphanSize</li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Header height :</strong></li>
-                                    <li class="list-inline-item">@Model.SidechainNode.HeaderHeight</li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Mining Status :</strong></li>
-                                    <li class="list-inline-item text-muted">
-                                        <span class="badge badge-@(Model.SidechainNode.IsMining ? "success" : "danger")">
-                                            @(Model.SidechainNode.IsMining ? "Mining" : "Not Mining")
-                                        </span>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Block Producer Hits :</strong></li>
-                                    <li class="list-inline-item">
-                                        <div class="inline-flex">@Model.SidechainNode.BlockProducerHits</div>
-                                        <div class="inline-flex progress" style="width: 100px;">
-                                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: @Model.SidechainNode.BlockProducerHitsValue%;" aria-valuenow="@Model.SidechainNode.BlockProducerHitsValue" aria-valuemin="0" aria-valuemax="100">@Model.SidechainNode.BlockProducerHitsValue%</div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="col-12">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Mining Wallet balance :</strong></li>
-                                    <li class="list-inline-item text-green">Confirmed: @Model.SidechainNode.ConfirmedBalance.ToString("N8") @Model.SidechainNode.CoinTicker</li>
-                                    <li class="list-inline-item text-muted">/</li>
-                                    <li class="list-inline-item text-muted">Unconfirmed: @Model.SidechainNode.UnconfirmedBalance.ToString("N8") @Model.SidechainNode.CoinTicker</li>
-                                </ul>
-                            </li>
-                            @if (fiftyKOnlyFeature)
+                            @if (Model.SidechainNode != null)
                             {
-                                <li class="col-12">
+                                <h3>Sidechain Node</h3>
+                            }
+                            else
+                            {
+                                <h3>Sidechain Node [OFFLINE]</h3>
+                            }
+                        </div>
+                        @if (Model.SidechainNode != null)
+                        {
+                            <ul class="list-inline float-right d-flex align-items-center">
+                                <li class="list-inline-item">
+                                    <span class="badge badge-@(Model.SidechainNode.SyncingStatus >= 100 ? "success" : "warning")">
+                                        <i class="material-icons">sync</i> @(Model.SidechainNode.SyncingStatus >= 100 ? "Synced" : "Syncing") @Model.SidechainNode.SyncingStatus.ToString("N2")%
+                                    </span>
+                                </li>
+                            </ul>
+                        }
+                    </div>
+
+                    @if (Model.SidechainNode != null)
+                    {
+                        <div class="card-text">
+                            <ul class="list-inline mb-0 row">
+                                <li class="col-12 col-xl-6">
                                     <ul class="list-inline">
-                                        <li class="list-inline-item"><strong>Federation Wallet balance :</strong></li>
-                                        <li class="list-inline-item text-green">Confirmed: @Model.SidechainNode.ConfirmedBalanceFed.ToString("N8") @Model.SidechainNode.CoinTicker</li>
-                                        <li class="list-inline-item text-muted">/</li>
-                                        <li class="list-inline-item text-muted">Unconfirmed: @Model.SidechainNode.UnconfirmedBalanceFed.ToString("N8") @Model.SidechainNode.CoinTicker</li>
+                                        <li class="list-inline-item"><strong>Swagger :</strong></li>
+                                        <li class="list-inline-item"><a target="_blank" href="@Model.SidechainNode.SwaggerUrl">@Model.SidechainNode.SwaggerUrl</a></li>
                                     </ul>
                                 </li>
-                            }
-                            <li class="col-12 col-xl-6">
-                                <ul class="list-inline">
-                                    <li class="list-inline-item"><strong>Total Peers / In / Out:</strong></li>
-                                    <li class="list-inline-item">@Model.SidechainNode.Peers.Count  /  @Model.SidechainNode.Peers.Where(p => p.Type == "inbound").Count()  /  @Model.SidechainNode.Peers.Where(p => p.Type == "outbound").Count() </li>
-                                </ul>
-                            </li>
-                        </ul>
-                        <label class="mt-3"><strong>Peers :</strong></label>
-                        <table class="table table-sm table-striped" id="sidechain-peers">
-                            <thead>
-                                <tr>
-                                    <th class="text-left">Endpoint</th>
-                                    <th class="text-center">Type</th>
-                                    <th class="text-center">Height</th>
-                                    <th style="width: 250px;" nowrap class="text-left">Version</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var peer in Model.SidechainNode.Peers)
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Cirrus Mining Address :</strong></li>
+                                        <li class="list-inline-item text-muted">
+                                            <a href="#qrcode" data-toggle="modal" role="qrcode" data-qr="@Model.SidechainNode.SidechainMiningAddress" class="inherit text-muted" id="sidechainMiningAddress">@Model.SidechainNode.SidechainMiningAddress</a>
+                                            <i role="copy" data-id="sidechainMiningAddress" data-message="Cirrus Mining Address successfully copied to clipboard" class="far fa-copy">
+                                            </i>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Uptime :</strong></li>
+                                        <li class="list-inline-item text-muted">@Model.SidechainNode.Uptime</li>
+                                    </ul>
+                                </li>
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Block height :</strong></li>
+                                        <li class="list-inline-item">@Model.SidechainNode.BlockHeight</li>
+                                    </ul>
+                                </li>
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Mempool size :</strong></li>
+                                        <li class="list-inline-item text-muted">@Model.SidechainNode.MempoolSize</li>
+                                    </ul>
+                                </li>
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline d-flex align-itmes-center">
+                                        <li class="list-inline-item"><strong>Block hash :</strong></li>
+                                        <li class="list-inline-item text-truncate" style="max-width: 150px;">
+                                            <a href="https://chainz.cryptoid.info/cirrus/block.dws?@(Model.SidechainNode.BlockHash).htm" id="sidechainBlockHash" target="_blank">@Model.SidechainNode.BlockHash</a>
+                                        </li>
+                                        <li class="list-inline-item"><i role="copy" data-id="sidechainBlockHash" data-message="Block hash successfully copied to clipboard" class="far fa-copy"></i></li>
+                                    </ul>
+                                </li>
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Orphan size :</strong></li>
+                                        <li class="list-inline-item text-muted">@Model.SidechainNode.OrphanSize</li>
+                                    </ul>
+                                </li>
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Header height :</strong></li>
+                                        <li class="list-inline-item">@Model.SidechainNode.HeaderHeight</li>
+                                    </ul>
+                                </li>
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Mining Status :</strong></li>
+                                        <li class="list-inline-item text-muted">
+                                            <span class="badge badge-@(Model.SidechainNode.IsMining ? "success" : "danger")">
+                                                @(Model.SidechainNode.IsMining ? "Mining" : "Not Mining")
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Block Producer Hits :</strong></li>
+                                        <li class="list-inline-item">
+                                            <div class="inline-flex">@Model.SidechainNode.BlockProducerHits</div>
+                                            <div class="inline-flex progress" style="width: 100px;">
+                                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: @Model.SidechainNode.BlockProducerHitsValue%;" aria-valuenow="@Model.SidechainNode.BlockProducerHitsValue" aria-valuemin="0" aria-valuemax="100">@Model.SidechainNode.BlockProducerHitsValue%</div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="col-12">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Mining Wallet balance :</strong></li>
+                                        <li class="list-inline-item text-green">Confirmed: @Model.SidechainNode.ConfirmedBalance.ToString("N8") @DashboardModel.SidechainCoinTicker>
+                                        <li class="list-inline-item text-muted">/</li>
+                                        <li class="list-inline-item text-muted">Unconfirmed: @Model.SidechainNode.UnconfirmedBalance.ToString("N8") @DashboardModel.SidechainCoinTicker</li>
+                                    </ul>
+                                </li>
+                                @if (fiftyKOnlyFeature)
                                 {
-                                    <tr>
-                                        <td class="text-left">@peer.Endpoint</td>
-                                        <td class="text-center">@peer.Type</td>
-                                        <td class="text-center">height:@peer.Height</td>
-                                        <td style="width: 250px;" nowrap class="text-left">agent:@peer.Version</td>
-                                    </tr>
+                                    <li class="col-12">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item"><strong>Federation Wallet balance :</strong></li>
+                                            <li class="list-inline-item text-green">Confirmed: @Model.SidechainNode.ConfirmedBalanceFed.ToString("N8") @DashboardModel.SidechainCoinTicker</li>
+                                            <li class="list-inline-item text-muted">/</li>
+                                            <li class="list-inline-item text-muted">Unconfirmed: @Model.SidechainNode.UnconfirmedBalanceFed.ToString("N8") @DashboardModel.SidechainCoinTicker</li>
+                                        </ul>
+                                    </li>
                                 }
-                            </tbody>
-                        </table>
-                        @if (fiftyKOnlyFeature)
-                        {
-                            <label><strong>Multisig Federation members :</strong></label>
-                            <table class="table table-sm table-striped" id="sidechain-members">
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Total Peers / In / Out:</strong></li>
+                                        <li class="list-inline-item">@Model.SidechainNode.Peers.Count  /  @Model.SidechainNode.Peers.Where(p => p.Type == "inbound").Count()  /  @Model.SidechainNode.Peers.Where(p => p.Type == "outbound").Count() </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <label class="mt-3"><strong>Peers :</strong></label>
+                            <table class="table table-sm table-striped" id="sidechain-peers">
                                 <thead>
                                     <tr>
                                         <th class="text-left">Endpoint</th>
@@ -370,28 +376,54 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var member in Model.SidechainNode.FederationMembers)
+                                    @foreach (var peer in Model.SidechainNode.Peers)
                                     {
                                         <tr>
-                                            <td class="text-left reveal-on-blur">@member.Endpoint</td>
-                                            <td class="text-center">@member.Type</td>
-                                            <td class="text-center">height:@member.Height</td>
-                                            <td style="width: 250px;" nowrap class="text-left">agent:@member.Version</td>
+                                            <td class="text-left">@peer.Endpoint</td>
+                                            <td class="text-center">@peer.Type</td>
+                                            <td class="text-center">height:@peer.Height</td>
+                                            <td style="width: 250px;" nowrap class="text-left">agent:@peer.Version</td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
-                        }
-                    </div>
+                            @if (fiftyKOnlyFeature)
+                            {
+                                <label><strong>Multisig Federation members :</strong></label>
+                                <table class="table table-sm table-striped" id="sidechain-members">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-left">Endpoint</th>
+                                            <th class="text-center">Type</th>
+                                            <th class="text-center">Height</th>
+                                            <th style="width: 250px;" nowrap class="text-left">Version</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var member in Model.SidechainNode.FederationMembers)
+                                        {
+                                            <tr>
+                                                <td class="text-left reveal-on-blur">@member.Endpoint</td>
+                                                <td class="text-center">@member.Type</td>
+                                                <td class="text-center">height:@member.Height</td>
+                                                <td style="width: 250px;" nowrap class="text-left">agent:@member.Version</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                        </div>
+                    }
                 </div>
             </div>
+
             @if (fiftyKOnlyFeature)
             {
                 <div class="card mb-4">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-4">
                             <label class="d-flex justify-content-start">
-                                <strong>Federation Wallet History <small class="text-muted">(@(((JArray)Model.StratisNode?.History)?.Count ?? 0))</small></strong>
+                                <strong>Federation Wallet History <small class="text-muted">(@(((JArray)Model.MainchainNode?.History)?.Count ?? 0))</small></strong>
                             </label>
                             <span class="d-flex justify-content-end align-items-center ml-auto">
                                 <a data-toggle="modal" data-target="#sidechainHistory" class="btn btn-outline-primary">See all history</a>
@@ -408,7 +440,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if (Model.StratisNode.History != null)
+                                @if (Model.MainchainNode.History != null)
                                 {
                                     foreach (dynamic transaction in ((JArray)Model.SidechainNode.History).Take(5).ToList())
                                     {
@@ -417,7 +449,7 @@
                                             <td class="text-center text-truncate"><code>@(transaction.withdrawal.targetAddress)</code></td>
                                             <td class="text-left text-truncate" style="max-width: 110px;"><a href="https://chainz.cryptoid.info/strax/tx.dws?@(transaction.withdrawal.id).htm" target="_blank">@transaction.withdrawal.id</a></td>
                                             <td class="text-center">@transaction.withdrawal.blockNumber</td>
-                                            <td class="text-right">@(((double)transaction.withdrawal.amount / 100000000).ToString("N8")) @Model.SidechainNode.CoinTicker</td>
+                                            <td class="text-right">@(((double)transaction.withdrawal.amount / 100000000).ToString("N8")) @DashboardModel.SidechainCoinTicker</td>
                                         </tr>
                                     }
                                 }

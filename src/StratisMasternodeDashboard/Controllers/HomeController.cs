@@ -39,11 +39,13 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         [Route("check-federation")]
         public async Task<IActionResult> CheckFederationAsync()
         {
-            ApiResponse getMainchainFederationInfo = await this.apiRequester.GetRequestAsync(this.defaultEndpointsSettings.StratisNode, "/api/FederationGateway/info");
-            if (getMainchainFederationInfo.IsSuccess)
+            if (defaultEndpointsSettings.SidechainNodeType == NodeTypes.FiftyK)
             {
-                return Json(getMainchainFederationInfo.Content.active);
+                ApiResponse getMainchainFederationInfo = await this.apiRequester.GetRequestAsync(this.defaultEndpointsSettings.StratisNode, "/api/FederationGateway/info");
+                if (getMainchainFederationInfo.IsSuccess)
+                    return Json(getMainchainFederationInfo.Content.active);
             }
+
             return Json(true);
         }
 
@@ -61,21 +63,31 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             }
 
             DashboardModel dashboardModel = JsonConvert.DeserializeObject<DashboardModel>(this.distributedCache.GetString("DashboardData"));
+
             this.ViewBag.DisplayLoader = true;
-            this.ViewBag.History = dashboardModel?.StratisNode?.History == null || dashboardModel?.SidechainNode?.History == null
-                        ? new[] {
-                            dashboardModel.StratisNode.History,
-                            dashboardModel.SidechainNode.History
-                        }
-                        : null;
-            this.ViewBag.StratisTicker = dashboardModel.StratisNode.CoinTicker;
-            this.ViewBag.SidechainTicker = dashboardModel.SidechainNode.CoinTicker;
+
+            if (dashboardModel != null && dashboardModel.MainchainNode != null && dashboardModel.SidechainNode != null)
+                this.ViewBag.History = new[] { dashboardModel.MainchainNode.History, dashboardModel.SidechainNode.History };
+            else
+                this.ViewBag.History = null;
+
+            this.ViewBag.StratisTicker = DashboardModel.MainchainCoinTicker;
+            this.ViewBag.SidechainTicker = DashboardModel.SidechainCoinTicker;
             this.ViewBag.MiningPubKeys = dashboardModel.MiningPublicKeys;
-            this.ViewBag.LogRules = new LogRulesModel().LoadRules(dashboardModel.StratisNode.LogRules, dashboardModel.SidechainNode.LogRules);
-            this.ViewBag.PendingPolls = dashboardModel.SidechainNode.PoAPendingPolls;
-            this.ViewBag.Status = "OK";
-            this.ViewBag.Vote = new Vote { Polls = dashboardModel.SidechainNode.PoAPendingPolls, FederationMemberCount = dashboardModel.SidechainNode.FederationMemberCount, KickFederationMemberPolls = dashboardModel.SidechainNode.KickFederationMemberPolls };
+
+            this.ViewBag.LogRules = new LogRulesModel().LoadRules(dashboardModel.MainchainNode?.LogRules ?? null, dashboardModel.SidechainNode?.LogRules ?? null);
+
+            this.ViewBag.Vote = null;
+
+            if (dashboardModel.SidechainNode != null)
+                this.ViewBag.Vote = new Vote { Polls = dashboardModel.SidechainNode.PoAPendingPolls, FederationMemberCount = dashboardModel.SidechainNode.FederationMemberCount, KickFederationMemberPolls = dashboardModel.SidechainNode.KickFederationMemberPolls };
+
             this.ViewBag.SDAVote = new SDAVoteModel { };
+
+            if (dashboardModel.MainchainNode == null || dashboardModel.SidechainNode == null)
+                this.ViewBag.Status = "API Unavailable";
+            else
+                this.ViewBag.Status = "OK";
 
             return View("Dashboard", dashboardModel);
         }
@@ -90,12 +102,15 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             if (!string.IsNullOrEmpty(this.distributedCache.GetString("DashboardData")))
             {
                 DashboardModel dashboardModel = JsonConvert.DeserializeObject<DashboardModel>(this.distributedCache.GetString("DashboardData"));
-                this.ViewBag.History = new[] {
-                    dashboardModel.StratisNode.History,
-                    dashboardModel.SidechainNode.History
-                };
-                this.ViewBag.StratisTicker = dashboardModel.StratisNode.CoinTicker;
-                this.ViewBag.SidechainTicker = dashboardModel.SidechainNode.CoinTicker;
+
+                if (dashboardModel.MainchainNode != null && dashboardModel.SidechainNode != null)
+                    this.ViewBag.History = new[] { dashboardModel.MainchainNode.History, dashboardModel.SidechainNode.History };
+                else
+                    this.ViewBag.History = null;
+
+                this.ViewBag.StratisTicker = DashboardModel.MainchainCoinTicker;
+                this.ViewBag.SidechainTicker = DashboardModel.SidechainCoinTicker;
+
                 return PartialView("Dashboard", dashboardModel);
             }
             return NoContent();
