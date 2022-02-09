@@ -1,3 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
@@ -11,13 +18,6 @@ using Stratis.FederatedSidechains.AdminDashboard.Hubs;
 using Stratis.FederatedSidechains.AdminDashboard.Models;
 using Stratis.FederatedSidechains.AdminDashboard.Services;
 using Stratis.FederatedSidechains.AdminDashboard.Settings;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
 {
@@ -153,7 +153,9 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                         LogRules = nodeDataServiceMainchain.LogRules,
                         Uptime = nodeDataServiceMainchain.NodeStatus.Uptime,
                         AddressIndexer = this.nodeDataServiceMainchain.AddressIndexerHeight,
-                        OrphanSize = this.nodeDataServiceMainchain.NodeDashboardStats?.OrphanSize ?? string.Empty
+                        OrphanSize = this.nodeDataServiceMainchain.NodeDashboardStats?.OrphanSize ?? string.Empty,
+
+                        AgentVersion = this.nodeDataServiceMainchain.NodeStatus.Version
                     };
 
                     dashboardModel.MainchainNode = mainchainNode;
@@ -200,6 +202,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                         BlockHeight = (int)nodeDataServiceSidechain.NodeStatus.BlockStoreHeight,
                         HeaderHeight = (int)nodeDataServiceSidechain.NodeStatus.HeaderHeight,
                         MempoolSize = nodeDataServiceSidechain.RawMempool,
+                        AgentVersion = nodeDataServiceSidechain.NodeStatus.Version,
 
                         LogRules = nodeDataServiceSidechain.LogRules,
                         PoAPendingPolls = nodeDataServiceSidechain.PendingPolls,
