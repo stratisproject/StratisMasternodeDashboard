@@ -1,10 +1,11 @@
-using Stratis.FederatedSidechains.AdminDashboard.Entities;
 using System.Collections.Generic;
+using Stratis.FederatedSidechains.AdminDashboard.Entities;
 
 namespace Stratis.FederatedSidechains.AdminDashboard.Models
 {
     public class StratisNodeModel
     {
+        public string AgentVersion { get; set; }
         public float SyncingStatus { get; set; }
         public string WebAPIUrl { get; set; } = "http://localhost:38221/api";
         public string SwaggerUrl { get; set; } = "http://localhost:38221/swagger";

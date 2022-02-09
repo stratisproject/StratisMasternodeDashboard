@@ -15,6 +15,7 @@
         public float ConsensusHeight { get; set; } = 0;
         public string Uptime { get; set; } = string.Empty;
         public string State { get; set; } = "Not Operational";
+        public string Version { get; set; }
     }
 
     public class NodeDashboardStats

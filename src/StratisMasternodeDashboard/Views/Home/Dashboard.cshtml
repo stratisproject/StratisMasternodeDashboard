@@ -41,14 +41,7 @@
                 <div class="card-body">
                     <div class="pb-3 mb-3">
                         <div class="mr-auto d-inline-block">
-                            @if (Model.MainchainNode != null)
-                            {
-                                <h3>Mainchain Node</h3>
-                            }
-                            else
-                            {
-                                <h3>Mainchain Node [OFFLINE]</h3>
-                            }
+                            <h3>@Model.MainChainNodeHeading</h3>
                         </div>
 
                         @if (Model.MainchainNode != null)
@@ -238,14 +231,7 @@
                 <div class="card-body">
                     <div class="pb-3 mb-3">
                         <div class="mr-auto d-inline-block">
-                            @if (Model.SidechainNode != null)
-                            {
-                                <h3>Sidechain Node</h3>
-                            }
-                            else
-                            {
-                                <h3>Sidechain Node [OFFLINE]</h3>
-                            }
+                            <h3>@Model.MainChainNodeHeading</h3>
                         </div>
                         @if (Model.SidechainNode != null)
                         {
