@@ -11,5 +11,29 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Models
 
         public const string MainchainCoinTicker = "STRAX";
         public const string SidechainCoinTicker = "CRS";
+
+        public string MainChainNodeHeading
+        {
+            get
+            {
+
+                if (MainchainNode == null)
+                    return $"Mainchain Node [OFFLINE]";
+
+                return $"Mainchain Node ({MainchainNode.AgentVersion})";
+            }
+        }
+
+        public string SidechainNodeHeading
+        {
+            get
+            {
+
+                if (SidechainNode == null)
+                    return $"Sidechain Node [OFFLINE]";
+
+                return $"Sidechain Node ({SidechainNode.AgentVersion})";
+            }
+        }
     }
 }

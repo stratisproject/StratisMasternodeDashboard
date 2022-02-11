@@ -1,17 +1,17 @@
-﻿using Microsoft.Extensions.Logging;
-using NBitcoin;
-using NBitcoin.DataEncoders;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Stratis.FederatedSidechains.AdminDashboard.Entities;
-using Stratis.FederatedSidechains.AdminDashboard.Settings;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using NBitcoin;
+using NBitcoin.DataEncoders;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Stratis.FederatedSidechains.AdminDashboard.Entities;
+using Stratis.FederatedSidechains.AdminDashboard.Settings;
 namespace Stratis.FederatedSidechains.AdminDashboard.Services
 {
     public abstract class NodeDataService
@@ -108,6 +108,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                 parseTime = parseTime.Take(parseTime.Length - 1).ToArray();
                 nodeStatus.Uptime = string.Join(".", parseTime);
                 nodeStatus.State = StatusResponse.Content.state;
+                nodeStatus.Version = StatusResponse.Content.version;
             }
             catch (Exception ex)
             {
