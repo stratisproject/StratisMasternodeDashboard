@@ -279,6 +279,21 @@
                                 </li>
                                 <li class="col-12 col-xl-6">
                                     <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Height :</strong></li>
+                                        <li class="list-inline-item"><label id="lblSidechainNodeBlockHeight"></label></li>
+                                    </ul>
+                                </li>
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline d-flex align-itmes-center">
+                                        <li class="list-inline-item"><strong>Hash :</strong></li>
+                                        <li class="list-inline-item text-truncate" style="max-width: 150px;">
+                                           <label id="lblSidechainNodeHash"></label>
+                                        </li>
+                                        <li class="list-inline-item"><i role="copy" data-id="sidechainBlockHash" data-message="Block hash successfully copied to clipboard" class="far fa-copy"></i></li>
+                                    </ul>
+                                </li>
+                                <li class="col-12 col-xl-6">
+                                    <ul class="list-inline">
                                         <li class="list-inline-item"><strong>Mempool size :</strong></li>
                                         <li class="list-inline-item text-muted">@Model.SidechainNode.MempoolSize</li>
                                     </ul>
@@ -333,6 +348,16 @@
                                         <li class="list-inline-item text-muted">Unconfirmed: @Model.SidechainNode.UnconfirmedBalance.ToString("N8") @DashboardModel.SidechainCoinTicker</li>
                                     </ul>
                                 </li>
+
+                                <li class="col-12">
+                                    <ul class="list-inline">
+                                        <li class="list-inline-item"><strong>Mining Wallet balance :</strong></li>
+                                        <li class="list-inline-item text-green">Confirmed:<label id="lblSidechainAmountConfirmed"></label> @DashboardModel.SidechainCoinTicker</li>
+                                        <li class="list-inline-item text-muted">/</li>
+                                        <li class="list-inline-item text-muted">Unconfirmed: <label id="lblSidechainAmountUnConfirmed"> </label> @DashboardModel.SidechainCoinTicker</li>
+                                    </ul>
+                                </li>
+
                                 @if (fiftyKOnlyFeature)
                                 {
                                     <li class="col-12">
