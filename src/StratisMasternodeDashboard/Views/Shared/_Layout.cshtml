@@ -30,10 +30,12 @@
         <script type="text/javascript" src="~/lib/datatables/js/jquery.dataTables.min.js"></script>
         <script type="text/javascript" src="~/lib/datatables/js/dataTables.bootstrap4.min.js"></script>
         <script type="text/javascript" src="~/js/default.js"></script>
+        <script type="text/javascript" src="~/js/nodeevent.js"></script>
     </environment>
     <environment exclude="Development">
         <script type="text/javascript" src="~/js/default.bundle.min.js"></script>
         <script type="text/javascript" src="~/js/default.min.js"></script>
+        <script type="text/javascript" src="~/js/nodeevent.js"></script>
     </environment>
 
     <link rel="icon" type="image/png" href="~/images/logo.png" />
@@ -82,13 +84,13 @@
                     <a data-toggle="modal" href="#sDAProposalVotes"><i class="fas fa-vote-yea"></i>&nbsp; SDA Vote</a>
                 </li>
                 @*<li class="list-inline-item">
-                        <a data-toggle="modal" href="#federationVotesIDGBKick"><i class="fas fa-vote-yea"></i>&nbsp; IDGB Member Kicking</a>
+                    <a data-toggle="modal" href="#federationVotesIDGBKick"><i class="fas fa-vote-yea"></i>&nbsp; IDGB Member Kicking</a>
                     </li>*@
                 <li class="list-inline-item">
                     <a data-toggle="modal" href="#federationVotes"><i class="fas fa-vote-yea"></i>&nbsp; Contract Whitelisting</a>
                 </li>
                 @*<li class="list-inline-item ml-4">
-                        <a asp-controller="Home" asp-action="Shutdown" class="text-danger"><i class="fas fa-power-off"></i>&nbsp; Shutdown Dashboard</a>
+                    <a asp-controller="Home" asp-action="Shutdown" class="text-danger"><i class="fas fa-power-off"></i>&nbsp; Shutdown Dashboard</a>
                     </li>*@
             </ul>
         </div>
