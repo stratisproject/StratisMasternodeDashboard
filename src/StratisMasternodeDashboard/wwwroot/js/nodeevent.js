@@ -19,6 +19,7 @@ connection.on("receiveEvent", function (message) {
     if (message.hash) {
         document.getElementById('lblSidechainNodeHash').innerHTML = ` ${message.hash}`;
     }
+   
     if (message.accountsBalances) {
         var confirmedAmount = (((` ${message.accountsBalances[0].amountConfirmed}`) / 100000000).toFixed(8));
         var parts = confirmedAmount.toString().split(".");
