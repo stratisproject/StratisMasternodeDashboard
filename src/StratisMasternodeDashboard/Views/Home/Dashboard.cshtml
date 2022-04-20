@@ -254,7 +254,7 @@
                                         <li class="list-inline-item"><strong>Swagger :</strong></li>
                                         <li class="list-inline-item"><a target="_blank" href="@Model.SidechainNode.SwaggerUrl">@Model.SidechainNode.SwaggerUrl</a></li>
                                     </ul>
-                                </li>                              
+                                </li>
                                 <li class="col-12 col-xl-6">
                                     <ul class="list-inline">
                                         <li class="list-inline-item"><strong>Cirrus Mining Address :</strong></li>
@@ -264,7 +264,7 @@
                                             </i>
                                         </li>
                                     </ul>
-                                </li>                              
+                                </li>
                                 <li class="col-12 col-xl-6">
                                     <ul class="list-inline">
                                         <li class="list-inline-item"><strong>Uptime :</strong></li>
@@ -349,7 +349,6 @@
                                         <li class="list-inline-item"><strong>Total Peers / In / Out:</strong></li>
                                         <label id="lblSidechainTotalConnectedNode"> </label>
                                         <li class="list-inline-item">@Model.SidechainNode.Peers.Where(p => p.Type == "inbound").Count()  /  @Model.SidechainNode.Peers.Where(p => p.Type == "outbound").Count() </li>
-                                        @* <li class="list-inline-item">@Model.SidechainNode.Peers.Count  /  @Model.SidechainNode.Peers.Where(p => p.Type == "inbound").Count()  /  @Model.SidechainNode.Peers.Where(p => p.Type == "outbound").Count() </li>*@
                                     </ul>
                                 </li>
                             </ul>

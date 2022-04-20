@@ -20,10 +20,12 @@ connection.on("receiveEvent", function (message) {
         document.getElementById('lblSidechainNodeHash').innerHTML = ` ${message.hash}`;
         var hashelement = document.getElementById("sidechainBlockHash");
         hashelement.setAttribute('href', "https://chainz.cryptoid.info/cirrus/block.dws?" + ` ${message.hash}` + ".htm");
-    }   
+    }
+    
     if (message.connectedNodes) {
         document.getElementById('lblSidechainTotalConnectedNode').innerHTML = ` ${message.connectedNodes}` + ' /';
     }
+
     if (message.accountsBalances) {
         var confirmedAmount = (((` ${message.accountsBalances[0].amountConfirmed}`) / 100000000).toFixed(8));
         var parts = confirmedAmount.toString().split(".");
@@ -35,8 +37,10 @@ connection.on("receiveEvent", function (message) {
         var unConfirmedAmountwithComma = unconfirmedparts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (unconfirmedparts[1] ? "." + unconfirmedparts[1] : "");
         document.getElementById('lblSidechainAmountUnConfirmed').innerHTML = unConfirmedAmountwithComma;
     }
+
     if (message.accountsBalances) {
         document.getElementById('sidechainMiningAddress').innerHTML = ` ${message.accountsBalances[0].addresses[0].address}`;        
         document.getElementById('lblSidechainMiningWalletAddress').innerHTML = ` ${message.accountsBalances[0].addresses[0].address}`;
     }
+
 });
