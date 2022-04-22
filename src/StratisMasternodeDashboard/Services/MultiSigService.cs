@@ -53,7 +53,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             await UpdateMultiSig().ConfigureAwait(false);
 
             // Sidechain related updates.
-            WalletBalance = await UpdateMiningWalletBalance().ConfigureAwait(false);
             PendingPolls = await UpdatePolls().ConfigureAwait(false);
             KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls().ConfigureAwait(false);
             FederationMemberCount = await UpdateFederationMemberCount().ConfigureAwait(false);
