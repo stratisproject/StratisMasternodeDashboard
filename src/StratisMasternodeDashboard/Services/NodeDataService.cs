@@ -183,29 +183,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             return (confirmed / STRATOSHI, unconfirmed / STRATOSHI);
         }
 
-        protected async Task<(double, double)> UpdateMiningWalletBalance()
-        {
-            double confirmed = 0;
-            double unconfirmed = 0;
-
-            try
-            {
-                ApiResponse responseWallet = await apiRequester.GetRequestAsync(endpoint, "/api/Wallet/list-wallets").ConfigureAwait(false);
-                if (responseWallet.Content == null)
-                    return (0, 0);
-
-                string firstWalletName = responseWallet.Content.walletNames[0].ToString();
-                ApiResponse responseBalance = await apiRequester.GetRequestAsync(endpoint, "/api/Wallet/balance", $"WalletName={firstWalletName}").ConfigureAwait(false);
-                double.TryParse(responseBalance.Content.balances[0].amountConfirmed.ToString(), out confirmed);
-                double.TryParse(responseBalance.Content.balances[0].amountUnconfirmed.ToString(), out unconfirmed);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Failed to get mining wallet balance");
-            }
-            return (confirmed / STRATOSHI, unconfirmed / STRATOSHI);
-        }
-
         protected async Task<object> UpdateHistory()
         {
             object history = new object();
