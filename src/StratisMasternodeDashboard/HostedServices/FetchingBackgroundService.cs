@@ -198,8 +198,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                         SyncingStatus = nodeDataServiceSidechain.NodeStatus.SyncingProgress,
                         Peers = sidechainPeers,
                         FederationMembers = sidechainFederationMembers,
-                        BlockHash = nodeDataServiceSidechain.BestHash,
-                        BlockHeight = (int)nodeDataServiceSidechain.NodeStatus.BlockStoreHeight,
                         HeaderHeight = (int)nodeDataServiceSidechain.NodeStatus.HeaderHeight,
                         MempoolSize = nodeDataServiceSidechain.RawMempool,
                         AgentVersion = nodeDataServiceSidechain.NodeStatus.Version,
@@ -215,8 +213,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
 
                         OrphanSize = this.nodeDataServiceSidechain.NodeDashboardStats?.OrphanSize ?? string.Empty,
                         FederationMemberCount = this.nodeDataServiceSidechain.FederationMemberCount,
-                        ConfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.confirmedBalance,
-                        UnconfirmedBalance = this.nodeDataServiceSidechain.WalletBalance.unconfirmedBalance,
                         KickFederationMemberPolls = nodeDataServiceSidechain.KickFederationMememberPendingPolls
                     };
 

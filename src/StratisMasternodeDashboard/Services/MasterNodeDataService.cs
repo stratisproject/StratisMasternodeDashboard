@@ -32,7 +32,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         {
             await base.Update().ConfigureAwait(false);
 
-            WalletBalance = await UpdateMiningWalletBalance().ConfigureAwait(false);
             PendingPolls = await UpdatePolls().ConfigureAwait(false);
             KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls().ConfigureAwait(false);
             FederationMemberCount = await UpdateFederationMemberCount().ConfigureAwait(false);
