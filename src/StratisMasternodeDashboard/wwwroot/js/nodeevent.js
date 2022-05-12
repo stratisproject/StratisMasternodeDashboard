@@ -24,6 +24,10 @@ connection.on("receiveEvent", function (message) {
         }
     }
 
+    if (message.nodeEventType.includes("Stratis.Bitcoin.Features.MemoryPool.TransactionAddedToMemoryPoolEvent")) {
+        alert("Mempool")
+    }
+
     if (message.nodeEventType.includes("Stratis.Bitcoin.Features.SignalR.Events.WalletGeneralInfo")) {
         if (message.connectedNodes) {
             document.getElementById('lblSidechainTotalConnectedNode').innerHTML = ` ${message.connectedNodes}` + ' /';
