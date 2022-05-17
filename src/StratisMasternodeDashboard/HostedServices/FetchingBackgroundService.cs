@@ -198,7 +198,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                         Peers = sidechainPeers,
                         FederationMembers = sidechainFederationMembers,
                         HeaderHeight = (int)nodeDataServiceSidechain.NodeStatus.HeaderHeight,
-                        MempoolSize = nodeDataServiceSidechain.RawMempool,
                         AgentVersion = nodeDataServiceSidechain.NodeStatus.Version,
 
                         LogRules = nodeDataServiceSidechain.LogRules,
