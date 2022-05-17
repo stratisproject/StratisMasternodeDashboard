@@ -80,7 +80,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         {
             BestHash = await UpdateBestHash();
             LogRules = await UpdateLogRules();
-            NodeDashboardStats = await UpdateDashboardStats();
             NodeStatus = await UpdateNodeStatus();
             RawMempool = await UpdateMempool();
 
@@ -332,25 +331,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
             return 0;
         }
-
-        Regex orphanSize = new Regex("Orphan Size:\\s+([0-9]+)", RegexOptions.Compiled);
-
-        protected async Task<NodeDashboardStats> UpdateDashboardStats()
-        {
-            var nodeDashboardStats = new NodeDashboardStats();
-            try
-            {
-                string response;
-                using HttpClient client = new HttpClient();
-                response = await client.GetStringAsync($"{endpoint}/api/Dashboard/Stats").ConfigureAwait(false);
-                nodeDashboardStats.OrphanSize = orphanSize.Match(response).Groups[1].Value;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Failed to get /api/Dashboard/Stats");
-            }
-
-            return nodeDashboardStats;
-        }
+       
     }
 }

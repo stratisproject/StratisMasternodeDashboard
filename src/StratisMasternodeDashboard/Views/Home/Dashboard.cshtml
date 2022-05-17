@@ -95,12 +95,6 @@
                                 </li>
                                 <li class="col-12 col-xl-6">
                                     <ul class="list-inline">
-                                        <li class="list-inline-item"><strong>Orphan size :</strong></li>
-                                        <li class="list-inline-item text-muted">@Model.MainchainNode.OrphanSize</li>
-                                    </ul>
-                                </li>
-                                <li class="col-12 col-xl-6">
-                                    <ul class="list-inline">
                                         <li class="list-inline-item"><strong>Header height :</strong></li>
                                         <li class="list-inline-item">@Model.MainchainNode.HeaderHeight</li>
                                     </ul>
@@ -276,11 +270,11 @@
                                         <li class="list-inline-item"><strong>Block height :</strong></li>
                                         <li class="list-inline-item"><label id="lblSidechainNodeBlockHeight"></label></li>
                                     </ul>
-                                </li>
-                                <li class="col-12 col-xl-6">
+                                </li>                                
+                                  <li class="col-12 col-xl-6">
                                     <ul class="list-inline">
                                         <li class="list-inline-item"><strong>Mempool size :</strong></li>
-                                        <li class="list-inline-item text-muted">@Model.SidechainNode.MempoolSize</li>
+                                        <li class="list-inline-item text-muted"><label id="lblSidechainMempoolSize"></label></li>
                                     </ul>
                                 </li>
                                 <li class="col-12 col-xl-6">
@@ -290,12 +284,6 @@
                                             <a id="sidechainBlockHash" target="_blank"><label id="lblSidechainNodeHash"></label></a>
                                         </li>
                                         <li class="list-inline-item"><i role="copy" data-id="sidechainBlockHash" data-message="Block hash successfully copied to clipboard" class="far fa-copy"></i></li>
-                                    </ul>
-                                </li>
-                                <li class="col-12 col-xl-6">
-                                    <ul class="list-inline">
-                                        <li class="list-inline-item"><strong>Orphan size :</strong></li>
-                                        <li class="list-inline-item text-muted">@Model.SidechainNode.OrphanSize</li>
                                     </ul>
                                 </li>
                                 <li class="col-12 col-xl-6">

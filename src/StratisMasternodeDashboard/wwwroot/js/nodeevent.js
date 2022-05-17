@@ -24,6 +24,15 @@ connection.on("receiveEvent", function (message) {
         }
     }
 
+    document.getElementById('lblSidechainMempoolSize').innerHTML = 0;
+    if (message.nodeEventType.includes("Stratis.Bitcoin.Features.MemoryPool.TransactionAddedToMemoryPoolEvent")) {
+        if (message.memPoolSize) {
+            document.getElementById('lblSidechainMempoolSize').innerHTML = ` ${message.memPoolSize}`;
+        }
+        else
+            document.getElementById('lblSidechainMempoolSize').innerHTML = 0;
+    }    
+
     if (message.nodeEventType.includes("Stratis.Bitcoin.Features.SignalR.Events.WalletGeneralInfo")) {
         if (message.connectedNodes) {
             document.getElementById('lblSidechainTotalConnectedNode').innerHTML = ` ${message.connectedNodes}` + ' /';

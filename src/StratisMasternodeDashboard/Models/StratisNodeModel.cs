@@ -14,13 +14,10 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Models
         public string BlockHash { get; set; }
         public double ConfirmedBalanceFed { get; set; }
         public double UnconfirmedBalanceFed { get; set; }
-        public double ConfirmedBalance { get; set; }
-        public double UnconfirmedBalance { get; set; }
         public List<Peer> Peers { get; set; }
         public List<Peer> FederationMembers { get; set; }
         public object History { get; set; }
         public List<LogRule> LogRules { get; set; }
-        public string OrphanSize { get; set; }
         public bool IsMining { get; set; }
         public int HeaderHeight { get; set; }
         public int AddressIndexer { get; set; }
