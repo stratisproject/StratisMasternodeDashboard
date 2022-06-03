@@ -55,4 +55,24 @@ connection.on("receiveEvent", function (message) {
             document.getElementById('lblSidechainMiningWalletAddress').innerHTML = ` ${message.accountsBalances[0].addresses[0].address}`;
         }
     }
+
+    document.getElementById('lblSidechainMinersHits').innerHTML = 0;
+    if (message.nodeEventType.includes("Stratis.Bitcoin.Features.PoA.Events.MiningStatisticsEvent")) {
+        var miningStatus = document.getElementById('lblSidechainMiningStatus');
+        if (message.isMining = true) {
+            miningStatus.innerHTML = `Mining`;
+            miningStatus.className = "badge badge-success";
+        }
+        else {
+            miningStatus.innerHTML = 'Not Mining';
+            miningStatus.className = "badge badge-danger";
+        }            
+
+        if (message.blockProducerHit) {
+            document.getElementById('lblSidechainMinersHits').innerHTML = ` ${message.blockProducerHit}`;
+        }
+        else
+            document.getElementById('lblSidechainMinersHits').innerHTML = 0;
+    }
+
 });
