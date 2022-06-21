@@ -256,4 +256,11 @@ wwwroot/css/default.bundle.min.css
 wwwroot/css/default.min.css
 wwwroot/js/default.bundle.min.js
 wwwroot/js/default.min.js
-wwwroot/lib/
+wwwroot/lib/bootstrap
+wwwroot/lib/font-awesome
+wwwroot/lib/jquery
+wwwroot/lib/jquery-ajax-unobtrusive
+wwwroot/lib/node-snackbar
+wwwroot/lib/nprogress
+wwwroot/lib/popper.js
+wwwroot/lib/signalr
