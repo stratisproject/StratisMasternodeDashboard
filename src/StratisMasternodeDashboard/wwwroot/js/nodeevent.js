@@ -31,7 +31,7 @@ connection.on("receiveEvent", function (message) {
         }
         else
             document.getElementById('lblSidechainMempoolSize').innerHTML = 0;
-    }    
+    }
 
     if (message.nodeEventType.includes("Stratis.Bitcoin.Features.SignalR.Events.WalletGeneralInfo")) {
         if (message.connectedNodes) {
@@ -57,6 +57,12 @@ connection.on("receiveEvent", function (message) {
     }
 
     document.getElementById('lblSidechainMinersHits').innerHTML = 0;
+    var minersHits = document.getElementById('lblSidechainMinerHitsinPercentage');
+    minersHits.style.margin = 0;
+    minersHits.innerHTML = "0.0%";
+    var blockProducerHitProgressBar = document.getElementById('blockProducerHitProgressBar');
+    blockProducerHitProgressBar.style.width = "0%";
+    blockProducerHitProgressBar.setAttribute("aria-valuenow", "0");
     if (message.nodeEventType.includes("Stratis.Bitcoin.Features.PoA.Events.MiningStatisticsEvent")) {
         var miningStatus = document.getElementById('lblSidechainMiningStatus');
         if (message.isMining = true) {
@@ -66,13 +72,21 @@ connection.on("receiveEvent", function (message) {
         else {
             miningStatus.innerHTML = 'Not Mining';
             miningStatus.className = "badge badge-danger";
-        }            
+        }
 
         if (message.blockProducerHit) {
             document.getElementById('lblSidechainMinersHits').innerHTML = ` ${message.blockProducerHit}`;
         }
         else
             document.getElementById('lblSidechainMinersHits').innerHTML = 0;
+
+        if (message.federationMemberSize) {
+            var minersHitsinPercentage = (Math.round(((` ${message.blockProducerHit}` / ` ${message.federationMemberSize}`) * 100))).toFixed(1);
+            minersHits.innerHTML = minersHitsinPercentage + "%";
+            minersHits.style.margin = 0;
+            blockProducerHitProgressBar.style.width = minersHitsinPercentage + "%";
+            blockProducerHitProgressBar.setAttribute("aria-valuenow", minersHitsinPercentage);
+        }
     }
 
 });

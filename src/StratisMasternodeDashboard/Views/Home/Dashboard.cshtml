@@ -304,9 +304,9 @@
                                     <ul class="list-inline">
                                         <li class="list-inline-item"><strong>Block Producer Hits :</strong></li>
                                         <li class="list-inline-item">
-                                            <div class="inline-flex"><label id="lblSidechainMinersHits"></label></div>
-                                            <div class="inline-flex progress" style="width: 100px;">
-                                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: @Model.SidechainNode.BlockProducerHitsValue%;" aria-valuenow="@Model.SidechainNode.BlockProducerHitsValue" aria-valuemin="0" aria-valuemax="100">@Model.SidechainNode.BlockProducerHitsValue%</div>
+                                            <div class="inline-flex"><label id="lblSidechainMinersHits"></label></div>                                          
+                                             <div class="inline-flex progress" style="width: 100px;">
+                                                <div class="progress-bar progress-bar-striped progress-bar-animated" id="blockProducerHitProgressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100"><label id="lblSidechainMinerHitsinPercentage"></label></div>
                                             </div>
                                         </li>
                                     </ul>

@@ -35,8 +35,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             PendingPolls = await UpdatePolls().ConfigureAwait(false);
             KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls().ConfigureAwait(false);
             FederationMemberCount = await UpdateFederationMemberCount().ConfigureAwait(false);
-            SidechainMinerStats = await UpdateFederationMemberInfo().ConfigureAwait(false);
-
+           
             return this;
         }
     }

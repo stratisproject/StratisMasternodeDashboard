@@ -204,7 +204,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                         PoAPendingPolls = nodeDataServiceSidechain.PendingPolls,
                         Uptime = nodeDataServiceSidechain.NodeStatus.Uptime,
 
-                        BlockProducerHitsValue = this.nodeDataServiceSidechain.SidechainMinerStats.BlockProducerHitsValue,
                         SidechainMiningAddress = this.nodeDataServiceSidechain.SidechainMinerStats.MiningAddress,
 
                         FederationMemberCount = this.nodeDataServiceSidechain.FederationMemberCount,
