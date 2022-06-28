@@ -198,43 +198,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
             return history;
         }
-
-        protected async Task<SidechainMinerStats> UpdateFederationMemberInfo()
-        {
-            var sidechainMinerStats = new SidechainMinerStats();
-
-            try
-            {
-                var response = await apiRequester.GetRequestAsync(endpoint, "/api/Federation/members/current").ConfigureAwait(false);
-
-                if (response.Content != null)
-                {
-                    sidechainMinerStats.BlockProducerHits = response.Content.miningStats?.minerHits ?? 0;
-                    if (sidechainMinerStats.BlockProducerHits != 0)
-                        sidechainMinerStats.BlockProducerHitsValue = (int)(response.Content.miningStats.minerHits / (float)response.Content.federationSize * 100);
-                    else
-                        sidechainMinerStats.BlockProducerHitsValue = 0;
-
-                    if (response.Content.miningStats != null)
-                    {
-                        if (string.IsNullOrWhiteSpace((string)response.Content.miningStats.miningAddress))
-                            sidechainMinerStats.MiningAddress = "Waiting for block to be mined.";
-                        else
-                            sidechainMinerStats.MiningAddress = response.Content.miningStats.miningAddress;
-                    }
-
-                    if (response.Content.miningStats != null)
-                        sidechainMinerStats.ProducedBlockInLastRound = (bool)response.Content.miningStats.producedBlockInLastRound;
-                }
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Failed to update federation member info.");
-            }
-
-            return sidechainMinerStats;
-        }
-
+       
         protected async Task<int> UpdateAddressIndexerTipAsync()
         {
             int tip = 0;

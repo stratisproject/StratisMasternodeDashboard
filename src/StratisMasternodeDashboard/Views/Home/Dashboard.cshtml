@@ -270,8 +270,8 @@
                                         <li class="list-inline-item"><strong>Block height :</strong></li>
                                         <li class="list-inline-item"><label id="lblSidechainNodeBlockHeight"></label></li>
                                     </ul>
-                                </li>                                
-                                  <li class="col-12 col-xl-6">
+                                </li>
+                                <li class="col-12 col-xl-6">
                                     <ul class="list-inline">
                                         <li class="list-inline-item"><strong>Mempool size :</strong></li>
                                         <li class="list-inline-item text-muted"><label id="lblSidechainMempoolSize"></label></li>
@@ -291,24 +291,22 @@
                                         <li class="list-inline-item"><strong>Header height :</strong></li>
                                         <li class="list-inline-item">@Model.SidechainNode.HeaderHeight</li>
                                     </ul>
-                                </li>
-                                <li class="col-12 col-xl-6">
+                                </li>                                
+                                 <li class="col-12 col-xl-6">
                                     <ul class="list-inline">
                                         <li class="list-inline-item"><strong>Mining Status :</strong></li>
                                         <li class="list-inline-item text-muted">
-                                            <span class="badge badge-@(Model.SidechainNode.IsMining ? "success" : "danger")">
-                                                @(Model.SidechainNode.IsMining ? "Mining" : "Not Mining")
-                                            </span>
+                                           <label id="lblSidechainMiningStatus"></label>
                                         </li>
                                     </ul>
-                                </li>
+                                </li>                                
                                 <li class="col-12 col-xl-6">
                                     <ul class="list-inline">
                                         <li class="list-inline-item"><strong>Block Producer Hits :</strong></li>
                                         <li class="list-inline-item">
-                                            <div class="inline-flex">@Model.SidechainNode.BlockProducerHits</div>
-                                            <div class="inline-flex progress" style="width: 100px;">
-                                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: @Model.SidechainNode.BlockProducerHitsValue%;" aria-valuenow="@Model.SidechainNode.BlockProducerHitsValue" aria-valuemin="0" aria-valuemax="100">@Model.SidechainNode.BlockProducerHitsValue%</div>
+                                            <div class="inline-flex"><label id="lblSidechainMinersHits"></label></div>                                          
+                                             <div class="inline-flex progress" style="width: 100px;">
+                                                <div class="progress-bar progress-bar-striped progress-bar-animated" id="blockProducerHitProgressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100"><label id="lblSidechainMinerHitsinPercentage"></label></div>
                                             </div>
                                         </li>
                                     </ul>
