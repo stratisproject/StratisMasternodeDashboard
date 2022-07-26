@@ -35,7 +35,7 @@
       "destination": "wwwroot/lib/nprogress"
     },
     {
-      "library": "font-awesome@6.1.1",
+      "library": "font-awesome@6.1.2",
       "provider": "cdnjs",
       "destination": "wwwroot/lib/font-awesome/"
     },
