@@ -17,3 +17,6 @@ src/.vs/StratisMasternodeDashboard/v16/Server/sqlite3/storage.ide-shm
 src/.vs/StratisMasternodeDashboard/v16/Server/sqlite3/storage.ide-wal
 src/.vs/StratisMasternodeDashboard/config/applicationhost.config
 /src/.vs/StratisMasternodeDashboard
+*.vsidx
+*.lock
+src/.vs/StratisMasternodeDashboard/v17/.suo
