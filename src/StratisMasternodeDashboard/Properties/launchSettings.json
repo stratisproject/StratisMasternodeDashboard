@@ -8,6 +8,14 @@
     }
   },
   "profiles": {
+    "IIS Express Dev": {
+      "commandName": "IISExpress",
+      "commandLineArgs": "--nodetype 10K --mainchainport 27103 --sidechainport 38223 --env Development --sdadaocontractaddress CbtYboKjnk7rhNbEFzn94UZikde36h6TCb",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,

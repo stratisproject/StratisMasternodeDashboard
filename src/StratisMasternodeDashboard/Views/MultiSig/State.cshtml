@@ -1,0 +1,33 @@
+﻿@model List<MultiSigMemberModel>
+
+<div class="row my-2">
+
+    <!-- MAIN CHAIN-->
+    <div class="col-12">
+
+        <table>
+            <thead>
+                <tr>
+                    <td class="col-2">PubKey</td>
+                    <td class="col-2">Name</td>
+                    <td class="col-2">Online</td>
+                    <td class="col-2">Last Reply</td>
+                    <td class="col-4">Cross Chain Store Height</td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var member in Model)
+                {
+                    <tr>
+                        <td><span id="@member.MemberPubKey">@member.MemberPubKey</span></td>
+                        <td><span id="@member.MemberPubKey">@member.MemberName</span></td>
+                        <td><span id="@member.MemberPubKey-Online"></span></td>
+                        <td><span id="@member.MemberPubKey-LastUpdate"></span></td>
+                        <td><span id="@member.MemberPubKey-CrossChainStoreHeight"></span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
