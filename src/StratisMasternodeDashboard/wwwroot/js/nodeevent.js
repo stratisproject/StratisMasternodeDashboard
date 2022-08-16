@@ -1,5 +1,7 @@
-﻿"use strict";
-var connection = new signalR.HubConnectionBuilder().withUrl("http://localhost:39823/events-hub", {
+﻿"use strict"
+var signalRPort = "39823";
+
+var connection = new signalR.HubConnectionBuilder().withUrl('http://localhost:' + signalRPort + '/events-hub', {
     skipNegotiation: true,
     transport: signalR.HttpTransportType.WebSockets
 })
@@ -89,4 +91,20 @@ connection.on("receiveEvent", function (message) {
         }
     }
 
+    if (message.nodeEventType.includes("Stratis.Bitcoin.EventBus.CoreEvents.ConsensusManagerStatusEvent")) {
+        var syncStatus = document.getElementById('lblSidechainSyncStatus');
+        if (!message.isIbd) {
+            syncStatus.innerHTML = `Synced 100.00%`;
+            syncStatus.className = "badge badge-success";
+        }
+        else {
+            syncStatus.innerHTML = 'Syncing';
+            syncStatus.className = "badge badge-warning";
+        }
+
+        if (message.headerHeight) {
+            document.getElementById('lblSidechainNodeHeaderHeight').innerHTML = ` ${message.headerHeight}`;
+        }
+    }
+   
 });
