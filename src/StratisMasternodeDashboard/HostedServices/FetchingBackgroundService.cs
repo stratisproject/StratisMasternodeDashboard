@@ -194,10 +194,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
 
                         WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/api").ToString(),
                         SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/swagger").ToString(),
-                        SyncingStatus = nodeDataServiceSidechain.NodeStatus.SyncingProgress,
                         Peers = sidechainPeers,
                         FederationMembers = sidechainFederationMembers,
-                        HeaderHeight = (int)nodeDataServiceSidechain.NodeStatus.HeaderHeight,
                         AgentVersion = nodeDataServiceSidechain.NodeStatus.Version,
 
                         LogRules = nodeDataServiceSidechain.LogRules,

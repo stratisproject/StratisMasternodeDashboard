@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using QRCoder;
 using Stratis.FederatedSidechains.AdminDashboard.Entities;
@@ -22,13 +23,15 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         private readonly DefaultEndpointsSettings defaultEndpointsSettings;
         private readonly IHubContext<DataUpdaterHub> updaterHub;
         private readonly ApiRequester apiRequester;
+        private readonly IConfiguration configuration;
 
-        public HomeController(IDistributedCache distributedCache, IHubContext<DataUpdaterHub> hubContext, DefaultEndpointsSettings defaultEndpointsSettings, ApiRequester apiRequester)
+        public HomeController(IDistributedCache distributedCache, IHubContext<DataUpdaterHub> hubContext, DefaultEndpointsSettings defaultEndpointsSettings, ApiRequester apiRequester, IConfiguration configuration)
         {
             this.distributedCache = distributedCache;
             this.defaultEndpointsSettings = defaultEndpointsSettings;
             this.updaterHub = hubContext;
             this.apiRequester = apiRequester;
+            this.configuration = configuration;
         }
 
         /// <summary>
@@ -130,6 +133,14 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
                 qrCode.GetGraphic(20).Save(memoryStream, ImageFormat.Png);
                 return File(memoryStream.ToArray(), "image/png");
             }
+        }
+
+        [Ajax]
+        [Route("getConfiguration")]
+        public IActionResult GetConfiguration(string sectionName, string paramName)
+        {
+            var parameterValue = configuration[$"{sectionName}:{paramName}"];
+            return Json(new { parameter = parameterValue });
         }
 
         /// <summary>
