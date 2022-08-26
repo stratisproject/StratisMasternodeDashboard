@@ -13,6 +13,7 @@ using Stratis.FederatedSidechains.AdminDashboard.Settings;
 using System;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
@@ -92,6 +93,22 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             else
                 this.ViewBag.Status = "OK";
 
+            SideChainNodeStatsModel sideChainNodeStats = new SideChainNodeStatsModel();
+            if (string.IsNullOrEmpty(this.distributedCache.GetString("SideChainNodeStats")))
+            {
+                sideChainNodeStats = GetNodeStatus().Result;
+                this.ViewBag.UpTime = sideChainNodeStats.Uptime;
+                this.ViewBag.AgentVersion = "(" + sideChainNodeStats.AgentVersion + ")";
+                this.ViewBag.NodeStartedDateTime = sideChainNodeStats.NodeStartDateTime;
+            }
+            else
+            {
+                sideChainNodeStats = JsonConvert.DeserializeObject<SideChainNodeStatsModel>(this.distributedCache.GetString("SideChainNodeStats"));
+                this.ViewBag.UpTime = sideChainNodeStats.Uptime;
+                this.ViewBag.AgentVersion = "(" + sideChainNodeStats.AgentVersion + ")";
+                this.ViewBag.NodeStartedDateTime = sideChainNodeStats.NodeStartDateTime;
+            }
+
             return View("Dashboard", dashboardModel);
         }
 
@@ -114,8 +131,19 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
                 this.ViewBag.StratisTicker = DashboardModel.MainchainCoinTicker;
                 this.ViewBag.SidechainTicker = DashboardModel.SidechainCoinTicker;
 
+                if (!string.IsNullOrEmpty(this.distributedCache.GetString("SideChainNodeStats")))
+                {
+                    SideChainNodeStatsModel sideChainNodeStats = JsonConvert.DeserializeObject<SideChainNodeStatsModel>(this.distributedCache.GetString("SideChainNodeStats"));
+                    this.ViewBag.AgentVersion = "(" + sideChainNodeStats.AgentVersion + ")";
+                    this.ViewBag.NodeStartedDateTime = sideChainNodeStats.NodeStartDateTime;
+
+                    //to get refreshed uptime
+                    this.ViewBag.UpTime = GetCurrentUpTime(sideChainNodeStats.NodeStartDateTime);
+                }
+
                 return PartialView("Dashboard", dashboardModel);
             }
+
             return NoContent();
         }
 
@@ -152,5 +180,47 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             Environment.Exit(0);
             return Ok();
         }
+
+        [Ajax]
+        [Route("getNodeStatus")]
+        public async Task<SideChainNodeStatsModel> GetNodeStatus()
+        {
+            SideChainNodeStatsModel sidechainNode = new SideChainNodeStatsModel();
+            ApiResponse response = await apiRequester.GetRequestAsync(this.defaultEndpointsSettings.SidechainNode, "/api/Node/status");
+
+            if (response.IsSuccess)
+            {
+                string runningTime = response.Content.runningTime;
+                string[] parseTime = runningTime.Split('.');
+                parseTime = parseTime.Take(parseTime.Length - 1).ToArray();
+                sidechainNode.Uptime = string.Join(".", parseTime);
+                sidechainNode.AgentVersion = response.Content.version;
+                long nodeStartedDateTime = response.Content.nodeStarted;
+
+                sidechainNode.NodeStartDateTime = ConvertUnixTimeToDateTime(nodeStartedDateTime);
+                this.distributedCache.SetString("SideChainNodeStats", JsonConvert.SerializeObject(sidechainNode));
+
+            }
+
+            return sidechainNode;
+        }
+
+        public DateTime ConvertUnixTimeToDateTime(long unixtime)
+        {
+            System.DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            dateTime = dateTime.AddSeconds(unixtime).ToUniversalTime();
+            return dateTime;
+        }
+
+        public string GetCurrentUpTime(DateTime nodeStartedTime)
+        {
+            String uptime = (DateTime.UtcNow - nodeStartedTime).ToString();
+            string[] parsenodeUpTime = uptime.Split('.');
+            parsenodeUpTime = parsenodeUpTime.Take(parsenodeUpTime.Length - 1).ToArray();
+            string nodeUptime = string.Join(".", parsenodeUpTime);
+
+            return nodeUptime;
+        }
+
     }
 }

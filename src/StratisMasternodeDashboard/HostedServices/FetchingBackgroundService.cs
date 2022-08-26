@@ -196,11 +196,9 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                         SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/swagger").ToString(),
                         Peers = sidechainPeers,
                         FederationMembers = sidechainFederationMembers,
-                        AgentVersion = nodeDataServiceSidechain.NodeStatus.Version,
 
                         LogRules = nodeDataServiceSidechain.LogRules,
                         PoAPendingPolls = nodeDataServiceSidechain.PendingPolls,
-                        Uptime = nodeDataServiceSidechain.NodeStatus.Uptime,
 
                         SidechainMiningAddress = this.nodeDataServiceSidechain.SidechainMinerStats.MiningAddress,
 
