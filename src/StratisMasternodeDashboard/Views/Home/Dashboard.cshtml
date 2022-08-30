@@ -13,25 +13,25 @@
 <div id="@(ViewBag.DisplayLoader == true ? "loading-content" : "")">
     <script type="text/javascript">
         $(function () {
-                         var peerSettings = { searching: false, pageLength: 25, "bDestroy": true, lengthChange: true, lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]], stateSave: true };
-                         var settings = { searching: false, pageLength: 5, lengthMenu: false, lengthChange: false, "bDestroy": true };
-                         var settings2 = { searching: false, pageLength: 10, lengthMenu: false, lengthChange: false, "bDestroy": true };
+           var peerSettings = { searching: false, pageLength: 25, "bDestroy": true, lengthChange: true, lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]], stateSave: true };
+           var settings = { searching: false, pageLength: 5, lengthMenu: false, lengthChange: false, "bDestroy": true };
+           var settings2 = { searching: false, pageLength: 10, lengthMenu: false, lengthChange: false, "bDestroy": true };
 
-                         $("#stratis-peers").DataTable(peerSettings);
-                         $("#stratis-members").DataTable(settings);
-                         $("#stratis-history").DataTable(settings);
-                         $("#sidechain-peers").DataTable(peerSettings);
-                         $("#sidechain-members").DataTable(settings);
-                         $("#sidechain-history").DataTable(settings);
-                         $("#polls-table").DataTable(settings2);
-                         $("#kickfedmem-polls-table").DataTable(settings2);
+           $("#stratis-peers").DataTable(peerSettings);
+           $("#stratis-members").DataTable(settings);
+           $("#stratis-history").DataTable(settings);
+           $("#sidechain-peers").DataTable(peerSettings);
+           $("#sidechain-members").DataTable(settings);
+           $("#sidechain-history").DataTable(settings);
+           $("#polls-table").DataTable(settings2);
+           $("#kickfedmem-polls-table").DataTable(settings2);
 
-                         setTimeout(function () {
-                             $(".loader").fadeOut(function () {
-                                 $("#loading-content").fadeIn();
-                             });
-                         }, 500);
-                     });
+           setTimeout(function () {
+           $(".loader").fadeOut(function () {
+           $("#loading-content").fadeIn();
+            });
+           }, 500);
+         });
     </script>
     <div class="row my-2">
 
@@ -270,8 +270,6 @@
                                         <li class="list-inline-item">@ViewBag.UpTime</li>
                                     </ul>
                                 </li>
-
-
                                 <li class="col-12 col-xl-6">
                                     <ul class="list-inline">
                                         <li class="list-inline-item"><strong>Block height :</strong></li>
