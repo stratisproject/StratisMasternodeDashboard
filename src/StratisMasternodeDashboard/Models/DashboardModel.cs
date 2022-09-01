@@ -32,7 +32,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Models
                 if (SidechainNode == null)
                     return $"Sidechain Node [OFFLINE]";
 
-                return $"Sidechain Node ({SidechainNode.AgentVersion})";
+                return $"Sidechain Node";
             }
         }
     }
