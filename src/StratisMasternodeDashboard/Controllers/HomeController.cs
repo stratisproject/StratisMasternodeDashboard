@@ -94,16 +94,17 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
                 this.ViewBag.Status = "OK";
 
             SideChainNodeStatsModel sideChainNodeStats = new SideChainNodeStatsModel();
-            if (string.IsNullOrEmpty(this.distributedCache.GetString("SideChainNodeStats")))
+            var nodeStats = this.distributedCache.GetString("SideChainNodeStats");
+            if (string.IsNullOrEmpty(nodeStats))
             {
-                sideChainNodeStats = GetNodeStatus().Result;
+                sideChainNodeStats = GetNodeStatus().GetAwaiter().GetResult();
                 this.ViewBag.UpTime = sideChainNodeStats.Uptime;
                 this.ViewBag.AgentVersion = "(" + sideChainNodeStats.AgentVersion + ")";
                 this.ViewBag.NodeStartedDateTime = sideChainNodeStats.NodeStartDateTime;
             }
             else
             {
-                sideChainNodeStats = JsonConvert.DeserializeObject<SideChainNodeStatsModel>(this.distributedCache.GetString("SideChainNodeStats"));
+                sideChainNodeStats = JsonConvert.DeserializeObject<SideChainNodeStatsModel>(nodeStats);
                 this.ViewBag.UpTime = sideChainNodeStats.Uptime;
                 this.ViewBag.AgentVersion = "(" + sideChainNodeStats.AgentVersion + ")";
                 this.ViewBag.NodeStartedDateTime = sideChainNodeStats.NodeStartDateTime;
@@ -199,7 +200,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
 
                 sidechainNode.NodeStartDateTime = ConvertUnixTimeToDateTime(nodeStartedDateTime);
                 this.distributedCache.SetString("SideChainNodeStats", JsonConvert.SerializeObject(sidechainNode));
-
             }
 
             return sidechainNode;
