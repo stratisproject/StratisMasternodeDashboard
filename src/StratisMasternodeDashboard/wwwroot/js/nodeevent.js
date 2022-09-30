@@ -1,5 +1,7 @@
 ﻿"use strict"
 
+
+
 $.ajax({
     type: "GET",
     url: "/getConfiguration",
@@ -31,10 +33,12 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
         return console.error(err.toString());
     });
 
+    var blockHeight;
     connection.on("receiveEvent", function (message) {
         if (message.nodeEventType.includes("Stratis.Bitcoin.EventBus.CoreEvents.BlockConnected")) {
             if (message.height) {
-                document.getElementById('lblSidechainNodeBlockHeight').innerHTML = ` ${message.height}`;
+                blockHeight = ` ${message.height}`;
+                // document.getElementById('lblSidechainNodeBlockHeight').innerHTML = ` ${message.height}`;                
             }
 
             if (message.hash) {
@@ -43,6 +47,7 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
                 hashelement.setAttribute('href', "https://chainz.cryptoid.info/cirrus/block.dws?" + ` ${message.hash}` + ".htm");
             }
         }
+        document.getElementById('lblSidechainNodeBlockHeight').innerHTML = blockHeight;
 
         document.getElementById('lblSidechainMempoolSize').innerHTML = 0;
         if (message.nodeEventType.includes("Stratis.Bitcoin.Features.MemoryPool.TransactionAddedToMemoryPoolEvent")) {
@@ -54,9 +59,9 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
         }
 
         if (message.nodeEventType.includes("Stratis.Bitcoin.Features.SignalR.Events.WalletGeneralInfo")) {
-            if (message.connectedNodes) {
-                document.getElementById('lblSidechainTotalConnectedNode').innerHTML = ` ${message.connectedNodes}` + ' /';
-            }
+            //if (message.connectedNodes) {
+            //    document.getElementById('lblSidechainTotalConnectedNode').innerHTML = ` ${message.connectedNodes}` + ' /';
+            //}
 
             if (message.accountsBalances) {
                 var confirmedAmount = (((` ${message.accountsBalances[0].amountConfirmed}`) / 100000000).toFixed(8));
@@ -123,6 +128,47 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
             if (message.headerHeight) {
                 document.getElementById('lblSidechainNodeHeaderHeight').innerHTML = ` ${message.headerHeight}`;
             }
+        }
+
+        if (message.nodeEventType.includes("Stratis.Bitcoin.EventBus.CoreEvents.PeerConnectionInfoEvent")) {
+            var inbountCount = 0;
+            var filtered = message.peerConnectionModels.filter(function (d) {
+                if (d.inbound) {
+                    inbountCount++;
+                }
+                //return d.inbound == 'false';
+            });
+            var totalPeerCount = message.peerConnectionModels.length;
+            document.getElementById('lblSidechainTotalConnectedNode').innerHTML = ` ${message.peerConnectionModels.length}` + ' /';
+
+            document.getElementById('lblSidechainTotalInNode').innerHTML = inbountCount + ' /';
+            document.getElementById('lblSidechainTotalOutNode').innerHTML = (` ${message.peerConnectionModels.length}` - inbountCount);
+
+            console.info(new Blob([JSON.stringify(message.peerConnectionModels)]).size);//to get the array's size in bytes 
+            console.log('number of the In Bound Nodes: ' + inbountCount);
+            console.log('number of the out Bound Nodes: ' + (message.peerConnectionModels.length - inbountCount));
+
+            //Display data in table
+            /* var html = "<table border='1|1'>";*/
+            var html = "<table class='table-sm table-striped'>";
+            // html.className = "table table-sm table-striped";
+            var peerconnections = message.peerConnectionModels;
+            html += "<th class='text-left'>Endpoint</th>";
+            html += "<th class='text-center'>Inbound</th>";
+            html += "<th class='text-center'>Height</th>";
+            html += "<th class='text-left' style='width: 250px;'>Version</th>";
+            for (var i = 0; i < peerconnections.length; i++) {
+                html += "<tr>";
+                html += "<td class='text-left'>" + peerconnections[i].address + "</td>";
+                html += "<td class='text-center'>" + peerconnections[i].inbound + "</td>";
+                html += "<td class='text-center'>" + peerconnections[i].height + "</td>";
+                html += "<td class='text-left' nowrap style='width: 250px;'>" + peerconnections[i].subversion + "</td>";
+
+                html += "</tr>";
+
+            }
+            html += "</table>";
+            document.getElementById("box").innerHTML = html;
         }
 
     });

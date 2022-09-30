@@ -339,11 +339,16 @@
                                     <ul class="list-inline">
                                         <li class="list-inline-item"><strong>Total Peers / In / Out:</strong></li>
                                         <label id="lblSidechainTotalConnectedNode"> </label>
-                                        <li class="list-inline-item">@Model.SidechainNode.Peers.Where(p => p.Type == "inbound").Count()  /  @Model.SidechainNode.Peers.Where(p => p.Type == "outbound").Count() </li>
+                                        <label id="lblSidechainTotalInNode"> </label>
+                                        <label id="lblSidechainTotalOutNode"> </label>
+                                        @*<li class="list-inline-item">@Model.SidechainNode.Peers.Where(p => p.Type == "inbound").Count()  /  @Model.SidechainNode.Peers.Where(p => p.Type == "outbound").Count() </li>*@
                                     </ul>
                                 </li>
                             </ul>
                             <label class="mt-3"><strong>Peers :</strong></label>
+
+                            <div id="box"></div>
+
                             <table class="table table-sm table-striped" id="sidechain-peers">
                                 <thead>
                                     <tr>
@@ -392,7 +397,7 @@
                             }
                         </div>
                     }
-                </div>
+                </label>
             </div>
 
             @if (fiftyKOnlyFeature)
