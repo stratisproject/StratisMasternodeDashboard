@@ -152,7 +152,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
 
                         LogRules = nodeDataServiceMainchain.LogRules,
                         Uptime = nodeDataServiceMainchain.NodeStatus.Uptime,
-                        AddressIndexer = this.nodeDataServiceMainchain.AddressIndexerHeight,                        
+                        AddressIndexer = this.nodeDataServiceMainchain.AddressIndexerHeight,
 
                         AgentVersion = this.nodeDataServiceMainchain.NodeStatus.Version
                     };
@@ -175,8 +175,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 {
                     if (this.multiSigNode)
                         this.ParsePeers(nodeDataServiceSidechain, sidechainPeers, sidechainFederationMembers);
-                    else
-                        this.ParsePeers(nodeDataServiceSidechain, sidechainPeers);
+
                 }
                 catch (Exception e)
                 {

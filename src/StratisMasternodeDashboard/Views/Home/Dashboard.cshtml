@@ -25,7 +25,7 @@
            $("#sidechain-history").DataTable(settings);
            $("#polls-table").DataTable(settings2);
            $("#kickfedmem-polls-table").DataTable(settings2);
-
+           
            setTimeout(function () {
            $(".loader").fadeOut(function () {
            $("#loading-content").fadeIn();
@@ -341,35 +341,27 @@
                                         <label id="lblSidechainTotalConnectedNode"> </label>
                                         <label id="lblSidechainTotalInNode"> </label>
                                         <label id="lblSidechainTotalOutNode"> </label>
-                                        @*<li class="list-inline-item">@Model.SidechainNode.Peers.Where(p => p.Type == "inbound").Count()  /  @Model.SidechainNode.Peers.Where(p => p.Type == "outbound").Count() </li>*@
                                     </ul>
                                 </li>
                             </ul>
                             <label class="mt-3"><strong>Peers :</strong></label>
 
-                            <div id="box"></div>
-
-                            <table class="table table-sm table-striped" id="sidechain-peers">
+                            <div class="row col-sm-12" id="sidechain-peerconnections">
+                                <table class="table table-sm table-striped" id="network-connection">
                                 <thead>
                                     <tr>
                                         <th class="text-left">Endpoint</th>
-                                        <th class="text-center">Type</th>
+                                        <th class="text-center">Inbound</th>
                                         <th class="text-center">Height</th>
                                         <th style="width: 250px;" nowrap class="text-left">Version</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @foreach (var peer in Model.SidechainNode.Peers)
-                                    {
-                                        <tr>
-                                            <td class="text-left">@peer.Endpoint</td>
-                                            <td class="text-center">@peer.Type</td>
-                                            <td class="text-center">height:@peer.Height</td>
-                                            <td style="width: 250px;" nowrap class="text-left">agent:@peer.Version</td>
-                                        </tr>
-                                    }
+                                 <tbody id="sidechain-peerconnection-data">
+                                   
                                 </tbody>
                             </table>
+                            </div>
+                    
                             @if (fiftyKOnlyFeature)
                             {
                                 <label><strong>Multisig Federation members :</strong></label>
@@ -397,7 +389,7 @@
                             }
                         </div>
                     }
-                </label>
+                </div>
             </div>
 
             @if (fiftyKOnlyFeature)
