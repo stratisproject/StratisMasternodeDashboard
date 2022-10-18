@@ -138,11 +138,8 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
                 }
             });
             document.getElementById('lblSidechainTotalConnectedNode').innerHTML = ` ${message.peerConnectionModels.length}` + ' /';
-
             document.getElementById('lblSidechainTotalInNode').innerHTML = inbountCount + ' /';
             document.getElementById('lblSidechainTotalOutNode').innerHTML = (` ${message.peerConnectionModels.length}` - inbountCount);
-
-            console.info(new Blob([JSON.stringify(message.peerConnectionModels)]).size);//to get the array's size in bytes 
 
             var peerconnections = message.peerConnectionModels;
             for (var i = 0; i < peerconnections.length; i++) {
@@ -155,6 +152,5 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
             }
             document.getElementById("sidechain-peerconnection-data").innerHTML = sidechainconnections;
         }
-
     });
 }
