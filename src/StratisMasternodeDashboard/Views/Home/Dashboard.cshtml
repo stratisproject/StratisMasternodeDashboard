@@ -24,8 +24,8 @@
            $("#sidechain-members").DataTable(settings);
            $("#sidechain-history").DataTable(settings);
            $("#polls-table").DataTable(settings2);
-           $("#kickfedmem-polls-table").DataTable(settings2);
-           
+           $("#kickfedmem-polls-table").DataTable(settings2);         
+
            setTimeout(function () {
            $(".loader").fadeOut(function () {
            $("#loading-content").fadeIn();
@@ -347,11 +347,11 @@
                             <label class="mt-3"><strong>Peers :</strong></label>
 
                             <div class="row col-sm-12" id="sidechain-peerconnections">
-                                <table class="table table-sm table-striped" id="network-connection">
+                                <table class="table table-sm table-striped" id="sidechain-peers">
                                 <thead>
                                     <tr>
                                         <th class="text-left">Endpoint</th>
-                                        <th class="text-center">Inbound</th>
+                                        <th class="text-center">Type</th>
                                         <th class="text-center">Height</th>
                                         <th style="width: 250px;" nowrap class="text-left">Version</th>
                                     </tr>

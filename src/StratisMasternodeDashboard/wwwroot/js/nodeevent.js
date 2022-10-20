@@ -131,7 +131,6 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
         var sidechainconnections = '';
         if (message.nodeEventType.includes("Stratis.Bitcoin.EventBus.CoreEvents.PeerConnectionInfoEvent")) {
             var inbountCount = 0;
-            var type;
             var filtered = message.peerConnectionModels.filter(function (d) {
                 if (d.inbound) {
                     inbountCount++;
@@ -143,6 +142,11 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
 
             var peerconnections = message.peerConnectionModels;
             for (var i = 0; i < peerconnections.length; i++) {
+                if (peerconnections[i].inbound) {
+                    peerconnections[i].inbound = "inbound";
+                }
+                else
+                    peerconnections[i].inbound = "outbound";
                 sidechainconnections += "<tr>";
                 sidechainconnections += "<td class='text-left' style='width: 250px;'>" + peerconnections[i].address + "</td>";
                 sidechainconnections += "<td class='text-center' style='width: 150px;'>" + peerconnections[i].inbound + "</td>";
