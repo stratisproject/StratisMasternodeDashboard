@@ -142,15 +142,11 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
 
             var peerconnections = message.peerConnectionModels;
             for (var i = 0; i < peerconnections.length; i++) {
-                if (peerconnections[i].inbound) {
-                    peerconnections[i].inbound = "inbound";
-                }
-                else
-                    peerconnections[i].inbound = "outbound";
+                var type = (peerconnections[i].inbound) ? "inbound" : "outbound";
                 sidechainconnections += "<tr>";
                 sidechainconnections += "<td class='text-left' style='width: 250px;'>" + peerconnections[i].address + "</td>";
-                sidechainconnections += "<td class='text-center' style='width: 150px;'>" + peerconnections[i].inbound + "</td>";
-                sidechainconnections += "<td class='text-center' style='width: 150px;'>" + peerconnections[i].height + "</td>";
+                sidechainconnections += "<td class='text-center' style='width: 150px;'>" + type + "</td>";
+                sidechainconnections += "<td class='text-center' style='width: 150px;'>"  + peerconnections[i].height + "</td>";
                 sidechainconnections += "<td class='text-left' style='width: 450px;'>" + peerconnections[i].subversion + "</td>";
                 sidechainconnections += "</tr>";
             }
