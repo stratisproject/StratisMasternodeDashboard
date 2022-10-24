@@ -1,12 +1,4 @@
 {
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:37000/",
-      "sslPort": 0
-    }
-  },
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
@@ -54,6 +46,23 @@
         "ASPNETCORE_ENVIRONMENT": "Production"
       },
       "applicationUrl": "http://localhost:37000/"
+    },
+    "Admin Dashboard on TestNet": {
+      "commandName": "Project",
+      "commandLineArgs": "--nodetype 10K --mainchainport 27103 --sidechainport 38223 --env testnet",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:37000/"
+    }
+  },
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:37000/",
+      "sslPort": 0
     }
   }
 }
