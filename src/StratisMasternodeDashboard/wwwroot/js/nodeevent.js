@@ -18,7 +18,6 @@ $.ajax({
         ConnectAndReceiveSignalRServerHub(signalRPort)
     });
 
-
 function ConnectAndReceiveSignalRServerHub(signalRPort) {
     var connection = new signalR.HubConnectionBuilder().withUrl('http://localhost:' + signalRPort + '/events-hub', {
         skipNegotiation: true,
@@ -32,12 +31,13 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
         return console.error(err.toString());
     });
 
-    var blockHeight="...";
-    var hash="...";
+    var blockHeight = "...";
+    var hash = "...";
+    var headerHeight = "...";
     connection.on("receiveEvent", function (message) {
         if (message.nodeEventType.includes("Stratis.Bitcoin.EventBus.CoreEvents.BlockConnected")) {
             if (message.height) {
-                blockHeight = ` ${message.height}`;            
+                blockHeight = ` ${message.height}`;
             }
 
             if (message.hash) {
@@ -58,7 +58,7 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
                 document.getElementById('lblSidechainMempoolSize').innerHTML = 0;
         }
 
-        if (message.nodeEventType.includes("Stratis.Bitcoin.Features.SignalR.Events.WalletGeneralInfo")) {           
+        if (message.nodeEventType.includes("Stratis.Bitcoin.Features.SignalR.Events.WalletGeneralInfo")) {
             if (message.accountsBalances) {
                 var confirmedAmount = (((` ${message.accountsBalances[0].amountConfirmed}`) / 100000000).toFixed(8));
                 var parts = confirmedAmount.toString().split(".");
@@ -77,17 +77,10 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
             }
         }
 
-        document.getElementById('lblSidechainMinersHits').innerHTML = 0;
         var minersHits = document.getElementById('lblSidechainMinerHitsinPercentage');
-        minersHits.style.margin = 0;
-        minersHits.innerHTML = "0.0%";
         var blockProducerHitProgressBar = document.getElementById('blockProducerHitProgressBar');
-        blockProducerHitProgressBar.style.width = "0%";
-        blockProducerHitProgressBar.setAttribute("aria-valuenow", "0");
         var miningStatus = document.getElementById('lblSidechainMiningStatus');
-        miningStatus.innerHTML = 'loading';
-        miningStatus.className = "badge badge-info";
-        if (message.nodeEventType.includes("Stratis.Bitcoin.Features.PoA.Events.MiningStatisticsEvent")) {           
+        if (message.nodeEventType.includes("Stratis.Bitcoin.Features.PoA.Events.MiningStatisticsEvent")) {
             if (message.isMining = true) {
                 miningStatus.innerHTML = `Mining`;
                 miningStatus.className = "badge badge-success";
@@ -107,6 +100,7 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
                 var minersHitsinPercentage = (Math.round(((` ${message.blockProducerHit}` / ` ${message.federationMemberSize}`) * 100))).toFixed(1);
                 minersHits.innerHTML = minersHitsinPercentage + "%";
                 minersHits.style.margin = 0;
+                blockProducerHitProgressBar.className = "progress-bar progress-bar-striped progress-bar-animated";
                 blockProducerHitProgressBar.style.width = minersHitsinPercentage + "%";
                 blockProducerHitProgressBar.setAttribute("aria-valuenow", minersHitsinPercentage);
             }
@@ -124,10 +118,10 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
             }
 
             if (message.headerHeight) {
-                document.getElementById('lblSidechainNodeHeaderHeight').innerHTML = ` ${message.headerHeight}`;
+                headerHeight = ` ${message.headerHeight}`;
             }
         }
-
+        document.getElementById('lblSidechainNodeHeaderHeight').innerHTML = headerHeight;
         var sidechainconnections = '';
         if (message.nodeEventType.includes("Stratis.Bitcoin.EventBus.CoreEvents.PeerConnectionInfoEvent")) {
             var inbountCount = 0;
@@ -146,7 +140,7 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
                 sidechainconnections += "<tr>";
                 sidechainconnections += "<td class='text-left' style='width: 250px;'>" + peerconnections[i].address + "</td>";
                 sidechainconnections += "<td class='text-center' style='width: 150px;'>" + type + "</td>";
-                sidechainconnections += "<td class='text-center' style='width: 150px;'>"  + peerconnections[i].height + "</td>";
+                sidechainconnections += "<td class='text-center' style='width: 150px;'>" + peerconnections[i].height + "</td>";
                 sidechainconnections += "<td class='text-left' style='width: 450px;'>" + peerconnections[i].subversion + "</td>";
                 sidechainconnections += "</tr>";
             }

@@ -24,7 +24,7 @@
            $("#sidechain-members").DataTable(settings);
            $("#sidechain-history").DataTable(settings);
            $("#polls-table").DataTable(settings2);
-           $("#kickfedmem-polls-table").DataTable(settings2);         
+           $("#kickfedmem-polls-table").DataTable(settings2);
 
            setTimeout(function () {
            $(".loader").fadeOut(function () {
@@ -311,7 +311,7 @@
                                         <li class="list-inline-item">
                                             <div class="inline-flex"><label id="lblSidechainMinersHits"></label></div>
                                             <div class="inline-flex progress" style="width: 100px;">
-                                                <div class="progress-bar progress-bar-striped progress-bar-animated" id="blockProducerHitProgressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100"><label id="lblSidechainMinerHitsinPercentage"></label></div>
+                                                <div id="blockProducerHitProgressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100"><label id="lblSidechainMinerHitsinPercentage"></label></div>
                                             </div>
                                         </li>
                                     </ul>
@@ -348,20 +348,19 @@
 
                             <div class="row col-sm-12" id="sidechain-peerconnections">
                                 <table class="table table-sm table-striped" id="sidechain-peers">
-                                <thead>
-                                    <tr>
-                                        <th class="text-left">Endpoint</th>
-                                        <th class="text-center">Type</th>
-                                        <th class="text-center">Height</th>
-                                        <th style="width: 250px;" nowrap class="text-left">Version</th>
-                                    </tr>
-                                </thead>
-                                 <tbody id="sidechain-peerconnection-data">
-                                   
-                                </tbody>
-                            </table>
+                                    <thead>
+                                        <tr>
+                                            <th class="text-left">Endpoint</th>
+                                            <th class="text-center">Type</th>
+                                            <th class="text-center">Height</th>
+                                            <th style="width: 250px;" nowrap class="text-left">Version</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sidechain-peerconnection-data">
+                                    </tbody>
+                                </table>
                             </div>
-                    
+
                             @if (fiftyKOnlyFeature)
                             {
                                 <label><strong>Multisig Federation members :</strong></label>
