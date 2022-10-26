@@ -18,12 +18,11 @@
                 @if (Model.MainchainNode != null)
                 {
                     <ul class="list-inline float-right d-flex align-items-center">
-                        <li class="list-inline-item">
-                            <span class="badge badge-@(Model.MainchainNode.SyncingStatus >= 100 ? "success" : "warning")">
-                                <i class="material-icons">sync</i> @(Model.MainchainNode.SyncingStatus >= 100 ? "Synced" : "Syncing") @Model.MainchainNode.SyncingStatus.ToString("N2")%
-                            </span>
+                        <li class="list-inline-item text-muted">
+                            <span> <i class="material-icons">sync</i> <label id="lblMainchainSyncStatus"></label></span>
                         </li>
                     </ul>
+
                 }
             </div>
 
@@ -46,28 +45,29 @@
                         <li class="col-12 col-xl-6">
                             <ul class="list-inline">
                                 <li class="list-inline-item"><strong>Block height :</strong></li>
-                                <li class="list-inline-item">@Model.MainchainNode.BlockHeight</li>
+                                <li class="list-inline-item"><label id="lblMainchainNodeBlockHeight"></label></li>
                             </ul>
                         </li>
                         <li class="col-12 col-xl-6">
                             <ul class="list-inline">
                                 <li class="list-inline-item"><strong>Mempool size :</strong></li>
-                                <li class="list-inline-item text-muted">@Model.MainchainNode.MempoolSize</li>
+                                <li class="list-inline-item text-muted"><label id="lblMainchainMempoolSize"></label></li>
                             </ul>
                         </li>
                         <li class="col-12 col-xl-6">
                             <ul class="list-inline d-flex align-itmes-center">
                                 <li class="list-inline-item"><strong>Block hash :</strong></li>
                                 <li class="list-inline-item text-truncate" style="max-width: 150px;">
-                                    <a href="https://chainz.cryptoid.info/strax/block.dws?@(Model.MainchainNode.BlockHash).htm" id="stratisBlockHash" target="_blank">@Model.MainchainNode.BlockHash</a>
+                                    <a id="mainchainBlockHash" target="_blank"><label id="lblMainchainNodeHash"></label></a>
                                 </li>
-                                <li class="list-inline-item"><i role="copy" data-id="stratisBlockHash" data-message="Block hash successfully copied to clipboard" class="far fa-copy"></i></li>
+                                <li class="list-inline-item"><i role="copy" data-id="mainchainBlockHash" data-message="Block hash successfully copied to clipboard" class="far fa-copy"></i></li>
+
                             </ul>
                         </li>
                         <li class="col-12 col-xl-6">
                             <ul class="list-inline">
                                 <li class="list-inline-item"><strong>Header height :</strong></li>
-                                <li class="list-inline-item">@Model.MainchainNode.HeaderHeight</li>
+                                <li class="list-inline-item"><label id="lblMainchainNodeHeaderHeight"></label></li>
                             </ul>
                         </li>
                         <li class="col-12 col-xl-6">
@@ -90,32 +90,28 @@
                         <li class="col-12 col-xl-6">
                             <ul class="list-inline">
                                 <li class="list-inline-item"><strong>Total Peers / In / Out:</strong></li>
-                                <li class="list-inline-item">@Model.MainchainNode.Peers.Count  /  @Model.MainchainNode.Peers.Where(p => p.Type == "inbound").Count()  /  @Model.MainchainNode.Peers.Where(p => p.Type == "outbound").Count() </li>
+                                <label id="lblMainchainTotalConnectedNode"> </label>
+                                <label id="lblMainchainTotalInNode"> </label>
+                                <label id="lblMainchainTotalOutNode"> </label>
                             </ul>
                         </li>
                     </ul>
                     <label class="mt-3"><strong>Peers :</strong></label>
-                    <table class="table table-sm table-striped" id="stratis-peers">
-                        <thead>
-                            <tr>
-                                <th>Endpoint</th>
-                                <th>Type</th>
-                                <th>Height</th>
-                                <th>Version</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var peer in Model.MainchainNode.Peers)
-                            {
+                    <div class="row col-sm-12" id="sidechain-peerconnections">
+                        <table class="table table-sm table-striped" id="stratis-peers">
+                            <thead>
                                 <tr>
-                                    <td class="text-left">@peer.Endpoint</td>
-                                    <td class="text-center">@peer.Type</td>
-                                    <td class="text-center">height:@peer.Height</td>
-                                    <td style="width: 250px;" nowrap class="text-left">agent:@peer.Version</td>
+                                    <th class="text-left">Endpoint</th>
+                                    <th class="text-center">Type</th>
+                                    <th class="text-center">Height</th>
+                                    <th style="width: 250px;" nowrap class="text-left">Version</th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody id="mainchain-peerconnection-data">
+                            </tbody>
+                        </table>
+                    </div>
+
                     @if (fiftyKOnlyFeature)
                     {
                         <label><strong>Multisig Federation members :</strong></label>
