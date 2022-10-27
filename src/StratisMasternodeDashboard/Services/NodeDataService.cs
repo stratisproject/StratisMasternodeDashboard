@@ -78,11 +78,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
         public virtual async Task<NodeDataService> Update()
         {
-            BestHash = await UpdateBestHash();
             LogRules = await UpdateLogRules();
             NodeStatus = await UpdateNodeStatus();
-            RawMempool = await UpdateMempool();
-
             return this;
         }
 
@@ -131,39 +128,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             }
 
             return responseLog;
-        }
-
-        protected async Task<int> UpdateMempool()
-        {
-            int mempoolSize = 0;
-            try
-            {
-                ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/Mempool/getrawmempool");
-                mempoolSize = response.Content.Count;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Failed to get mempool info");
-            }
-
-            return mempoolSize;
-        }
-
-        protected async Task<string> UpdateBestHash()
-        {
-            string hash = string.Empty;
-            try
-            {
-                ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/Consensus/getbestblockhash");
-                hash = response.Content;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Failed to get best hash");
-            }
-
-            return hash;
-        }
+        }      
 
         protected async Task<(double, double)> UpdateWalletBalance()
         {
@@ -198,7 +163,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
             return history;
         }
-       
+
         protected async Task<int> UpdateAddressIndexerTipAsync()
         {
             int tip = 0;
@@ -295,6 +260,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
             return 0;
         }
-       
+
     }
 }

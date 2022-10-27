@@ -124,8 +124,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 {
                     if (this.multiSigNode)
                         this.ParsePeers(nodeDataServiceMainchain, stratisPeers, stratisFederationMembers);
-                    else
-                        this.ParsePeers(nodeDataServiceMainchain, stratisPeers);
+                    
                 }
                 catch (Exception e)
                 {
@@ -142,13 +141,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
 
                         WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/api").ToString(),
                         SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/swagger").ToString(),
-                        SyncingStatus = nodeDataServiceMainchain.NodeStatus.SyncingProgress,
                         Peers = stratisPeers,
                         FederationMembers = stratisFederationMembers,
-                        BlockHash = nodeDataServiceMainchain.BestHash,
-                        BlockHeight = (int)nodeDataServiceMainchain.NodeStatus.BlockStoreHeight,
-                        HeaderHeight = (int)nodeDataServiceMainchain.NodeStatus.HeaderHeight,
-                        MempoolSize = nodeDataServiceMainchain.RawMempool,
 
                         LogRules = nodeDataServiceMainchain.LogRules,
                         Uptime = nodeDataServiceMainchain.NodeStatus.Uptime,
