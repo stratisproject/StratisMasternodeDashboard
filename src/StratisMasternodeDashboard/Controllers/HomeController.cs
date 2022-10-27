@@ -71,7 +71,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             this.ViewBag.DisplayLoader = true;
 
             if (dashboardModel != null && dashboardModel.MainchainNode != null && dashboardModel.SidechainNode != null)
-                this.ViewBag.History = new[] { dashboardModel.MainchainNode.History, dashboardModel.SidechainNode.History };
+                this.ViewBag.History = new[] { dashboardModel.MainchainNode.FederationWalletHistory, dashboardModel.SidechainNode.FederationWalletHistory };
             else
                 this.ViewBag.History = null;
 
@@ -125,7 +125,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
                 DashboardModel dashboardModel = JsonConvert.DeserializeObject<DashboardModel>(this.distributedCache.GetString("DashboardData"));
 
                 if (dashboardModel.MainchainNode != null && dashboardModel.SidechainNode != null)
-                    this.ViewBag.History = new[] { dashboardModel.MainchainNode.History, dashboardModel.SidechainNode.History };
+                    this.ViewBag.History = new[] { dashboardModel.MainchainNode.FederationWalletHistory, dashboardModel.SidechainNode.FederationWalletHistory };
                 else
                     this.ViewBag.History = null;
 

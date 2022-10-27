@@ -135,9 +135,9 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 {
                     var mainchainNode = new StratisNodeModel
                     {
-                        History = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).WalletHistory : new JArray(),
-                        ConfirmedBalanceFed = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).FedWalletBalance.confirmedBalance : -1,
-                        UnconfirmedBalanceFed = this.multiSigNode ? ((MultiSigService)nodeDataServiceMainchain).FedWalletBalance.unconfirmedBalance : -1,
+                        FederationWalletHistory = ((MultiSigNodeDataService)nodeDataServiceMainchain).WalletHistory,
+                        ConfirmedBalanceFed = this.multiSigNode ? ((MultiSigNodeDataService)nodeDataServiceMainchain).FedWalletBalance.confirmedBalance : -1,
+                        UnconfirmedBalanceFed = this.multiSigNode ? ((MultiSigNodeDataService)nodeDataServiceMainchain).FedWalletBalance.unconfirmedBalance : -1,
 
                         WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/api").ToString(),
                         SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/swagger").ToString(),
@@ -181,7 +181,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                     // Sidechain Node
                     var sidechainNode = new SidechainNodeModel
                     {
-                        History = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).WalletHistory : new JArray(),
+                        FederationWalletHistory = ((MultiSigSideChainService)nodeDataServiceSidechain).WalletHistory,
                         ConfirmedBalanceFed = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).FedWalletBalance.confirmedBalance : -1,
                         UnconfirmedBalanceFed = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).FedWalletBalance.unconfirmedBalance : -1,
 

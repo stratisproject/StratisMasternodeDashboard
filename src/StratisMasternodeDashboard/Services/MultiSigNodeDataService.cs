@@ -1,15 +1,17 @@
 ﻿using Microsoft.Extensions.Logging;
+using Stratis.FederatedSidechains.AdminDashboard.Models;
 using Stratis.FederatedSidechains.AdminDashboard.Settings;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Stratis.FederatedSidechains.AdminDashboard.Services
 {
-    public abstract class MultiSigService : NodeDataService
+    public abstract class MultiSigNodeDataService : NodeDataService
     {
         public (double confirmedBalance, double unconfirmedBalance) FedWalletBalance { get; set; } = (0, 0);
-        public object WalletHistory { get; set; }
+        public List<FederationWalletHistoryModel> WalletHistory { get; set; }
 
-        public MultiSigService(ApiRequester apiRequester, string endpoint, ILoggerFactory loggerFactory, string environment, string dataFolder)
+        public MultiSigNodeDataService(ApiRequester apiRequester, string endpoint, ILoggerFactory loggerFactory, string environment, string dataFolder)
             : base(apiRequester, endpoint, loggerFactory, environment, dataFolder)
         {
         }
@@ -19,13 +21,13 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             await base.Update().ConfigureAwait(false);
 
             FedWalletBalance = await this.UpdateWalletBalance().ConfigureAwait(false);
-            WalletHistory = await this.UpdateHistory().ConfigureAwait(false);
+            WalletHistory = await this.UpdateWalletHistory().ConfigureAwait(false);
 
             return this;
         }
     }
 
-    public sealed class MultiSigMainChainService : MultiSigService
+    public sealed class MultiSigMainChainService : MultiSigNodeDataService
     {
         public MultiSigMainChainService(ApiRequester apiRequester, DefaultEndpointsSettings defaultEndpointSettings, ILoggerFactory loggerFactory)
             : base(apiRequester, defaultEndpointSettings.StratisNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
@@ -41,11 +43,12 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         }
     }
 
-    public sealed class MultiSigSideChainService : MultiSigService
+    public sealed class MultiSigSideChainService : MultiSigNodeDataService
     {
         public MultiSigSideChainService(ApiRequester apiRequester, DefaultEndpointsSettings defaultEndpointSettings, ILoggerFactory loggerFactory)
             : base(apiRequester, defaultEndpointSettings.SidechainNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
         {
+            SidechainMinerStats = new SidechainMinerStats();
         }
 
         public override async Task<NodeDataService> Update()
