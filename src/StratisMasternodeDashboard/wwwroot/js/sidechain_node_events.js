@@ -31,26 +31,29 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
         return console.error(err.toString());
     });
 
-    var blockHeight = "...";
-    var hash = "...";
-    var headerHeight = "...";
+    document.getElementById('lblSidechainNodeBlockHeight').innerHTML = "...";
+    document.getElementById('lblSidechainNodeHash').innerHTML = "...";
+    document.getElementById('lblSidechainNodeHeaderHeight').innerHTML = "...";
+    document.getElementById('lblSidechainMempoolSize').innerHTML = 0;
+    document.getElementById("sidechain-peerconnection-data").innerHTML = "...";
+
     connection.on("receiveEvent", function (message) {
+
         if (message.nodeEventType.includes("Stratis.Bitcoin.EventBus.CoreEvents.BlockConnected")) {
+
             if (message.height) {
-                blockHeight = ` ${message.height}`;
+                document.getElementById('lblSidechainNodeBlockHeight').innerHTML = `${message.height}`;
             }
 
             if (message.hash) {
-                hash = ` ${message.hash}`;
+                document.getElementById('lblSidechainNodeHash').innerHTML = `${message.hash}`;
                 var hashelement = document.getElementById("sidechainBlockHash");
                 hashelement.setAttribute('href', "https://chainz.cryptoid.info/cirrus/block.dws?" + ` ${message.hash}` + ".htm");
             }
-        }
-        document.getElementById('lblSidechainNodeBlockHeight').innerHTML = blockHeight;
-        document.getElementById('lblSidechainNodeHash').innerHTML = hash;
+        }        
 
-        document.getElementById('lblSidechainMempoolSize').innerHTML = 0;
         if (message.nodeEventType.includes("Stratis.Bitcoin.Features.MemoryPool.TransactionAddedToMemoryPoolEvent")) {
+
             if (message.memPoolSize) {
                 document.getElementById('lblSidechainMempoolSize').innerHTML = ` ${message.memPoolSize}`;
             }
@@ -59,6 +62,7 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
         }
 
         if (message.nodeEventType.includes("Stratis.Bitcoin.Features.SignalR.Events.WalletGeneralInfo")) {
+
             if (message.accountsBalances) {
                 var confirmedAmount = (((` ${message.accountsBalances[0].amountConfirmed}`) / 100000000).toFixed(8));
                 var parts = confirmedAmount.toString().split(".");
@@ -77,10 +81,13 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
             }
         }
 
-        var minersHits = document.getElementById('lblSidechainMinerHitsinPercentage');
-        var blockProducerHitProgressBar = document.getElementById('blockProducerHitProgressBar');
-        var miningStatus = document.getElementById('lblSidechainMiningStatus');
+
         if (message.nodeEventType.includes("Stratis.Bitcoin.Features.PoA.Events.MiningStatisticsEvent")) {
+
+            var minersHits = document.getElementById('lblSidechainMinerHitsinPercentage');
+            var blockProducerHitProgressBar = document.getElementById('blockProducerHitProgressBar');
+            var miningStatus = document.getElementById('lblSidechainMiningStatus');
+
             if (message.isMining = true) {
                 miningStatus.innerHTML = `Mining`;
                 miningStatus.className = "badge badge-success";
@@ -118,23 +125,27 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
             }
 
             if (message.headerHeight) {
-                headerHeight = ` ${message.headerHeight}`;
+                document.getElementById('lblSidechainNodeHeaderHeight').innerHTML = ` ${message.headerHeight}`;
             }
         }
-        document.getElementById('lblSidechainNodeHeaderHeight').innerHTML = headerHeight;
-        var sidechainconnections = '';
+
         if (message.nodeEventType.includes("Stratis.Bitcoin.EventBus.CoreEvents.PeerConnectionInfoEvent")) {
+
+            var sidechainconnections = '';
             var inbountCount = 0;
-            var filtered = message.peerConnectionModels.filter(function (d) {
+
+            message.peerConnectionModels.filter(function (d) {
                 if (d.inbound) {
                     inbountCount++;
                 }
             });
+
             document.getElementById('lblSidechainTotalConnectedNode').innerHTML = ` ${message.peerConnectionModels.length}` + ' /';
             document.getElementById('lblSidechainTotalInNode').innerHTML = inbountCount + ' /';
             document.getElementById('lblSidechainTotalOutNode').innerHTML = (` ${message.peerConnectionModels.length}` - inbountCount);
 
             var peerconnections = message.peerConnectionModels;
+
             for (var i = 0; i < peerconnections.length; i++) {
                 var type = (peerconnections[i].inbound) ? "inbound" : "outbound";
                 sidechainconnections += "<tr>";
@@ -144,6 +155,7 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
                 sidechainconnections += "<td class='text-left' style='width: 450px;'>" + peerconnections[i].subversion + "</td>";
                 sidechainconnections += "</tr>";
             }
+
             document.getElementById("sidechain-peerconnection-data").innerHTML = sidechainconnections;
         }
     });

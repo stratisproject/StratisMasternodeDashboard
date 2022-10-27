@@ -47,9 +47,18 @@
       },
       "applicationUrl": "http://localhost:37000/"
     },
-    "Admin Dashboard on TestNet": {
+    "Masternode Dashboard on TestNet": {
       "commandName": "Project",
       "commandLineArgs": "--nodetype 10K --mainchainport 27103 --sidechainport 38223 --env testnet",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:37000/"
+    },
+    "MultiSig Dashboard on TestNet": {
+      "commandName": "Project",
+      "commandLineArgs": "--nodetype 50K --mainchainport 27103 --sidechainport 38223 --env testnet",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

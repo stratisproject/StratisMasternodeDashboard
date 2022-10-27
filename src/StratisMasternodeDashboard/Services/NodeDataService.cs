@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
 using NBitcoin.DataEncoders;
+using NBitcoin.JsonConverters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Stratis.FederatedSidechains.AdminDashboard.Entities;
+using Stratis.FederatedSidechains.AdminDashboard.Models;
 using Stratis.FederatedSidechains.AdminDashboard.Settings;
 namespace Stratis.FederatedSidechains.AdminDashboard.Services
 {
@@ -182,21 +182,21 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             return (confirmed / STRATOSHI, unconfirmed / STRATOSHI);
         }
 
-        protected async Task<object> UpdateHistory()
+        protected async Task<List<FederationWalletHistoryModel>> UpdateWalletHistory()
         {
-            object history = new object();
+            List<FederationWalletHistoryModel> walletHistory = new();
 
             try
             {
                 ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/FederationWallet/history", "maxEntriesToReturn=30").ConfigureAwait(false);
-                history = response.Content;
+                walletHistory = Serializer.ToObject<List<FederationWalletHistoryModel>>((response.Content as JArray).ToString());
             }
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "Failed to get history");
             }
 
-            return history;
+            return walletHistory;
         }
        
         protected async Task<int> UpdateAddressIndexerTipAsync()

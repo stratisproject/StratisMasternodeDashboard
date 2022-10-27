@@ -1,4 +1,5 @@
-﻿@using Stratis.FederatedSidechains.AdminDashboard.Settings
+﻿@using Stratis.FederatedSidechains.AdminDashboard.Models;
+@using Stratis.FederatedSidechains.AdminDashboard.Settings;
 
 @inject DefaultEndpointsSettings defaultEndpointsSettings;
 
@@ -153,7 +154,7 @@
             <div class="card-body">
                 <div class="d-flex align-items-center mb-4">
                     <label class="d-flex justify-content-start">
-                        <strong>Federation Wallet History <small class="text-muted">(@(((JArray)Model.MainchainNode?.History)?.Count ?? 0))</small></strong>
+                        <strong>Federation Wallet History <small class="text-muted">(@((Model.MainchainNode?.FederationWalletHistory)?.Count ?? 0))</small></strong>
                     </label>
                     <span class="d-flex justify-content-end align-items-center ml-auto">
                         <a data-toggle="modal" data-target="#stratisHistory" class="btn btn-outline-primary">See all history</a>
@@ -170,16 +171,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (Model.MainchainNode.History != null)
+                        @if (Model.MainchainNode.FederationWalletHistory != null)
                         {
-                            foreach (dynamic transaction in ((JArray)Model.MainchainNode.History).Take(5).ToList())
+                            foreach (FederationWalletHistoryModel transaction in (Model.MainchainNode.FederationWalletHistory).Take(5).ToList())
                             {
                                 <tr>
                                     <td class="text-center"><i class="material-icons text-green md-18">check_circle</i></td>
-                                    <td class="text-center text-truncate"><code>@(transaction.withdrawal.targetAddress)</code></td>
-                                    <td class="text-left text-truncate" style="max-width: 110px;"><a href="https://chainz.cryptoid.info/strax/tx.dws?@(transaction.withdrawal.id).htm" target="_blank">@transaction.withdrawal.id</a></td>
-                                    <td class="text-center">@transaction.withdrawal.blockNumber</td>
-                                    <td class="text-right">@(((double)transaction.withdrawal.amount / 100000000).ToString("N8")) @DashboardModel.MainchainCoinTicker</td>
+                                    <td class="text-center text-truncate"><code>@(transaction.PayingTo)</code></td>
+                                    <td class="text-left text-truncate" style="max-width: 110px;"><a href="https://chainz.cryptoid.info/strax/tx.dws?@(transaction.Id).htm" target="_blank">@transaction.Id</a></td>
+                                    <td class="text-center">@transaction.BlockHeight</td>
+                                    <td class="text-right">@(((double)transaction.Amount / 100000000).ToString("N8")) @DashboardModel.MainchainCoinTicker</td>
                                 </tr>
                             }
                         }
