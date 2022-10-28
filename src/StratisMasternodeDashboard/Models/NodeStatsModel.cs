@@ -2,7 +2,7 @@
 
 namespace Stratis.FederatedSidechains.AdminDashboard.Models
 {
-    public class SideChainNodeStatsModel
+    public class NodeStatsModel
     {
         public string AgentVersion { get; set; }
         public string Uptime { get; set; }

@@ -13,7 +13,7 @@
         <div class="card-body">
             <div class="pb-3 mb-3">
                 <div class="mr-auto d-inline-block">
-                    <h3>@Model.MainChainNodeHeading</h3>
+                     <h3>@Model.MainChainNodeHeading @ViewBag.AgentVersion</h3>
                 </div>
 
                 @if (Model.MainchainNode != null)
@@ -23,7 +23,6 @@
                             <span> <i class="material-icons">sync</i> <label id="lblMainchainSyncStatus"></label></span>
                         </li>
                     </ul>
-
                 }
             </div>
 
@@ -37,10 +36,10 @@
                                 <li class="list-inline-item"><a target="_blank" href="@Model.MainchainNode.SwaggerUrl">@Model.MainchainNode.SwaggerUrl</a></li>
                             </ul>
                         </li>
-                        <li class="col-12 col-xl-6">
+                          <li class="col-12 col-xl-6">
                             <ul class="list-inline">
-                                <li class="list-inline-item"><strong>Uptime :</strong></li>
-                                <li class="list-inline-item text-muted">@Model.MainchainNode.Uptime</li>
+                                <li class="list-inline-item"><strong>Node Started :</strong></li>
+                                <li class="list-inline-item">@ViewBag.MainchainNodeStartedDateTime</li>
                             </ul>
                         </li>
                         <li class="col-12 col-xl-6">
@@ -48,11 +47,11 @@
                                 <li class="list-inline-item"><strong>Block height :</strong></li>
                                 <li class="list-inline-item"><label id="lblMainchainNodeBlockHeight"></label></li>
                             </ul>
-                        </li>
+                        </li>                        
                         <li class="col-12 col-xl-6">
                             <ul class="list-inline">
-                                <li class="list-inline-item"><strong>Mempool size :</strong></li>
-                                <li class="list-inline-item text-muted"><label id="lblMainchainMempoolSize"></label></li>
+                                <li class="list-inline-item"><strong>Uptime :</strong></li>
+                                 <li class="list-inline-item">@ViewBag.MainchainUpTime</li>
                             </ul>
                         </li>
                         <li class="col-12 col-xl-6">
@@ -65,6 +64,12 @@
 
                             </ul>
                         </li>
+                        <li class="col-12 col-xl-6">
+                            <ul class="list-inline">
+                                <li class="list-inline-item"><strong>Mempool size :</strong></li>
+                                <li class="list-inline-item text-muted"><label id="lblMainchainMempoolSize"></label></li>
+                            </ul>
+                        </li>                        
                         <li class="col-12 col-xl-6">
                             <ul class="list-inline">
                                 <li class="list-inline-item"><strong>Header height :</strong></li>
