@@ -16,7 +16,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Models
         public double UnconfirmedBalanceFed { get; set; }
         public List<Peer> Peers { get; set; }
         public List<Peer> FederationMembers { get; set; }
-        public object History { get; set; }
+        public List<FederationWalletHistoryModel> FederationWalletHistory { get; set; }
         public List<LogRule> LogRules { get; set; }
         public bool IsMining { get; set; }
         public int HeaderHeight { get; set; }
