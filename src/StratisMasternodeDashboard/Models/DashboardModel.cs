@@ -20,7 +20,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Models
                 if (MainchainNode == null)
                     return $"Mainchain Node [OFFLINE]";
 
-                return $"Mainchain Node ({MainchainNode.AgentVersion})";
+                return $"Mainchain Node";
             }
         }
 
