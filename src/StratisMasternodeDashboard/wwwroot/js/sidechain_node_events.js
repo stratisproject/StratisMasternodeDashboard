@@ -158,5 +158,10 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
 
             document.getElementById("sidechain-peerconnection-data").innerHTML = sidechainconnections;
         }
+
+        if (message.nodeEventType.includes("Stratis.Bitcoin.EventBus.CoreEvents.FederationWalletStatusEvent")) {
+            document.getElementById('lblSidechainFederationWalletAmountConfirmed').innerHTML = message.confirmedBalance.toString("N2");
+            document.getElementById('lblSidechainFederationWalletAmountUnconfirmed').innerHTML = message.unconfirmedBalance.toString("N2");
+        }
     });
 }
