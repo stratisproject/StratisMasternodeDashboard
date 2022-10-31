@@ -136,8 +136,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                     var mainchainNode = new StratisNodeModel
                     {
                         FederationWalletHistory = ((MultiSigNodeDataService)nodeDataServiceMainchain).WalletHistory,
-                        ConfirmedBalanceFed = this.multiSigNode ? ((MultiSigNodeDataService)nodeDataServiceMainchain).FedWalletBalance.confirmedBalance : -1,
-                        UnconfirmedBalanceFed = this.multiSigNode ? ((MultiSigNodeDataService)nodeDataServiceMainchain).FedWalletBalance.unconfirmedBalance : -1,
 
                         WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/api").ToString(),
                         SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/swagger").ToString(),
@@ -182,8 +180,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                     var sidechainNode = new SidechainNodeModel
                     {
                         FederationWalletHistory = ((MultiSigSideChainService)nodeDataServiceSidechain).WalletHistory,
-                        ConfirmedBalanceFed = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).FedWalletBalance.confirmedBalance : -1,
-                        UnconfirmedBalanceFed = this.multiSigNode ? ((MultiSigSideChainService)nodeDataServiceSidechain).FedWalletBalance.unconfirmedBalance : -1,
 
                         WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/api").ToString(),
                         SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/swagger").ToString(),

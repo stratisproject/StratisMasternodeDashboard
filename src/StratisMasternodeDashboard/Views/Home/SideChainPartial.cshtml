@@ -117,9 +117,9 @@
                             <li class="col-12">
                                 <ul class="list-inline">
                                     <li class="list-inline-item"><strong>Federation Wallet balance :</strong></li>
-                                    <li class="list-inline-item text-green">Confirmed: @Model.SidechainNode.ConfirmedBalanceFed.ToString("N8") @DashboardModel.SidechainCoinTicker</li>
+                                    <li class="list-inline-item text-green">Confirmed: <label id="lblSidechainFederationWalletAmountConfirmed"></label> @DashboardModel.SidechainCoinTicker</li>
                                     <li class="list-inline-item text-muted">/</li>
-                                    <li class="list-inline-item text-muted">Unconfirmed: @Model.SidechainNode.UnconfirmedBalanceFed.ToString("N8") @DashboardModel.SidechainCoinTicker</li>
+                                    <li class="list-inline-item text-muted">Unconfirmed: <label id="lblSidechainFederationWalletAmountUnconfirmed"></label> @DashboardModel.SidechainCoinTicker</li>
                                 </ul>
                             </li>
                         }

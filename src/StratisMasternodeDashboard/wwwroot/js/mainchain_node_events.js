@@ -103,5 +103,10 @@ function ConnectAndReceiveSignalRServerHubMainchain(signalRPort) {
             document.getElementById("mainchain-peerconnection-data").innerHTML = mainchainconnections;
         }
 
+        if (message.nodeEventType.includes("Stratis.Bitcoin.EventBus.CoreEvents.FederationWalletStatusEvent")) {
+            document.getElementById('lblMainchainFederationWalletAmountConfirmed').innerHTML = message.confirmedBalance.toString("N2");
+            document.getElementById('lblMainchainFederationWalletAmountUnconfirmed').innerHTML = message.unconfirmedBalance.toString("N2");
+        }
+
     });
 }
