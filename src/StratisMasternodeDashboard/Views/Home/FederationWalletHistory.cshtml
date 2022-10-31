@@ -1,0 +1,42 @@
+﻿@using Stratis.FederatedSidechains.AdminDashboard.Models;
+@using Stratis.FederatedSidechains.AdminDashboard.Settings;
+
+@model StratisNodeModel
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex align-items-center mb-4">
+            <label class="d-flex justify-content-start">
+                <strong>Federation Wallet History <small class="text-muted">(@(Model.FederationWalletHistory.Count))</small></strong>
+            </label>
+            <span class="d-flex justify-content-end align-items-center ml-auto">
+                <a data-toggle="modal" data-target="#stratisHistory" class="btn btn-outline-primary">See all history</a>
+            </span>
+        </div>
+        <table class="table table-sm table-history" id="stratis-history">
+            <thead>
+                <tr>
+                    <th class="text-center" scope="col">Status</th>
+                    <th class="text-center" scope="col">Destination</th>
+                    <th class="text-center" scope="col">Tx ID</th>
+                    <th class="text-center" scope="col">Confirmed in Block</th>
+                    <th class="text-center" scope="col">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+
+               @foreach(FederationWalletHistoryModel transaction in Model.FederationWalletHistory.Take(5).ToList())
+                {
+                    <tr>
+                        <td class="text-center"><i class="material-icons text-green md-18">check_circle</i></td>
+                        <td class="text-center text-truncate"><code>@(transaction.PayingTo)</code></td>
+                        <td class="text-left text-truncate" style="max-width: 110px;"><a href="https://chainz.cryptoid.info/strax/tx.dws?@(transaction.Id).htm" target="_blank">@transaction.Id</a></td>
+                        <td class="text-center">@transaction.BlockHeight</td>
+                        <td class="text-right">@(((double)transaction.Amount / 100000000).ToString("N8")) @DashboardModel.MainchainCoinTicker</td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+</div>
