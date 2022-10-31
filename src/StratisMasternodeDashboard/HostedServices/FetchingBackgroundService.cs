@@ -135,10 +135,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 {
                     var mainchainNode = new StratisNodeModel
                     {
-                        FederationWalletHistory = ((MultiSigNodeDataService)nodeDataServiceMainchain).WalletHistory,
-
-                        WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/api").ToString(),
-                        SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/swagger").ToString(),
+                        WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.MainchainNode, "/api").ToString(),
+                        SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.MainchainNode, "/swagger").ToString(),
                         Peers = stratisPeers,
                         FederationMembers = stratisFederationMembers,
 
@@ -179,8 +177,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                     // Sidechain Node
                     var sidechainNode = new SidechainNodeModel
                     {
-                        FederationWalletHistory = ((MultiSigSideChainService)nodeDataServiceSidechain).WalletHistory,
-
                         WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/api").ToString(),
                         SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/swagger").ToString(),
                         Peers = sidechainPeers,
@@ -311,7 +307,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
         /// <returns>True if the connection are succeed</returns>
         private (bool, bool) PerformNodeCheck()
         {
-            var mainNodeUp = this.PortCheck(new Uri(this.defaultEndpointsSettings.StratisNode));
+            var mainNodeUp = this.PortCheck(new Uri(this.defaultEndpointsSettings.MainchainNode));
             var sidechainsNodeUp = this.PortCheck(new Uri(this.defaultEndpointsSettings.SidechainNode));
             return (mainNodeUp, sidechainsNodeUp);
         }

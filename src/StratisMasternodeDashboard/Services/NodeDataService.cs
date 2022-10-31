@@ -147,23 +147,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             return (confirmed / STRATOSHI, unconfirmed / STRATOSHI);
         }
 
-        protected async Task<List<FederationWalletHistoryModel>> UpdateWalletHistory()
-        {
-            List<FederationWalletHistoryModel> walletHistory = new();
-
-            try
-            {
-                ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/FederationWallet/history", "maxEntriesToReturn=30").ConfigureAwait(false);
-                walletHistory = Serializer.ToObject<List<FederationWalletHistoryModel>>((response.Content as JArray).ToString());
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Failed to get history");
-            }
-
-            return walletHistory;
-        }
-
         protected async Task<int> UpdateAddressIndexerTipAsync()
         {
             int tip = 0;

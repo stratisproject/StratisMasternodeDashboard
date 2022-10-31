@@ -59,7 +59,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         public async Task<IActionResult> ResyncCrosschainTransactionsAsync()
         {
             //TODO: implement this method
-            ApiResponse stopNodeRequest = await this.apiRequester.GetRequestAsync(this.defaultEndpointsSettings.StratisNode, "/api/Node/status");
+            ApiResponse stopNodeRequest = await this.apiRequester.GetRequestAsync(this.defaultEndpointsSettings.MainchainNode, "/api/Node/status");
             return stopNodeRequest.IsSuccess ? (IActionResult)Ok() : BadRequest();
         }
 
@@ -75,7 +75,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         [Route("change-log-level/{level}")]
         public async Task<IActionResult> ChangeLogLevelAsync(string rule, string level)
         {
-            ApiResponse changeLogLevelRequest = await this.apiRequester.PostRequestAsync(this.defaultEndpointsSettings.StratisNode, "/api/Node/loglevels", new { logRules = new[] { new { ruleName = rule, logLevel = level } } });
+            ApiResponse changeLogLevelRequest = await this.apiRequester.PostRequestAsync(this.defaultEndpointsSettings.MainchainNode, "/api/Node/loglevels", new { logRules = new[] { new { ruleName = rule, logLevel = level } } });
             return changeLogLevelRequest.IsSuccess ? (IActionResult)Ok() : BadRequest();
         }
 

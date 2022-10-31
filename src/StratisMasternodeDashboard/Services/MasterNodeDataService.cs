@@ -7,7 +7,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
     public sealed class MasterNodeMainChainService : NodeDataService
     {
         public MasterNodeMainChainService(ApiRequester apiRequester, DefaultEndpointsSettings defaultEndpointSettings, ILoggerFactory loggerFactory)
-            : base(apiRequester, defaultEndpointSettings.StratisNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
+            : base(apiRequester, defaultEndpointSettings.MainchainNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
         {
         }
 

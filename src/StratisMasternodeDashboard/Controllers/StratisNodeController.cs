@@ -29,13 +29,13 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             bool isHeight = int.TryParse(value, out _);
             if (isHeight)
             {
-                ApiResponse getblockhashRequest = await this.apiRequester.GetRequestAsync(this.defaultEndpointsSettings.StratisNode, $"/api/Consensus/getblockhash?height={value}");
-                ApiResponse syncRequest = await this.apiRequester.PostRequestAsync(this.defaultEndpointsSettings.StratisNode, "/api/Wallet/sync", new { hash = ((string)getblockhashRequest.Content) });
+                ApiResponse getblockhashRequest = await this.apiRequester.GetRequestAsync(this.defaultEndpointsSettings.MainchainNode, $"/api/Consensus/getblockhash?height={value}");
+                ApiResponse syncRequest = await this.apiRequester.PostRequestAsync(this.defaultEndpointsSettings.MainchainNode, "/api/Wallet/sync", new { hash = ((string)getblockhashRequest.Content) });
                 return syncRequest.IsSuccess ? (IActionResult)Ok() : BadRequest();
             }
             else
             {
-                ApiResponse syncRequest = await this.apiRequester.PostRequestAsync(this.defaultEndpointsSettings.StratisNode, "/api/Wallet/sync", new { hash = value });
+                ApiResponse syncRequest = await this.apiRequester.PostRequestAsync(this.defaultEndpointsSettings.MainchainNode, "/api/Wallet/sync", new { hash = value });
                 return syncRequest.IsSuccess ? (IActionResult)Ok() : BadRequest();
             }
         }
@@ -45,7 +45,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         public async Task<IActionResult> ResyncCrosschainTransactionsAsync()
         {
             //TODO: implement this method
-            ApiResponse stopNodeRequest = await this.apiRequester.GetRequestAsync(this.defaultEndpointsSettings.StratisNode, "/api/Node/status");
+            ApiResponse stopNodeRequest = await this.apiRequester.GetRequestAsync(this.defaultEndpointsSettings.MainchainNode, "/api/Node/status");
             return stopNodeRequest.IsSuccess ? (IActionResult)Ok() : BadRequest();
         }
 
@@ -53,7 +53,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         [Route("stop")]
         public async Task<IActionResult> StopNodeAsync()
         {
-            ApiResponse stopNodeRequest = await this.apiRequester.PostRequestAsync(this.defaultEndpointsSettings.StratisNode, "/api/Node/stop", true);
+            ApiResponse stopNodeRequest = await this.apiRequester.PostRequestAsync(this.defaultEndpointsSettings.MainchainNode, "/api/Node/stop", true);
             return stopNodeRequest.IsSuccess ? (IActionResult)Ok() : BadRequest();
         }
 
@@ -61,7 +61,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         [Route("change-log-level/{level}")]
         public async Task<IActionResult> ChangeLogLevelAsync(string rule, string level)
         {
-            ApiResponse changeLogLevelRequest = await this.apiRequester.PostRequestAsync(this.defaultEndpointsSettings.StratisNode, "/api/Node/loglevels", new { logRules = new[] { new { ruleName = rule, logLevel = level } } }, Method.PUT);
+            ApiResponse changeLogLevelRequest = await this.apiRequester.PostRequestAsync(this.defaultEndpointsSettings.MainchainNode, "/api/Node/loglevels", new { logRules = new[] { new { ruleName = rule, logLevel = level } } }, Method.PUT);
             return changeLogLevelRequest.IsSuccess ? (IActionResult)Ok() : BadRequest();
         }
     }
