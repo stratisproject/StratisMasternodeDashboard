@@ -6,13 +6,13 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Settings
         public string EnvType { get; set; }
         public string IntervalTime { get; set; }
         public string SDADaoContractAddress { get; set; }
-        public string StratisNode { get; set; }
-        public string SidechainNode { get; set; }
+        public string MainchainNodeEndpoint { get; set; }
+        public string SidechainNodeEndpoint { get; set; }
         public string SidechainNodeType { get; set; }
 
         public override string ToString()
         {
-            return $"{nameof(this.StratisNode)}: {this.StratisNode}; {nameof(this.SidechainNode)}: {this.SidechainNode}; {nameof(this.SidechainNodeType)}: {this.SidechainNodeType}; {nameof(this.EnvType)}: {this.EnvType}";
+            return $"{nameof(this.MainchainNodeEndpoint)}: {this.MainchainNodeEndpoint}; {nameof(this.SidechainNodeEndpoint)}: {this.SidechainNodeEndpoint}; {nameof(this.SidechainNodeType)}: {this.SidechainNodeType}; {nameof(this.EnvType)}: {this.EnvType}";
         }
     }
 

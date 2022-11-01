@@ -135,10 +135,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                 {
                     var mainchainNode = new StratisNodeModel
                     {
-                        FederationWalletHistory = ((MultiSigNodeDataService)nodeDataServiceMainchain).WalletHistory,
-
-                        WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/api").ToString(),
-                        SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.StratisNode, "/swagger").ToString(),
+                        WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.MainchainNodeEndpoint, "/api").ToString(),
+                        SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.MainchainNodeEndpoint, "/swagger").ToString(),
                         Peers = stratisPeers,
                         FederationMembers = stratisFederationMembers,
 
@@ -179,10 +177,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                     // Sidechain Node
                     var sidechainNode = new SidechainNodeModel
                     {
-                        FederationWalletHistory = ((MultiSigSideChainService)nodeDataServiceSidechain).WalletHistory,
-
-                        WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/api").ToString(),
-                        SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNode, "/swagger").ToString(),
+                        WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNodeEndpoint, "/api").ToString(),
+                        SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNodeEndpoint, "/swagger").ToString(),
                         Peers = sidechainPeers,
                         FederationMembers = sidechainFederationMembers,
 
@@ -311,8 +307,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
         /// <returns>True if the connection are succeed</returns>
         private (bool, bool) PerformNodeCheck()
         {
-            var mainNodeUp = this.PortCheck(new Uri(this.defaultEndpointsSettings.StratisNode));
-            var sidechainsNodeUp = this.PortCheck(new Uri(this.defaultEndpointsSettings.SidechainNode));
+            var mainNodeUp = this.PortCheck(new Uri(this.defaultEndpointsSettings.MainchainNodeEndpoint));
+            var sidechainsNodeUp = this.PortCheck(new Uri(this.defaultEndpointsSettings.SidechainNodeEndpoint));
             return (mainNodeUp, sidechainsNodeUp);
         }
 

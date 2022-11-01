@@ -78,7 +78,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             {
                 List<WalletAddress> walletAddresses = new List<WalletAddress>();
 
-                ApiResponse responseWalletAddress = await GetRequestAsync(settings.SidechainNode, "/api/Wallet/addresses", $"WalletName={sDAVote.WalletName}" + "&" + $"AccountName=account 0").ConfigureAwait(false);
+                ApiResponse responseWalletAddress = await GetRequestAsync(settings.SidechainNodeEndpoint, "/api/Wallet/addresses", $"WalletName={sDAVote.WalletName}" + "&" + $"AccountName=account 0").ConfigureAwait(false);
 
                 if (responseWalletAddress.IsSuccess)
                 {
@@ -102,7 +102,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
                         Parameters = new string[] { "5#" + sDAVote.ProposalId, "1#" + sDAVote.VotingDecision },
                     };
 
-                    ApiResponse response = await PostRequestAsync(settings.SidechainNode, "/api/SmartContracts/build-and-send-call", sDAVoteContractCall).ConfigureAwait(false);
+                    ApiResponse response = await PostRequestAsync(settings.SidechainNodeEndpoint, "/api/SmartContracts/build-and-send-call", sDAVoteContractCall).ConfigureAwait(false);
 
                     return response;
                 }

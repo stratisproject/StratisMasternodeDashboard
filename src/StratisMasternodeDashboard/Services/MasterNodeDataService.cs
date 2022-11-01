@@ -7,7 +7,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
     public sealed class MasterNodeMainChainService : NodeDataService
     {
         public MasterNodeMainChainService(ApiRequester apiRequester, DefaultEndpointsSettings defaultEndpointSettings, ILoggerFactory loggerFactory)
-            : base(apiRequester, defaultEndpointSettings.StratisNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
+            : base(apiRequester, defaultEndpointSettings.MainchainNodeEndpoint, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
         {
         }
 
@@ -23,7 +23,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
     public sealed class MasterNodeSideChainService : NodeDataService
     {
         public MasterNodeSideChainService(ApiRequester apiRequester, DefaultEndpointsSettings defaultEndpointSettings, ILoggerFactory loggerFactory)
-            : base(apiRequester, defaultEndpointSettings.SidechainNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
+            : base(apiRequester, defaultEndpointSettings.SidechainNodeEndpoint, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
         {
             SidechainMinerStats = new SidechainMinerStats();
         }

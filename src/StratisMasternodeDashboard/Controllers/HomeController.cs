@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
+using NBitcoin.JsonConverters;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using QRCoder;
 using Stratis.FederatedSidechains.AdminDashboard.Entities;
 using Stratis.FederatedSidechains.AdminDashboard.Filters;
@@ -11,6 +13,7 @@ using Stratis.FederatedSidechains.AdminDashboard.Models;
 using Stratis.FederatedSidechains.AdminDashboard.Services;
 using Stratis.FederatedSidechains.AdminDashboard.Settings;
 using System;
+using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -45,7 +48,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         {
             if (defaultEndpointsSettings.SidechainNodeType == NodeTypes.FiftyK)
             {
-                ApiResponse getMainchainFederationInfo = await this.apiRequester.GetRequestAsync(this.defaultEndpointsSettings.StratisNode, "/api/FederationGateway/info");
+                ApiResponse getMainchainFederationInfo = await this.apiRequester.GetRequestAsync(this.defaultEndpointsSettings.MainchainNodeEndpoint, "/api/FederationGateway/info");
                 if (getMainchainFederationInfo.IsSuccess)
                     return Json(getMainchainFederationInfo.Content.active);
             }
@@ -56,7 +59,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         /// <summary>
         /// This is the Index action that return the dashboard if the local cache is built otherwise the initialization page is displayed
         /// </summary>
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             if (string.IsNullOrEmpty(this.distributedCache.GetString("DashboardData")))
             {
@@ -93,11 +96,17 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             else
                 this.ViewBag.Status = "OK";
 
+            if (this.defaultEndpointsSettings.SidechainNodeType == NodeTypes.FiftyK)
+            {
+                dashboardModel.MainchainNode.FederationWalletHistory = await GetFederationWalletHistory(this.defaultEndpointsSettings.MainchainNodeEndpoint).ConfigureAwait(false);
+                dashboardModel.SidechainNode.FederationWalletHistory = await GetFederationWalletHistory(this.defaultEndpointsSettings.SidechainNodeEndpoint).ConfigureAwait(false);
+            }
+
             NodeStatsModel sideChainNodeStats = new NodeStatsModel();
             var sideChainnodeStats = this.distributedCache.GetString("SideChainNodeStats");
             if (string.IsNullOrEmpty(sideChainnodeStats))
             {
-                sideChainNodeStats = GetNodeStatus(this.defaultEndpointsSettings.SidechainNode).GetAwaiter().GetResult();
+                sideChainNodeStats = GetNodeStatus(this.defaultEndpointsSettings.SidechainNodeEndpoint).GetAwaiter().GetResult();
                 this.ViewBag.UpTime = sideChainNodeStats.Uptime;
                 this.ViewBag.AgentVersion = "(" + sideChainNodeStats.AgentVersion + ")";
                 this.ViewBag.NodeStartedDateTime = sideChainNodeStats.NodeStartDateTime;
@@ -114,7 +123,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             var mainChainnodeStats = this.distributedCache.GetString("MainChainNodeStats");
             if (string.IsNullOrEmpty(mainChainnodeStats))
             {
-                mainChainNodeStats = GetNodeStatus(this.defaultEndpointsSettings.StratisNode).GetAwaiter().GetResult();
+                mainChainNodeStats = GetNodeStatus(this.defaultEndpointsSettings.MainchainNodeEndpoint).GetAwaiter().GetResult();
                 this.ViewBag.MainchainUpTime = mainChainNodeStats.Uptime;
                 this.ViewBag.MainchainAgentVersion = "(" + mainChainNodeStats.AgentVersion + ")";
                 this.ViewBag.MainchainNodeStartedDateTime = mainChainNodeStats.NodeStartDateTime;
@@ -197,6 +206,20 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             return Json(new { parameter = parameterValue });
         }
 
+        [Ajax]
+        [Route("RefreshFederationWalletHistory")]
+        [HttpGet]
+        public async Task<IActionResult> RefreshFederationWalletHistory(bool isMainchain)
+        {
+            List<FederationWalletHistoryModel> result;
+            if (isMainchain)
+                result = await GetFederationWalletHistory(this.defaultEndpointsSettings.MainchainNodeEndpoint).ConfigureAwait(false);
+            else
+                result = await GetFederationWalletHistory(this.defaultEndpointsSettings.SidechainNodeEndpoint).ConfigureAwait(false);
+
+            return PartialView("FederationWalletHistory", result);
+        }
+
         /// <summary>
         /// Shutdown the ASP.Net MVC Application
         /// </summary>
@@ -207,11 +230,9 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             return Ok();
         }
 
-        [Ajax]
-        [Route("getNodeStatus")]        
-        public async Task<NodeStatsModel> GetNodeStatus(string endpoint)
+        private async Task<NodeStatsModel> GetNodeStatus(string endpoint)
         {
-            NodeStatsModel nodeStat = new NodeStatsModel();
+            NodeStatsModel nodeStat = new ();
             ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/Node/status");
 
             if (response.IsSuccess)
@@ -225,18 +246,34 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
 
                 nodeStat.NodeStartDateTime = ConvertUnixTimeToDateTime(nodeStartedDateTime);
 
-                if (endpoint == this.defaultEndpointsSettings.SidechainNode)
+                if (endpoint == this.defaultEndpointsSettings.SidechainNodeEndpoint)
                 {
                     this.distributedCache.SetString("SideChainNodeStats", JsonConvert.SerializeObject(nodeStat));
                 }
 
-                if (endpoint == this.defaultEndpointsSettings.StratisNode)
+                if (endpoint == this.defaultEndpointsSettings.MainchainNodeEndpoint)
                 {
                     this.distributedCache.SetString("MainChainNodeStats", JsonConvert.SerializeObject(nodeStat));
                 }
             }
 
             return nodeStat;
+        }
+
+        private async Task<List<FederationWalletHistoryModel>> GetFederationWalletHistory(string endpoint)
+        {
+            List<FederationWalletHistoryModel> walletHistory = new();
+
+            try
+            {
+                ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/FederationWallet/history", "maxEntriesToReturn=30").ConfigureAwait(false);
+                walletHistory = Serializer.ToObject<List<FederationWalletHistoryModel>>((response.Content as JArray).ToString());
+            }
+            catch (Exception)
+            {                
+            }
+
+            return walletHistory;
         }
 
         public DateTime ConvertUnixTimeToDateTime(long unixtime)

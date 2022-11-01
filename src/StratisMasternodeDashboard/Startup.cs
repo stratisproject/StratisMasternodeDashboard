@@ -28,10 +28,10 @@ namespace Stratis.FederatedSidechains.AdminDashboard
             IConfigurationSection defaultEndpoints = this.Configuration.GetSection("DefaultEndpoints");
             var defaultEndpointsSettings = new DefaultEndpointsSettings
             {
-                StratisNode = !string.IsNullOrEmpty(this.Configuration["mainchainport"]) ? $"http://localhost:{this.Configuration["mainchainport"]}" : defaultEndpoints["StratisNode"],
+                MainchainNodeEndpoint = !string.IsNullOrEmpty(this.Configuration["mainchainport"]) ? $"http://localhost:{this.Configuration["mainchainport"]}" : defaultEndpoints["StratisNode"],
                 EnvType = defaultEndpoints["EnvType"],
                 SidechainNodeType = this.Configuration["nodetype"] ?? defaultEndpoints["SidechainNodeType"],
-                SidechainNode = !string.IsNullOrEmpty(this.Configuration["sidechainport"]) ? $"http://localhost:{this.Configuration["sidechainport"]}" : defaultEndpoints["SidechainNode"],
+                SidechainNodeEndpoint = !string.IsNullOrEmpty(this.Configuration["sidechainport"]) ? $"http://localhost:{this.Configuration["sidechainport"]}" : defaultEndpoints["SidechainNode"],
                 IntervalTime = defaultEndpoints["IntervalTime"],
                 SDADaoContractAddress = defaultEndpoints["sdadaocontractaddress"]
             };

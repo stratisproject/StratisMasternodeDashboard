@@ -5,6 +5,11 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Models
 {
     public class StratisNodeModel
     {
+        public StratisNodeModel()
+        {
+            FederationWalletHistory = new List<FederationWalletHistoryModel>();
+        }
+
         public string AgentVersion { get; set; }
         public float SyncingStatus { get; set; }
         public string WebAPIUrl { get; set; } = "http://localhost:38221/api";
