@@ -6,17 +6,15 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NBitcoin;
 using NBitcoin.DataEncoders;
-using NBitcoin.JsonConverters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Stratis.FederatedSidechains.AdminDashboard.Entities;
-using Stratis.FederatedSidechains.AdminDashboard.Models;
 using Stratis.FederatedSidechains.AdminDashboard.Settings;
+
 namespace Stratis.FederatedSidechains.AdminDashboard.Services
 {
     public abstract class NodeDataService
     {
-        public int AddressIndexerHeight { get; set; } = 0;
         public NodeStatus NodeStatus { get; set; }
         public List<LogRule> LogRules { get; set; }
         public int RawMempool { get; set; } = 0;
@@ -85,7 +83,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
         protected async Task<NodeStatus> UpdateNodeStatus()
         {
-            NodeStatus nodeStatus = new NodeStatus();
+            NodeStatus nodeStatus = new();
             try
             {
                 StatusResponse = await apiRequester.GetRequestAsync(endpoint, "/api/Node/status");
@@ -116,7 +114,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 
         protected async Task<List<LogRule>> UpdateLogRules()
         {
-            List<LogRule> responseLog = new List<LogRule>();
+            List<LogRule> responseLog = new();
             try
             {
                 ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/Node/logrules");
@@ -128,7 +126,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             }
 
             return responseLog;
-        }      
+        }
 
         protected async Task<(double, double)> UpdateWalletBalance()
         {
@@ -147,26 +145,9 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             return (confirmed / STRATOSHI, unconfirmed / STRATOSHI);
         }
 
-        protected async Task<int> UpdateAddressIndexerTipAsync()
-        {
-            int tip = 0;
-
-            try
-            {
-                var response = await apiRequester.GetRequestAsync(endpoint, "/api/BlockStore/addressindexertip").ConfigureAwait(false);
-                tip = response.Content.tipHeight;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Failed to update the address indexer tip.");
-            }
-
-            return tip;
-        }
-
         protected async Task<List<PendingPoll>> UpdatePolls()
         {
-            List<PendingPoll> pendingPolls = new List<PendingPoll>();
+            List<PendingPoll> pendingPolls = new();
 
             try
             {

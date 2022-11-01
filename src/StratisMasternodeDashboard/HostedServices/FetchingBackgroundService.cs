@@ -80,7 +80,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
 
         private async void DoWorkAsync(object state)
         {
-            var (mainChainUp, sideChainUp) = this.PerformNodeCheck();
+            var (mainChainUp, sideChainUp) = Utilities.PerformNodeCheck(this.defaultEndpointsSettings);
 
             await this.BuildCacheAsync(mainChainUp, sideChainUp).ConfigureAwait(false);
 
@@ -107,13 +107,10 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
 
             var dashboardModel = new DashboardModel
             {
-                Status = true,
                 MiningPublicKeys = nodeDataServiceMainchain.FedInfoResponse?.Content?.federationMultisigPubKeys ?? new JArray()
             };
 
-            var stratisPeers = new List<Peer>();
             var stratisFederationMembers = new List<Peer>();
-            var sidechainPeers = new List<Peer>();
             var sidechainFederationMembers = new List<Peer>();
 
             if (mainChainUp)
@@ -122,29 +119,10 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
 
                 try
                 {
-                    if (this.multiSigNode)
-                        this.ParsePeers(nodeDataServiceMainchain, stratisPeers, stratisFederationMembers);
-                    
-                }
-                catch (Exception e)
-                {
-                    this.logger.LogError(e, "Unable to parse peer data for the mainchain.");
-                }
-
-                try
-                {
                     var mainchainNode = new StratisNodeModel
                     {
-                        WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.MainchainNodeEndpoint, "/api").ToString(),
-                        SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.MainchainNodeEndpoint, "/swagger").ToString(),
-                        Peers = stratisPeers,
                         FederationMembers = stratisFederationMembers,
-
                         LogRules = nodeDataServiceMainchain.LogRules,
-                        Uptime = nodeDataServiceMainchain.NodeStatus.Uptime,
-                        AddressIndexer = this.nodeDataServiceMainchain.AddressIndexerHeight,
-
-                        AgentVersion = this.nodeDataServiceMainchain.NodeStatus.Version
                     };
 
                     dashboardModel.MainchainNode = mainchainNode;
@@ -163,23 +141,9 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
 
                 try
                 {
-                    if (this.multiSigNode)
-                        this.ParsePeers(nodeDataServiceSidechain, sidechainPeers, sidechainFederationMembers);
-
-                }
-                catch (Exception e)
-                {
-                    this.logger.LogError(e, "Unable to parse peer data for the sidechain.");
-                }
-
-                try
-                {
                     // Sidechain Node
                     var sidechainNode = new SidechainNodeModel
                     {
-                        WebAPIUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNodeEndpoint, "/api").ToString(),
-                        SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNodeEndpoint, "/swagger").ToString(),
-                        Peers = sidechainPeers,
                         FederationMembers = sidechainFederationMembers,
 
                         LogRules = nodeDataServiceSidechain.LogRules,
@@ -208,70 +172,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
             this.distributedCache.SetString("DashboardData", JsonConvert.SerializeObject(dashboardModel));
         }
 
-        private void ParsePeers(NodeDataService dataService, List<Peer> peers, List<Peer> federationMembers)
-        {
-            string fedEndpoints = dataService.FedInfoResponse?.Content?.endpoints?.ToString() ?? string.Empty;
-
-            if (dataService.StatusResponse.Content.outboundPeers is JArray outboundPeers)
-            {
-                this.LoadPeers(fedEndpoints, outboundPeers, "outbound", peers, federationMembers);
-            }
-
-            if (dataService.StatusResponse.Content.inboundPeers is JArray inboundPeers)
-            {
-                this.LoadPeers(fedEndpoints, inboundPeers, "inbound", peers, federationMembers);
-            }
-        }
-
-        private void ParsePeers(NodeDataService dataService, List<Peer> peers)
-        {
-            if (dataService.StatusResponse.Content.outboundPeers is JArray outboundPeers)
-            {
-                this.LoadPeers(outboundPeers, "outbound", peers);
-            }
-
-            if (dataService.StatusResponse.Content.inboundPeers is JArray inboundPeers)
-            {
-                this.LoadPeers(inboundPeers, "inbound", peers);
-            }
-        }
-
-        private void LoadPeers(JArray peersToProcess, string direction, List<Peer> peers)
-        {
-            foreach (dynamic peer in peersToProcess)
-            {
-                var peerToAdd = new Peer
-                {
-                    Endpoint = peer.remoteSocketEndpoint,
-                    Type = direction,
-                    Height = peer.tipHeight,
-                    Version = peer.version
-                };
-
-                peers.Add(peerToAdd);
-            }
-        }
-
-        private void LoadPeers(string fedEndpoints, JArray peersToProcess, string direction, List<Peer> peers, List<Peer> federationMembers)
-        {
-            foreach (dynamic peer in peersToProcess)
-            {
-                string peerIp = this.GetPeerIP(peer);
-                var peerToAdd = new Peer
-                {
-                    Endpoint = peer.remoteSocketEndpoint,
-                    Type = direction,
-                    Height = peer.tipHeight,
-                    Version = peer.version
-                };
-
-                if (fedEndpoints.Contains(peerIp))
-                    federationMembers.Add(peerToAdd);
-                else
-                    peers.Add(peerToAdd);
-            }
-        }
-
         private string GetPeerIP(dynamic peer)
         {
             var endpointRegex = new Regex("\\[([A-Za-z0-9:.]*)\\]:([0-9]*)");
@@ -298,42 +198,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
         public void Dispose()
         {
             this.dataRetrieverTimer?.Dispose();
-        }
-
-        /// <summary>
-        /// Perform connection check with the nodes
-        /// </summary>
-        /// <remarks>The ports can be changed in the future</remarks>
-        /// <returns>True if the connection are succeed</returns>
-        private (bool, bool) PerformNodeCheck()
-        {
-            var mainNodeUp = this.PortCheck(new Uri(this.defaultEndpointsSettings.MainchainNodeEndpoint));
-            var sidechainsNodeUp = this.PortCheck(new Uri(this.defaultEndpointsSettings.SidechainNodeEndpoint));
-            return (mainNodeUp, sidechainsNodeUp);
-        }
-
-        /// <summary>
-        /// Perform a TCP port scan
-        /// </summary>
-        /// <param name="port">Specify the port to scan</param>
-        /// <returns>True if the port is opened</returns>
-        private bool PortCheck(Uri endpointToCheck)
-        {
-            this.logger.LogInformation($"Perform a port check for {endpointToCheck.Host}:{endpointToCheck.Port}");
-            using (var tcpClient = new TcpClient())
-            {
-                try
-                {
-                    this.logger.LogInformation($"Host {endpointToCheck.Host}:{endpointToCheck.Port} is available");
-                    tcpClient.Connect(endpointToCheck.Host, endpointToCheck.Port);
-                    return true;
-                }
-                catch
-                {
-                    this.logger.LogWarning($"Host {endpointToCheck.Host}:{endpointToCheck.Port} unavailable");
-                    return false;
-                }
-            }
         }
     }
 }
