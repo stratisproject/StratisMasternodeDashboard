@@ -31,12 +31,12 @@ $(document).ready(function()
 			.withAutomaticReconnect()
 			.build();
 
-	//signalrHub.on("RefreshDashboard", function () {
-	//	NProgress.start();
-	//	$("#container").load("/update-dashboard");
-	//	Snackbar.close();
-	//	NProgress.done();
-	//});
+	signalrHub.on("RefreshDashboard", function () {
+		NProgress.start();
+		$("#container").load("/update-dashboard");
+		Snackbar.close();
+		NProgress.done();
+	});
 
 	signalrHub.on("NodeUnavailable", function () {
 		$(".status").text("API Unavailable");
