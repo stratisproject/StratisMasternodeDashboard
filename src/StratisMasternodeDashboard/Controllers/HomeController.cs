@@ -213,11 +213,16 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         {
             List<FederationWalletHistoryModel> result;
             if (isMainchain)
+            {
                 result = await GetFederationWalletHistory(this.defaultEndpointsSettings.MainchainNodeEndpoint).ConfigureAwait(false);
+                return PartialView("FederationWalletHistory", new StratisNodeModel() {  FederationWalletHistory = result});
+            }
             else
+            {
                 result = await GetFederationWalletHistory(this.defaultEndpointsSettings.SidechainNodeEndpoint).ConfigureAwait(false);
+                return PartialView("FederationWalletHistory", new SidechainNodeModel() { FederationWalletHistory = result });
 
-            return PartialView("FederationWalletHistory", result);
+            }
         }
 
         /// <summary>
