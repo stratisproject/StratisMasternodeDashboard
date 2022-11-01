@@ -31,11 +31,11 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
         return console.error(err.toString());
     });
 
-    document.getElementById('lblSidechainNodeBlockHeight').innerHTML = "...";
-    document.getElementById('lblSidechainNodeHash').innerHTML = "...";
-    document.getElementById('lblSidechainNodeHeaderHeight').innerHTML = "...";
+    document.getElementById('lblSidechainNodeBlockHeight').innerHTML = "initializing...";
+    document.getElementById('lblSidechainNodeHash').innerHTML = "initializing...";
+    document.getElementById('lblSidechainNodeHeaderHeight').innerHTML = "initializing...";
     document.getElementById('lblSidechainMempoolSize').innerHTML = 0;
-    document.getElementById("sidechain-peerconnection-data").innerHTML = "...";
+    document.getElementById("sidechain-peerconnection-data").innerHTML = "initializing...";
 
     connection.on("receiveEvent", function (message) {
 

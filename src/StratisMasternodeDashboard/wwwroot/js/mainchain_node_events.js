@@ -31,11 +31,11 @@ function ConnectAndReceiveSignalRServerHubMainchain(signalRPort) {
         return console.error(err.toString());
     });
     
-    document.getElementById('lblMainchainNodeBlockHeight').innerHTML = "...";
-    document.getElementById('lblMainchainNodeHash').innerHTML = "...";
-    document.getElementById('lblMainchainNodeHeaderHeight').innerHTML = "...";
+    document.getElementById('lblMainchainNodeBlockHeight').innerHTML = "initializing...";
+    document.getElementById('lblMainchainNodeHash').innerHTML = "initializing...";
+    document.getElementById('lblMainchainNodeHeaderHeight').innerHTML = "initializing...";
     document.getElementById('lblMainchainMempoolSize').innerHTML = 0;
-    document.getElementById("mainchain-peerconnection-data").innerHTML = "...";
+    document.getElementById("mainchain-peerconnection-data").innerHTML = "initializing...";
 
     connection.on("receiveEvent", function (message) {
         if (message.nodeEventType.includes("Stratis.Bitcoin.EventBus.CoreEvents.BlockConnected")) {
@@ -106,6 +106,10 @@ function ConnectAndReceiveSignalRServerHubMainchain(signalRPort) {
         if (message.nodeEventType.includes("Stratis.Bitcoin.EventBus.CoreEvents.FederationWalletStatusEvent")) {
             document.getElementById('lblMainchainFederationWalletAmountConfirmed').innerHTML = message.confirmedBalance.toString("N2");
             document.getElementById('lblMainchainFederationWalletAmountUnconfirmed').innerHTML = message.unconfirmedBalance.toString("N2");
+        }
+
+        if (message.nodeEventType.includes("Stratis.Bitcoin.EventBus.CoreEvents.AddressIndexerStatusEvent")) {
+            document.getElementById('lblAddressIndexerHeight').innerHTML = message.tip;
         }
 
     });

@@ -28,8 +28,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         public override async Task<NodeDataService> Update()
         {
             await UpdateMultiSig().ConfigureAwait(false);
-            AddressIndexerHeight = await UpdateAddressIndexerTipAsync().ConfigureAwait(false);
-
             return this;
         }
     }

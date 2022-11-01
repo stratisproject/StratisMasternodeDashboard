@@ -4,6 +4,7 @@
 @inject DefaultEndpointsSettings defaultEndpointsSettings;
 
 @model DashboardModel
+
 @{
     bool fiftyKOnlyFeature = this.defaultEndpointsSettings.SidechainNodeType == NodeTypes.FiftyK;
 }
@@ -52,12 +53,6 @@
                             </ul>
                         </li>
 
-                        <li class="col-12 col-xl-6">
-                            <ul class="list-inline">
-                                <li class="list-inline-item"><strong>Uptime :</strong></li>
-                                <li class="list-inline-item">@ViewBag.UpTime</li>
-                            </ul>
-                        </li>
                         <li class="col-12 col-xl-6">
                             <ul class="list-inline">
                                 <li class="list-inline-item"><strong>Block height :</strong></li>
