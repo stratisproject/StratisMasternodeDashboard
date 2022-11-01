@@ -21,7 +21,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
     public sealed class MultiSigMainChainService : MultiSigNodeDataService
     {
         public MultiSigMainChainService(ApiRequester apiRequester, DefaultEndpointsSettings defaultEndpointSettings, ILoggerFactory loggerFactory)
-            : base(apiRequester, defaultEndpointSettings.MainchainNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
+            : base(apiRequester, defaultEndpointSettings.MainchainNodeEndpoint, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
         {
         }
 
@@ -37,7 +37,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
     public sealed class MultiSigSideChainService : MultiSigNodeDataService
     {
         public MultiSigSideChainService(ApiRequester apiRequester, DefaultEndpointsSettings defaultEndpointSettings, ILoggerFactory loggerFactory)
-            : base(apiRequester, defaultEndpointSettings.SidechainNode, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
+            : base(apiRequester, defaultEndpointSettings.SidechainNodeEndpoint, loggerFactory, defaultEndpointSettings.EnvType, defaultEndpointSettings.DataFolder)
         {
             SidechainMinerStats = new SidechainMinerStats();
         }
