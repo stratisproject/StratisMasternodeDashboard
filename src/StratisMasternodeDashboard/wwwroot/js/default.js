@@ -31,12 +31,12 @@ $(document).ready(function()
 			.withAutomaticReconnect()
 			.build();
 
-	signalrHub.on("RefreshDashboard", function () {
-		NProgress.start();
-		$("#container").load("/update-dashboard");
-		Snackbar.close();
-		NProgress.done();
-	});
+	//signalrHub.on("RefreshDashboard", function () {
+	//	NProgress.start();
+	//	$("#container").load("/update-dashboard");
+	//	Snackbar.close();
+	//	NProgress.done();
+	//});
 
 	signalrHub.on("NodeUnavailable", function () {
 		$(".status").text("API Unavailable");
@@ -72,6 +72,25 @@ $(document).ready(function()
 		tempField.remove();
 		Snackbar.show({text: "Mining Public Key Copied to Clipboard !", pos: "bottom-center", showAction: true});
 	});
+
+	RefreshWalletHistory = function (isMainchain) {
+
+		if (isMainchain.toLowerCase() == "true")
+			$("#federationWalletHistoryMainchainDiv").html("<span>refreshing...</span>");
+		else
+			$("#federationWalletHistorySidechainDiv").html("<span>refreshing...</span>");
+
+		$.ajax({
+			type: "GET",
+			url: "/RefreshFederationWalletHistory?isMainchain=" + isMainchain.toLowerCase(),
+		}).done(
+			function (result) {
+				if (isMainchain.toLowerCase() == "true")
+					$("#federationWalletHistoryMainchainDiv").html(result);
+				else
+					$("#federationWalletHistorySidechainDiv").html(result);
+			});
+	};
 });
 
 function DisplayNotification(text)
