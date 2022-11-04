@@ -175,7 +175,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
 
         }
 
-        public async Task<List<PendingPoll>> UpdatePolls()
+        private async Task<List<PendingPoll>> UpdatePolls()
         {
             List<PendingPoll> pendingPolls = new();
 
@@ -209,13 +209,12 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             }
             catch (Exception)
             {
-
             }
 
             return pendingPolls;
         }
 
-        public async Task<int> UpdateFederationMemberCount()
+        private async Task<int> UpdateFederationMemberCount()
         {
             try
             {
@@ -229,7 +228,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             }
             catch (Exception)
             {
-
             }
 
             return 0;
