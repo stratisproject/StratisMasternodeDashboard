@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Stratis.FederatedSidechains.AdminDashboard.Entities;
 using Stratis.FederatedSidechains.AdminDashboard.Filters;
 using Stratis.FederatedSidechains.AdminDashboard.Models;
 using Stratis.FederatedSidechains.AdminDashboard.Services;
 using Stratis.FederatedSidechains.AdminDashboard.Settings;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -156,6 +159,80 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
                     return this.BadRequest((string)responseReceipt.Content.error);
 
             } while (true);
+        }
+
+        //PendingPoll
+        [Ajax]
+        [Route("Getpolls")]
+        [HttpGet]
+        public async Task<IActionResult> Getpolls()
+        {
+            List<PendingPoll> result;
+
+            result = await UpdatePolls().ConfigureAwait(false);
+            int federationmemberCount = await UpdateFederationMemberCount().ConfigureAwait(false);
+            return PartialView("Partials/ProofOfAuthority", new Vote() { Polls = result, FederationMemberCount = federationmemberCount });
+
+        }
+
+        public async Task<List<PendingPoll>> UpdatePolls()
+        {
+            List<PendingPoll> pendingPolls = new();
+
+            try
+            {
+                ApiResponse whitelistedHashesResponse = await apiRequester.GetRequestAsync(this.defaultEndpointsSettings.SidechainNodeEndpoint, "/api/Voting/whitelistedhashes").ConfigureAwait(false);
+                if (whitelistedHashesResponse.Content == null)
+                    return pendingPolls;
+
+                var approvedPolls = JsonConvert.DeserializeObject<List<ApprovedPoll>>(whitelistedHashesResponse.Content.ToString());
+                ApiResponse responsePending = await apiRequester.GetRequestAsync(this.defaultEndpointsSettings.SidechainNodeEndpoint, "/api/Voting/polls/pending", $"voteType=2").ConfigureAwait(false);
+
+                pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responsePending.Content.ToString());
+
+                pendingPolls = pendingPolls.FindAll(x => x.VotingDataString.Contains("WhitelistHash"));
+
+                if (approvedPolls == null || approvedPolls.Count == 0)
+                    return pendingPolls;
+
+                foreach (var vote in approvedPolls)
+                {
+                    PendingPoll pp = new PendingPoll
+                    {
+                        IsPending = false,
+                        IsExecuted = true,
+                        VotingDataString = $"Action: 'WhitelistHash',Hash: '{vote.Hash}'"
+                    };
+                    pendingPolls.RemoveAll(x => x.Hash == vote.Hash);
+                    pendingPolls.Add(pp);
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+
+            return pendingPolls;
+        }
+
+        public async Task<int> UpdateFederationMemberCount()
+        {
+            try
+            {
+                ApiResponse response = await apiRequester.GetRequestAsync(this.defaultEndpointsSettings.SidechainNodeEndpoint, "/api/Federation/members");
+                if (response.IsSuccess)
+                {
+                    var token = JToken.Parse(response.Content.ToString());
+                    return token.Count;
+                }
+
+            }
+            catch (Exception)
+            {
+
+            }
+
+            return 0;
         }
 
         private string GetBadResponseMessage(ApiResponse apiResponse)

@@ -147,11 +147,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                         FederationMembers = sidechainFederationMembers,
 
                         LogRules = nodeDataServiceSidechain.LogRules,
-                        PoAPendingPolls = nodeDataServiceSidechain.PendingPolls,
 
-                        SidechainMiningAddress = this.nodeDataServiceSidechain.SidechainMinerStats.MiningAddress,
-
-                        FederationMemberCount = this.nodeDataServiceSidechain.FederationMemberCount,
                         KickFederationMemberPolls = nodeDataServiceSidechain.KickFederationMememberPendingPolls
                     };
 
