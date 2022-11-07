@@ -8,6 +8,7 @@ using Stratis.FederatedSidechains.AdminDashboard.Services;
 using Stratis.FederatedSidechains.AdminDashboard.Settings;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -163,16 +164,15 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
 
         //PendingPoll
         [Ajax]
-        [Route("Getpolls")]
+        [Route("UpdateWhitelistedHashPolls")]
         [HttpGet]
-        public async Task<IActionResult> Getpolls()
+        public async Task<IActionResult> UpdateWhitelistedHashPolls()
         {
             List<PendingPoll> result;
 
             result = await UpdatePolls().ConfigureAwait(false);
             int federationmemberCount = await UpdateFederationMemberCount().ConfigureAwait(false);
             return PartialView("Partials/ProofOfAuthority", new Vote() { Polls = result, FederationMemberCount = federationmemberCount });
-
         }
 
         private async Task<List<PendingPoll>> UpdatePolls()
@@ -224,7 +224,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
                     var token = JToken.Parse(response.Content.ToString());
                     return token.Count;
                 }
-
             }
             catch (Exception)
             {
