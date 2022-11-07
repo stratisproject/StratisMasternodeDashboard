@@ -15,17 +15,12 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
 {
     public abstract class NodeDataService
     {
-        public NodeStatus NodeStatus { get; set; }
-        public List<LogRule> LogRules { get; set; }
-        public int RawMempool { get; set; } = 0;
-        public string BestHash { get; set; } = string.Empty;
+        public List<LogRule> LogRules { get; set; }       
         public ApiResponse StatusResponse { get; set; }
         public ApiResponse FedInfoResponse { get; set; }
         public List<PendingPoll> PendingPolls { get; set; }
         public List<PendingPoll> KickFederationMememberPendingPolls { get; set; }
         public int FederationMemberCount { get; set; }
-        public (double confirmedBalance, double unconfirmedBalance) WalletBalance { get; set; } = (0, 0);
-        public NodeDashboardStats NodeDashboardStats { get; set; }
         public SidechainMinerStats SidechainMinerStats { get; set; }
         public string MiningPubKey { get; set; }
 
@@ -77,39 +72,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         public virtual async Task<NodeDataService> Update()
         {
             LogRules = await UpdateLogRules();
-            NodeStatus = await UpdateNodeStatus();
             return this;
-        }
-
-        protected async Task<NodeStatus> UpdateNodeStatus()
-        {
-            NodeStatus nodeStatus = new();
-            try
-            {
-                StatusResponse = await apiRequester.GetRequestAsync(endpoint, "/api/Node/status");
-                if (StatusResponse.Content == null)
-                    return nodeStatus;
-
-                nodeStatus.BlockStoreHeight = StatusResponse.Content.blockStoreHeight;
-                nodeStatus.HeaderHeight = StatusResponse.Content.headerHeight;
-
-                float parsed = 0;
-                if (StatusResponse.Content.consensusHeight != null && float.TryParse((string)StatusResponse.Content.consensusHeight, out parsed))
-                    nodeStatus.ConsensusHeight = parsed;
-
-                string runningTime = StatusResponse.Content.runningTime;
-                string[] parseTime = runningTime.Split('.');
-                parseTime = parseTime.Take(parseTime.Length - 1).ToArray();
-                nodeStatus.Uptime = string.Join(".", parseTime);
-                nodeStatus.State = StatusResponse.Content.state;
-                nodeStatus.Version = StatusResponse.Content.version;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Failed to update node status");
-            }
-
-            return nodeStatus;
         }
 
         protected async Task<List<LogRule>> UpdateLogRules()
@@ -126,64 +89,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             }
 
             return responseLog;
-        }
-
-        protected async Task<(double, double)> UpdateWalletBalance()
-        {
-            double confirmed = 0;
-            double unconfirmed = 0;
-            try
-            {
-                ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/FederationWallet/balance").ConfigureAwait(false);
-                double.TryParse(response.Content.balances[0].amountConfirmed.ToString(), out confirmed);
-                double.TryParse(response.Content.balances[0].amountUnconfirmed.ToString(), out unconfirmed);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Failed to get wallet balance");
-            }
-            return (confirmed / STRATOSHI, unconfirmed / STRATOSHI);
-        }
-
-        protected async Task<List<PendingPoll>> UpdatePolls()
-        {
-            List<PendingPoll> pendingPolls = new();
-
-            try
-            {
-                ApiResponse whitelistedHashesResponse = await apiRequester.GetRequestAsync(endpoint, "/api/Voting/whitelistedhashes").ConfigureAwait(false);
-                if (whitelistedHashesResponse.Content == null)
-                    return pendingPolls;
-
-                var approvedPolls = JsonConvert.DeserializeObject<List<ApprovedPoll>>(whitelistedHashesResponse.Content.ToString());
-                ApiResponse responsePending = await apiRequester.GetRequestAsync(endpoint, "/api/Voting/polls/pending", $"voteType=2").ConfigureAwait(false);
-
-                pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responsePending.Content.ToString());
-
-                pendingPolls = pendingPolls.FindAll(x => x.VotingDataString.Contains("WhitelistHash"));
-
-                if (approvedPolls == null || approvedPolls.Count == 0)
-                    return pendingPolls;
-
-                foreach (var vote in approvedPolls)
-                {
-                    PendingPoll pp = new PendingPoll
-                    {
-                        IsPending = false,
-                        IsExecuted = true,
-                        VotingDataString = $"Action: 'WhitelistHash',Hash: '{vote.Hash}'"
-                    };
-                    pendingPolls.RemoveAll(x => x.Hash == vote.Hash);
-                    pendingPolls.Add(pp);
-                }
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Failed to update polls");
-            }
-
-            return pendingPolls;
-        }
+        }              
 
         protected async Task<List<PendingPoll>> UpdateKickFederationMemberPolls()
         {
@@ -203,26 +109,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             }
 
             return pendingPolls;
-        }
-
-        protected async Task<int> UpdateFederationMemberCount()
-        {
-            try
-            {
-                ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/Federation/members");
-                if (response.IsSuccess)
-                {
-                    var token = JToken.Parse(response.Content.ToString());
-                    return token.Count;
-                }
-
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Failed to update fed members count");
-            }
-
-            return 0;
         }
 
     }
