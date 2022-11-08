@@ -58,8 +58,6 @@
         </div>
     </div>
 
-   @* <partial name="Partials/ProofOfAuthority" model="@(ViewBag.Vote)" />*@
-    <partial name="Partials/IDGBMemberKick" model="@(ViewBag.Vote)" />
     <partial name="Partials/SDAProposalVote" model="@ViewBag.SDAVote" />
     <partial name="Partials/MiningPubKeys" model="@(ViewBag.MiningPubKeys)" />
     <partial name="Partials/LogLevels" model="@(ViewBag.LogRules)" />
@@ -82,10 +80,10 @@
                     <a data-toggle="modal" href="#sDAProposalVotes"><i class="fas fa-vote-yea"></i>&nbsp; SDA Vote</a>
                 </li>
                 <li class="list-inline-item">
-                    <a data-toggle="modal" href="#federationVotesIDGBKick" onclick="GetKickFederationMember()"><i class="fas fa-vote-yea"></i>&nbsp; Federation Member Kicking</a>
+                    <a onclick="UpdateKickFederationMemberPolls()"><i class="fas fa-vote-yea"></i>&nbsp; Federation Member Kicking</a>
                 </li>
                 <li class="list-inline-item">
-                   <a onclick="UpdateWhitelistedHashPolls()"><i class="fas fa-vote-yea"></i>&nbsp; Contract Whitelisting</a>
+                    <a onclick="UpdateWhitelistedHashPolls()"><i class="fas fa-vote-yea"></i>&nbsp; Contract Whitelisting</a>
                 </li>
                 @*<li class="list-inline-item ml-4">
                 <a asp-controller="Home" asp-action="Shutdown" class="text-danger"><i class="fas fa-power-off"></i>&nbsp; Shutdown Dashboard</a>
@@ -98,6 +96,11 @@
     </section>
     <!-- Proof of Authority-Votes-->
     <div class="modal fade right" id="federationVotes" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="width: 950px">
+        </div>
+    </div>
+    <!-- IDGB Member kick-->
+    <div class="modal fade right" id="federationVotesIDGBKick" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-dialog-centered" role="document" style="width: 950px">
         </div>
     </div>

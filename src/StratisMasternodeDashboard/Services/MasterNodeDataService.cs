@@ -30,8 +30,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         {
             await base.Update().ConfigureAwait(false);
 
-            KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls().ConfigureAwait(false);
-           
             return this;
         }
     }

@@ -89,27 +89,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
             }
 
             return responseLog;
-        }              
-
-        protected async Task<List<PendingPoll>> UpdateKickFederationMemberPolls()
-        {
-            List<PendingPoll> pendingPolls = new List<PendingPoll>();
-
-            try
-            {
-                ApiResponse responseKickFedMemPending = await apiRequester.GetRequestAsync(endpoint, "/api/Voting/polls/pending", $"voteType=0");
-                if (responseKickFedMemPending.Content != null)
-                    pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responseKickFedMemPending.Content.ToString());
-
-                return pendingPolls;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Failed to update Kicked Federation Member polls");
-            }
-
-            return pendingPolls;
-        }
+        }                     
 
     }
 }

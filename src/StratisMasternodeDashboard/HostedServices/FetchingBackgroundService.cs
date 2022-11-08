@@ -147,8 +147,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                         FederationMembers = sidechainFederationMembers,
 
                         LogRules = nodeDataServiceSidechain.LogRules,
-
-                        KickFederationMemberPolls = nodeDataServiceSidechain.KickFederationMememberPendingPolls
                     };
 
                     dashboardModel.SidechainNode = sidechainNode;
@@ -162,8 +160,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
             }
 
             this.logger.LogInformation("Feeds updated...");
-
-            await this.updaterHub.Clients.All.SendAsync("RefreshDashboard").ConfigureAwait(false);
 
             this.distributedCache.SetString("DashboardData", JsonConvert.SerializeObject(dashboardModel));
         }

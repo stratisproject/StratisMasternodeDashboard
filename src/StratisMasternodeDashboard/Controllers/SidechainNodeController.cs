@@ -175,6 +175,17 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             return PartialView("Partials/ProofOfAuthority", new Vote() { Polls = result, FederationMemberCount = federationmemberCount });
         }
 
+        [Ajax]
+        [Route("UpdateKickFederationMemberPolls")]
+        [HttpGet]
+        public async Task<IActionResult> UpdateKickFederationMemberPolls()
+        {
+            List<PendingPoll> result;
+
+            result = await UpdateKickFederationMemberPendingPolls().ConfigureAwait(false);
+            return PartialView("Partials/IDGBMemberKick", new Vote() { KickFederationMemberPolls = result });
+        }
+
         private async Task<List<PendingPoll>> UpdatePolls()
         {
             List<PendingPoll> pendingPolls = new();
@@ -230,6 +241,25 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             }
 
             return 0;
+        }
+
+        private async Task<List<PendingPoll>> UpdateKickFederationMemberPendingPolls()
+        {
+            List<PendingPoll> pendingPolls = new();
+
+            try
+            {
+                ApiResponse responseKickFedMemPending = await apiRequester.GetRequestAsync(this.defaultEndpointsSettings.SidechainNodeEndpoint, "/api/Voting/polls/pending", $"voteType=0");
+                if (responseKickFedMemPending.Content != null)
+                    pendingPolls = JsonConvert.DeserializeObject<List<PendingPoll>>(responseKickFedMemPending.Content.ToString());
+
+                return pendingPolls;
+            }
+            catch (Exception)
+            {
+            }
+
+            return pendingPolls;
         }
 
         private string GetBadResponseMessage(ApiResponse apiResponse)

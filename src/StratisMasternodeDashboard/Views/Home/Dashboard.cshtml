@@ -12,7 +12,6 @@
         $(function () {
            var peerSettings = { searching: false, pageLength: 25, "bDestroy": true, lengthChange: true, lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]], stateSave: true };
            var settings = { searching: false, pageLength: 5, lengthMenu: false, lengthChange: false, "bDestroy": true };
-           var settings2 = { searching: false, pageLength: 10, lengthMenu: false, lengthChange: false, "bDestroy": true };
 
            $("#stratis-peers").DataTable(peerSettings);
            $("#stratis-members").DataTable(settings);
@@ -20,8 +19,6 @@
            $("#sidechain-peers").DataTable(peerSettings);
            $("#sidechain-members").DataTable(settings);
            $("#sidechain-history").DataTable(settings);
-           $("#polls-table").DataTable(settings2);
-           $("#kickfedmem-polls-table").DataTable(settings2);
 
            setTimeout(function () {
            $(".loader").fadeOut(function () {

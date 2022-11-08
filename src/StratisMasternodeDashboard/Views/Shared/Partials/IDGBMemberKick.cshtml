@@ -1,56 +1,54 @@
 ﻿@model Vote
 
-<div class="modal fade right" id="federationVotesIDGBKick" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-dialog-centered" role="document" style="width: 950px">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Kick Federation Member</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="alert alert-danger" role="alert" style="display: none;" id="kickError">
-                </div>
-                <form id="kickForm" novalidate class="needs-validation">
-                    <div class="form-group">
-                        <label for="exampleInputEmail1">Federation Member PubKey</label>
-                        <input asp-for="PubKey" type="text" class="form-control" id="kick" aria-describedby="hashHelp" placeholder="Enter Federation Member PubKey" required>
-                        <small id="hashHelp" class="form-text text-muted">Paste federation member PubKey to be kicked.</small>
-                        <div class="invalid-feedback">
-                            Please provide a federation member Key.
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-primary" onclick="submitKick()">Submit</button>
-                </form>
-
-                <div>
-                    <label class="mt-3"><strong>Federation Member Kicking </strong></label>
-                    <table class="table table-sm table-striped table-bordered" id="kickfedmem-polls-table">
-                        <thead>
-                            <tr>
-                                <th class="text-left">ID</th>
-                                <th class="text-center">Public Key</th>
-                                <th class="text-center">Collateral Address</th>
-                                <th class="text-center">Votes In Favour</th>
-
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @{ int ordinalKick = 0; }
-                            @foreach (var poll in Model?.KickFederationMemberPolls ?? new List<PendingPoll>())
-                            {
-                                <tr>
-                                    <td class="text-left">@(ordinalKick++)</td>
-                                    <td class="text-left ellipsis" style="min-width: 350px;" title="@poll.PubKey">@poll.PubKey</td>
-                                    <td class="text-center ellipsis" style="min-width: 250px;" title="@poll.CollateralAddress">@poll.CollateralAddress</td>                                   
-                                    <td class="text-center ellipsis">@(poll.IsExecuted ? "51%" : poll.PubKeysHexVotedInFavor.Count.ToString())</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+<div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title">Kick Federation Member</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="alert alert-danger" role="alert" style="display: none;" id="kickError">
+        </div>
+        <form id="kickForm" novalidate class="needs-validation">
+            <div class="form-group">
+                <label for="exampleInputEmail1">Federation Member PubKey</label>
+                <input asp-for="PubKey" type="text" class="form-control" id="kick" aria-describedby="hashHelp" placeholder="Enter Federation Member PubKey" required>
+                <small id="hashHelp" class="form-text text-muted">Paste federation member PubKey to be kicked.</small>
+                <div class="invalid-feedback">
+                    Please provide a federation member Key.
                 </div>
             </div>
+            <button type="button" class="btn btn-primary" onclick="submitKick()">Submit</button>
+        </form>
+
+        <div>
+            <label class="mt-3"><strong>Federation Member Kicking </strong></label>
+            <table class="table table-sm table-striped table-bordered" id="kickfedmem-polls-table">
+                <thead>
+                    <tr>
+                        <th class="text-left">ID</th>
+                        <th class="text-center">Public Key</th>
+                        <th class="text-center">Collateral Address</th>
+                        <th class="text-center">Votes In Favour</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int ordinalKick = 0;
+                    }
+                    @foreach (var poll in Model?.KickFederationMemberPolls ?? new List<PendingPoll>())
+                    {
+                        <tr>
+                            <td class="text-left">@(ordinalKick++)</td>
+                            <td class="text-left ellipsis" style="min-width: 350px;" title="@poll.PubKey">@poll.PubKey</td>
+                            <td class="text-center ellipsis" style="min-width: 250px;" title="@poll.CollateralAddress">@poll.CollateralAddress</td>
+                            <td class="text-center ellipsis">@(poll.IsExecuted ? "51%" : poll.PubKeysHexVotedInFavor.Count.ToString())</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -75,7 +73,7 @@
 </div>
 
 <script type="text/javascript">
-    function submitKick() {         
+    function submitKick() {
         var pubKey = $("#kick").val();
         $.ajax({
             type: 'POST',
