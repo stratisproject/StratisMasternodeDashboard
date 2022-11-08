@@ -25,14 +25,7 @@ $(document).ready(function () {
         new signalR.HubConnectionBuilder()
             .withUrl("/ws-updater")
             .withAutomaticReconnect()
-            .build();
-
-    signalrHub.on("RefreshDashboard", function () {
-        NProgress.start();
-        $("#container").load("/update-dashboard");
-        Snackbar.close();
-        NProgress.done();
-    });
+            .build();   
 
     signalrHub.on("NodeUnavailable", function () {
         $(".status").text("API Unavailable");
@@ -40,6 +33,9 @@ $(document).ready(function () {
     });
 
     signalrHub.start();
+
+    // DataTable setting
+    var settings2 = { searching: false, pageLength: 10, lengthMenu: false, lengthChange: false, "bDestroy": true };   
 
     // Prevent modal disclosure
     $(".close").click(function () {
@@ -92,6 +88,20 @@ $(document).ready(function () {
                 $("#federationVotes").find(".modal-dialog").html(result);
                 $('#federationVotes').modal('show');
                 $("#federationVotes").modal("toggle");
+                $("#polls-table").DataTable(settings2);
+            }
+        })
+    };
+
+    UpdateKickFederationMemberPolls = function () {
+        $.ajax({
+            type: "GET",
+            url: "/sidechain-node/UpdateKickFederationMemberPolls",
+            success: function (result) {
+                $("#federationVotesIDGBKick").find(".modal-dialog").html(result);
+                $('#federationVotesIDGBKick').modal('show');
+                $("#federationVotesIDGBKick").modal("toggle");
+                $("#kickfedmem-polls-table").DataTable(settings2);
             }
         })
     };

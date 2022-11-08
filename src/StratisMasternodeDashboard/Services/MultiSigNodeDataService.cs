@@ -43,9 +43,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         public override async Task<NodeDataService> Update()
         {
             await UpdateMultiSig().ConfigureAwait(false);
-
-            // Sidechain related updates.
-            KickFederationMememberPendingPolls = await UpdateKickFederationMemberPolls().ConfigureAwait(false);
            
             return this;
         }
