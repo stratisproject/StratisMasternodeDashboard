@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Stratis.FederatedSidechains.AdminDashboard.HostedServices;
 using Stratis.FederatedSidechains.AdminDashboard.Hubs;
 using Stratis.FederatedSidechains.AdminDashboard.Services;
 using Stratis.FederatedSidechains.AdminDashboard.Settings;
@@ -62,8 +61,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard
             services.AddDistributedMemoryCache();
 
             services.AddTransient<ApiRequester>();
-
-            services.AddHostedService<FetchingBackgroundService>();
 
             services.AddMvc();
             services.AddSignalR(options =>
