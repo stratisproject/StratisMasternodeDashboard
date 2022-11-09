@@ -122,7 +122,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                     var mainchainNode = new StratisNodeModel
                     {
                         FederationMembers = stratisFederationMembers,
-                        LogRules = nodeDataServiceMainchain.LogRules,
                     };
 
                     dashboardModel.MainchainNode = mainchainNode;
@@ -145,8 +144,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.HostedServices
                     var sidechainNode = new SidechainNodeModel
                     {
                         FederationMembers = sidechainFederationMembers,
-
-                        LogRules = nodeDataServiceSidechain.LogRules,
                     };
 
                     dashboardModel.SidechainNode = sidechainNode;

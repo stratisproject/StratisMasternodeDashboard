@@ -70,25 +70,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Services
         }
 
         public virtual async Task<NodeDataService> Update()
-        {
-            LogRules = await UpdateLogRules();
+        {            
             return this;
-        }
-
-        protected async Task<List<LogRule>> UpdateLogRules()
-        {
-            List<LogRule> responseLog = new();
-            try
-            {
-                ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/Node/logrules");
-                responseLog = JsonConvert.DeserializeObject<List<LogRule>>(response.Content.ToString());
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Failed to get log rules");
-            }
-
-            return responseLog;
         }                     
 
     }

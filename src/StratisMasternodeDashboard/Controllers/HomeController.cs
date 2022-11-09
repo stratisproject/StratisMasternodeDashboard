@@ -117,49 +117,6 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         }
 
         /// <summary>
-        /// This action redraw the dashboard with the new cached datas, it's only called from the SignalR event
-        /// </summary>
-        [Ajax]
-        [Route("update-dashboard")]
-        public IActionResult UpdateDashboard()
-        {
-            if (!string.IsNullOrEmpty(this.distributedCache.GetString("DashboardData")))
-            {
-                DashboardModel dashboardModel = JsonConvert.DeserializeObject<DashboardModel>(this.distributedCache.GetString("DashboardData"));
-
-                if (dashboardModel.MainchainNode != null && dashboardModel.SidechainNode != null)
-                    this.ViewBag.History = new[] { dashboardModel.MainchainNode.FederationWalletHistory, dashboardModel.SidechainNode.FederationWalletHistory };
-                else
-                    this.ViewBag.History = null;
-
-                this.ViewBag.StratisTicker = DashboardModel.MainchainCoinTicker;
-                this.ViewBag.SidechainTicker = DashboardModel.SidechainCoinTicker;
-
-                if (!string.IsNullOrEmpty(this.distributedCache.GetString("SideChainNodeStats")))
-                {
-                    NodeStatsModel sideChainNodeStats = JsonConvert.DeserializeObject<NodeStatsModel>(this.distributedCache.GetString("SideChainNodeStats"));
-                    this.ViewBag.AgentVersion = "(" + sideChainNodeStats.AgentVersion + ")";
-                    this.ViewBag.NodeStartedDateTime = sideChainNodeStats.NodeStartDateTime;
-
-                    //to get refreshed uptime
-                    this.ViewBag.UpTime = GetCurrentUpTime(sideChainNodeStats.NodeStartDateTime);
-                }
-
-                if (!string.IsNullOrEmpty(this.distributedCache.GetString("MainChainNodeStats")))
-                {
-                    NodeStatsModel mainChainNodeStats = JsonConvert.DeserializeObject<NodeStatsModel>(this.distributedCache.GetString("MainChainNodeStats"));
-                    this.ViewBag.MainchainAgentVersion = "(" + mainChainNodeStats.AgentVersion + ")";
-                    this.ViewBag.MainchainNodeStartedDateTime = mainChainNodeStats.NodeStartDateTime;
-                    this.ViewBag.MainchainUpTime = GetCurrentUpTime(mainChainNodeStats.NodeStartDateTime);
-                }
-
-                return PartialView("Dashboard", dashboardModel);
-            }
-
-            return NoContent();
-        }
-
-        /// <summary>
         /// Display Qr code from text value
         /// </summary>
         [Route("qr-code/{value?}")]
