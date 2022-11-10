@@ -87,6 +87,11 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
                 {
                     SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.MainchainNodeEndpoint, "/swagger").ToString(),
                 };
+
+                if (this.defaultEndpointsSettings.SidechainNodeType == NodeTypes.FiftyK)
+                {
+                    dashboardModel.MainchainNode.FederationWalletHistory = await GetFederationWalletHistory(this.defaultEndpointsSettings.MainchainNodeEndpoint).ConfigureAwait(false);
+                }
             }
 
             if (sideChainUp)
@@ -95,12 +100,11 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
                 {
                     SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNodeEndpoint, "/swagger").ToString(),
                 };
-            }
 
-            if (this.defaultEndpointsSettings.SidechainNodeType == NodeTypes.FiftyK)
-            {
-                dashboardModel.MainchainNode.FederationWalletHistory = await GetFederationWalletHistory(this.defaultEndpointsSettings.MainchainNodeEndpoint).ConfigureAwait(false);
-                dashboardModel.SidechainNode.FederationWalletHistory = await GetFederationWalletHistory(this.defaultEndpointsSettings.SidechainNodeEndpoint).ConfigureAwait(false);
+                if (this.defaultEndpointsSettings.SidechainNodeType == NodeTypes.FiftyK)
+                {
+                    dashboardModel.SidechainNode.FederationWalletHistory = await GetFederationWalletHistory(this.defaultEndpointsSettings.SidechainNodeEndpoint).ConfigureAwait(false);
+                }
             }
 
             var sidechainNodeStatsModel = await GetNodeStatus(this.defaultEndpointsSettings.SidechainNodeEndpoint);
