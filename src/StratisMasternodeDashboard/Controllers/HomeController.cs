@@ -105,7 +105,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
                 {
                     dashboardModel.SidechainNode.FederationWalletHistory = await GetFederationWalletHistory(this.defaultEndpointsSettings.SidechainNodeEndpoint).ConfigureAwait(false);
                 }
-            }           
+            }
 
             var sidechainNodeStatsModel = await GetNodeStatus(this.defaultEndpointsSettings.SidechainNodeEndpoint);
             this.ViewBag.UpTime = sidechainNodeStatsModel.Uptime;
