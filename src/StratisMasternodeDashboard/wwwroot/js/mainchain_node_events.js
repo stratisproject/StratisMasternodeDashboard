@@ -78,7 +78,7 @@ function ConnectAndReceiveSignalRServerHubMainchain(signalRPort) {
         if (message.nodeEventType.includes("Stratis.Bitcoin.EventBus.CoreEvents.PeerConnectionInfoEvent")) {
             var mainchainconnections = '';
             var inbountCount = 0;
-            var filtered = message.peerConnectionModels.filter(function (d) {
+            message.peerConnectionModels.filter(function (d) {
                 if (d.inbound) {
                     inbountCount++;
                 }
