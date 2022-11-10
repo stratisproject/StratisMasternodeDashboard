@@ -88,7 +88,7 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
             var blockProducerHitProgressBar = document.getElementById('blockProducerHitProgressBar');
             var miningStatus = document.getElementById('lblSidechainMiningStatus');
 
-            if (message.isMining = true) {
+            if (message.isMining == true) {
                 miningStatus.innerHTML = `Mining`;
                 miningStatus.className = "badge badge-success";
             }
@@ -101,7 +101,7 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
                 document.getElementById('lblSidechainMinersHits').innerHTML = ` ${message.blockProducerHit}`;
             }
             else
-                document.getElementById('lblSidechainMinersHits').innerHTML = 0;
+                document.getElementById('lblSidechainMinersHits').innerHTML = "n/a";
 
             if (message.federationMemberSize) {
                 var minersHitsinPercentage = (Math.round(((` ${message.blockProducerHit}` / ` ${message.federationMemberSize}`) * 100))).toFixed(1);
