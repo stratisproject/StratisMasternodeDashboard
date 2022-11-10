@@ -12,8 +12,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Models
         }
       
         public List<Peer> FederationMembers { get; set; }
-        public List<FederationWalletHistoryModel> FederationWalletHistory { get; set; }
-        public List<LogRule> LogRules { get; set; }       
+        public List<FederationWalletHistoryModel> FederationWalletHistory { get; set; }      
         public string SwaggerUrl { get; set; }
     }
 }
