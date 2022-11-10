@@ -174,7 +174,7 @@
         </div>
     </div>
 
-    @if (fiftyKOnlyFeature)
+    @if (fiftyKOnlyFeature && Model.SidechainNode != null)
     {
         <div id="federationWalletHistorySidechainDiv">
             <partial name="FederationWalletHistory" model="Model.SidechainNode" />
