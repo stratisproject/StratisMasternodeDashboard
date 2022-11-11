@@ -1,24 +1,39 @@
 ﻿"use strict"
 
-$.ajax({
-    type: "GET",
-    url: "/getConfiguration",
-    data: {
-        sectionName: "DefaultEndpoints",
-        paramName: "EnvType"
-    }
-}).done(
-    function (parameterValue) {
-        var signalRPort = "";
-        if (parameterValue.parameter.includes('TestNet'))
-            signalRPort = "39823";
-        else
-            signalRPort = "38823";
+$(function () {
+    SidechainDataLoad();
+});
 
-        ConnectAndReceiveSignalRServerHub(signalRPort)
-    });
+setInterval(function () {
+    SidechainDataLoad();
+}, 30000);
+
+function SidechainDataLoad() {
+    $.ajax({
+        type: "GET",
+        url: "/getConfiguration",
+        data: {
+            sectionName: "DefaultEndpoints",
+            paramName: "EnvType"
+        }
+    }).done(
+        function (parameterValue) {
+            var signalRPort = "";
+            if (parameterValue.parameter.includes('TestNet'))
+                signalRPort = "39823";
+            else
+                signalRPort = "38823";
+
+            ConnectAndReceiveSignalRServerHub(signalRPort)
+        });
+};
+
+function abortTimer() {
+    clearInterval(30000);
+}
 
 function ConnectAndReceiveSignalRServerHub(signalRPort) {
+    abortTimer();
     var connection = new signalR.HubConnectionBuilder().withUrl('http://localhost:' + signalRPort + '/events-hub', {
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets
@@ -50,7 +65,7 @@ function ConnectAndReceiveSignalRServerHub(signalRPort) {
                 var hashelement = document.getElementById("sidechainBlockHash");
                 hashelement.setAttribute('href', "https://chainz.cryptoid.info/cirrus/block.dws?" + ` ${message.hash}` + ".htm");
             }
-        }        
+        }
 
         if (message.nodeEventType.includes("Stratis.Bitcoin.Features.MemoryPool.TransactionAddedToMemoryPoolEvent")) {
 
