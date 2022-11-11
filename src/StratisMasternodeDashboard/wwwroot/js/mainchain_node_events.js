@@ -1,24 +1,39 @@
 ﻿"use strict"
 
-$.ajax({
-    type: "GET",
-    url: "/getConfiguration",
-    data: {
-        sectionName: "DefaultEndpoints",
-        paramName: "EnvType"
-    }
-}).done(
-    function (parameterValue) {
-        var signalRPort = "";
-        if (parameterValue.parameter.includes('TestNet'))
-            signalRPort = "27102";
-        else
-            signalRPort = "17102";
+$(function () {
+    MainchainDataLoad();
+});
 
-        ConnectAndReceiveSignalRServerHubMainchain(signalRPort)
-    });
+setInterval(function () {
+    MainchainDataLoad();
+}, 30000);
+
+function MainchainDataLoad() {
+    $.ajax({
+        type: "GET",
+        url: "/getConfiguration",
+        data: {
+            sectionName: "DefaultEndpoints",
+            paramName: "EnvType"
+        }
+    }).done(
+        function (parameterValue) {
+            var signalRPort = "";
+            if (parameterValue.parameter.includes('TestNet'))
+                signalRPort = "27102";
+            else
+                signalRPort = "17102";
+
+            ConnectAndReceiveSignalRServerHubMainchain(signalRPort)
+        });
+}
+
+function abortTimer() {
+    clearInterval(30000);
+}
 
 function ConnectAndReceiveSignalRServerHubMainchain(signalRPort) {
+    abortTimer();
     var connection = new signalR.HubConnectionBuilder().withUrl('http://localhost:' + signalRPort + '/events-hub', {
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets
@@ -30,7 +45,7 @@ function ConnectAndReceiveSignalRServerHubMainchain(signalRPort) {
     }).catch(function (err) {
         return console.error(err.toString());
     });
-    
+
     document.getElementById('lblMainchainNodeBlockHeight').innerHTML = "initializing...";
     document.getElementById('lblMainchainNodeHash').innerHTML = "initializing...";
     document.getElementById('lblMainchainNodeHeaderHeight').innerHTML = "initializing...";
@@ -49,7 +64,7 @@ function ConnectAndReceiveSignalRServerHubMainchain(signalRPort) {
                 hashelement.setAttribute('href', "https://chainz.cryptoid.info/strax/block.dws?" + ` ${message.hash}` + ".htm");
             }
         }
-        
+
         if (message.nodeEventType.includes("Stratis.Bitcoin.Features.MemoryPool.TransactionAddedToMemoryPoolEvent")) {
             if (message.memPoolSize) {
                 document.getElementById('lblMainchainMempoolSize').innerHTML = ` ${message.memPoolSize}`;
@@ -73,8 +88,8 @@ function ConnectAndReceiveSignalRServerHubMainchain(signalRPort) {
                 document.getElementById('lblMainchainNodeHeaderHeight').innerHTML = ` ${message.headerHeight}`;
             }
 
-        }       
-        
+        }
+
         if (message.nodeEventType.includes("Stratis.Bitcoin.EventBus.CoreEvents.PeerConnectionInfoEvent")) {
             var mainchainconnections = '';
             var inbountCount = 0;
