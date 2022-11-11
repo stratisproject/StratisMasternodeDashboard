@@ -8,11 +8,12 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Settings
         public string SDADaoContractAddress { get; set; }
         public string MainchainNodeEndpoint { get; set; }
         public string SidechainNodeEndpoint { get; set; }
-        public string SidechainNodeType { get; set; }
+
+        public string NodeType { get; set; }
 
         public override string ToString()
         {
-            return $"{nameof(this.MainchainNodeEndpoint)}: {this.MainchainNodeEndpoint}; {nameof(this.SidechainNodeEndpoint)}: {this.SidechainNodeEndpoint}; {nameof(this.SidechainNodeType)}: {this.SidechainNodeType}; {nameof(this.EnvType)}: {this.EnvType}";
+            return $"{nameof(this.MainchainNodeEndpoint)}: {this.MainchainNodeEndpoint}; {nameof(this.SidechainNodeEndpoint)}: {this.SidechainNodeEndpoint}; {nameof(this.NodeType)}: {this.NodeType}; {nameof(this.EnvType)}: {this.EnvType}";
         }
     }
 

@@ -47,7 +47,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         [Route("check-federation")]
         public async Task<IActionResult> CheckFederationAsync()
         {
-            if (defaultEndpointsSettings.SidechainNodeType == NodeTypes.FiftyK)
+            if (defaultEndpointsSettings.NodeType == NodeTypes.FiftyK)
             {
                 ApiResponse getMainchainFederationInfo = await this.apiRequester.GetRequestAsync(this.defaultEndpointsSettings.MainchainNodeEndpoint, "/api/FederationGateway/info");
                 if (getMainchainFederationInfo.IsSuccess)
@@ -60,7 +60,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
         /// <summary>
         /// This is the Index action that return the dashboard if the local cache is built otherwise the initialization page is displayed
         /// </summary>
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             DashboardModel dashboardModel = new();
 
@@ -69,55 +69,48 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             this.ViewBag.StratisTicker = DashboardModel.MainchainCoinTicker;
             this.ViewBag.SidechainTicker = DashboardModel.SidechainCoinTicker;
             this.ViewBag.MiningPubKeys = dashboardModel.MiningPublicKeys;
-
-            //this.ViewBag.LogRules = new LogRulesModel().LoadRules(dashboardModel.MainchainNode?.LogRules ?? null, dashboardModel.SidechainNode?.LogRules ?? null);
-
             this.ViewBag.Vote = null;
-
-            //if (dashboardModel.SidechainNode != null)
-            //    this.ViewBag.Vote = new Vote { Polls = dashboardModel.SidechainNode.PoAPendingPolls, FederationMemberCount = dashboardModel.SidechainNode.FederationMemberCount, KickFederationMemberPolls = dashboardModel.SidechainNode.KickFederationMemberPolls };
-
             this.ViewBag.SDAVote = new SDAVoteModel { };
 
-            var (mainChainUp, sideChainUp) = Utilities.PerformNodeCheck(this.defaultEndpointsSettings);
-
-            if (mainChainUp)
-            {
-                dashboardModel.MainchainNode = new()
-                {
-                    SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.MainchainNodeEndpoint, "/swagger").ToString(),
-                };
-
-                if (this.defaultEndpointsSettings.SidechainNodeType == NodeTypes.FiftyK)
-                {
-                    dashboardModel.MainchainNode.FederationWalletHistory = await GetFederationWalletHistory(this.defaultEndpointsSettings.MainchainNodeEndpoint).ConfigureAwait(false);
-                }
-            }
-
-            if (sideChainUp)
-            {
-                dashboardModel.SidechainNode = new()
-                {
-                    SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNodeEndpoint, "/swagger").ToString(),
-                };
-
-                if (this.defaultEndpointsSettings.SidechainNodeType == NodeTypes.FiftyK)
-                {
-                    dashboardModel.SidechainNode.FederationWalletHistory = await GetFederationWalletHistory(this.defaultEndpointsSettings.SidechainNodeEndpoint).ConfigureAwait(false);
-                }
-            }
-
-            var sidechainNodeStatsModel = await GetNodeStatus(this.defaultEndpointsSettings.SidechainNodeEndpoint);
-            this.ViewBag.UpTime = sidechainNodeStatsModel.Uptime;
-            this.ViewBag.AgentVersion = "(" + sidechainNodeStatsModel.AgentVersion + ")";
-            this.ViewBag.NodeStartedDateTime = sidechainNodeStatsModel.NodeStartDateTime;
-
-            var mainChainNodeStats = await GetNodeStatus(this.defaultEndpointsSettings.MainchainNodeEndpoint);
-            this.ViewBag.MainchainUpTime = mainChainNodeStats.Uptime;
-            this.ViewBag.MainchainAgentVersion = "(" + mainChainNodeStats.AgentVersion + ")";
-            this.ViewBag.MainchainNodeStartedDateTime = mainChainNodeStats.NodeStartDateTime;
-
             return View("Dashboard", dashboardModel);
+        }
+
+        [HttpGet]
+        [Route("mainchaindata")]
+        public async Task<IActionResult> MainchainData()
+        {
+            var nodeStatus = await GetNodeStatus(this.defaultEndpointsSettings.MainchainNodeEndpoint);
+
+            var model = new StratisNodeModel
+            {
+                SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.MainchainNodeEndpoint, "/swagger").ToString(),
+                MainchainNodeHeading = $"Mainchain Node [{nodeStatus.AgentVersion}]",
+                MainchainNodeStarted = nodeStatus.NodeStartDateTime
+            };
+
+            if (this.defaultEndpointsSettings.NodeType == NodeTypes.FiftyK)
+                model.FederationWalletHistory = await GetFederationWalletHistory(this.defaultEndpointsSettings.MainchainNodeEndpoint).ConfigureAwait(false);
+
+            return PartialView("MainchainPartial", model);
+        }
+
+        [HttpGet]
+        [Route("sidechaindata")]
+        public async Task<IActionResult> SidechainData()
+        {
+            var nodeStatus = await GetNodeStatus(this.defaultEndpointsSettings.SidechainNodeEndpoint);
+
+            var model = new SidechainNodeModel
+            {
+                SwaggerUrl = UriHelper.BuildUri(this.defaultEndpointsSettings.SidechainNodeEndpoint, "/swagger").ToString(),
+                SidechainNodeHeading = $"Sidechain Node [{nodeStatus.AgentVersion}]",
+                SidechainNodeStarted = nodeStatus.NodeStartDateTime
+            };
+
+            if (this.defaultEndpointsSettings.NodeType == NodeTypes.FiftyK)
+                model.FederationWalletHistory = await GetFederationWalletHistory(this.defaultEndpointsSettings.SidechainNodeEndpoint).ConfigureAwait(false);
+
+            return PartialView("SidechainPartial", model);
         }
 
         /// <summary>
@@ -172,30 +165,30 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             return Ok();
         }
 
-        private async Task<NodeStatsModel> GetNodeStatus(string endpoint)
+        private async Task<NodeStatusModel> GetNodeStatus(string endpoint)
         {
-            NodeStatsModel nodeStats = new();
+            NodeStatusModel nodeStatus = new();
             ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/Node/status").ConfigureAwait(false);
 
             if (response.IsSuccess)
             {
-                nodeStats.AgentVersion = response.Content.version;
+                nodeStatus.AgentVersion = response.Content.version;
                 long nodeStartedDateTime = response.Content.nodeStarted;
 
-                nodeStats.NodeStartDateTime = ConvertUnixTimeToDateTime(nodeStartedDateTime);
+                nodeStatus.NodeStartDateTime = ConvertUnixTimeToDateTime(nodeStartedDateTime);
 
                 if (endpoint == this.defaultEndpointsSettings.SidechainNodeEndpoint)
                 {
-                    this.distributedCache.SetString("SideChainNodeStats", JsonConvert.SerializeObject(nodeStats));
+                    this.distributedCache.SetString("SideChainNodeStats", JsonConvert.SerializeObject(nodeStatus));
                 }
 
                 if (endpoint == this.defaultEndpointsSettings.MainchainNodeEndpoint)
                 {
-                    this.distributedCache.SetString("MainChainNodeStats", JsonConvert.SerializeObject(nodeStats));
+                    this.distributedCache.SetString("MainChainNodeStats", JsonConvert.SerializeObject(nodeStatus));
                 }
             }
 
-            return nodeStats;
+            return nodeStatus;
         }
 
         private async Task<List<FederationWalletHistoryModel>> GetFederationWalletHistory(string endpoint)

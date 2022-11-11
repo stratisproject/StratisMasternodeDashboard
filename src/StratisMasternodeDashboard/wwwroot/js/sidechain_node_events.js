@@ -1,14 +1,12 @@
 ﻿"use strict"
 
-$(function () {
-    SidechainDataLoad();
-});
+GetSidechainConfiguration();
 
-setInterval(function () {
-    SidechainDataLoad();
-}, 30000);
+var sidechainInterval = setInterval(function () {
+    GetSidechainConfiguration();
+}, 5000);
 
-function SidechainDataLoad() {
+function GetSidechainConfiguration() {
     $.ajax({
         type: "GET",
         url: "/getConfiguration",
@@ -18,37 +16,65 @@ function SidechainDataLoad() {
         }
     }).done(
         function (parameterValue) {
+
             var signalRPort = "";
             if (parameterValue.parameter.includes('TestNet'))
                 signalRPort = "39823";
             else
                 signalRPort = "38823";
 
-            ConnectAndReceiveSignalRServerHub(signalRPort)
+            ConnectToSidechainHub(signalRPort);
         });
 };
 
-function abortTimer() {
-    clearInterval(30000);
+function LoadSidechainPartial(connection) {
+
+    // Stop trying to connect to the node.
+    clearInterval(sidechainInterval);
+
+    // Refresh the sidechain partial view.
+    $.ajax({
+        type: "GET",
+        url: "/sidechaindata"
+    }).done(
+        function (response) {
+
+            // Set the div's HTML
+            $('#divSidechainPartial').html(response);
+
+            // Configure all the signalR events.
+            ConfigureSidechainSignalREvents(connection);
+        });
 }
 
-function ConnectAndReceiveSignalRServerHub(signalRPort) {
-    abortTimer();
-    var connection = new signalR.HubConnectionBuilder().withUrl('http://localhost:' + signalRPort + '/events-hub', {
+function ConnectToSidechainHub(signalRPort) {
+
+    var connection = new signalR
+        .HubConnectionBuilder()
+        .withUrl('http://localhost:' + signalRPort + '/events-hub', {
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets
     })
         .withAutomaticReconnect()
         .configureLogging(signalR.LogLevel.Information)
         .build();
-    connection.start().then(function () {
-    }).catch(function (err) {
-        return console.error(err.toString());
-    });
 
-    document.getElementById('lblSidechainNodeBlockHeight').innerHTML = "initializing...";
-    document.getElementById('lblSidechainNodeHash').innerHTML = "initializing...";
-    document.getElementById('lblSidechainNodeHeaderHeight').innerHTML = "initializing...";
+    connection
+        .start()
+        .then(function () {
+
+            // If we successfully connect to the hub we can load the data into the partial view.
+            LoadSidechainPartial(connection);
+        })
+        .catch(function (err) {
+            return console.error(err.toString());
+        });
+}
+
+function ConfigureSidechainSignalREvents(connection) {
+    document.getElementById('lblSidechainNodeBlockHeight').innerHTML = "waiting for next block...";
+    document.getElementById('lblSidechainNodeHash').innerHTML = "waiting for next block...";
+    document.getElementById('lblSidechainNodeHeaderHeight').innerHTML = "waiting for next block...";
     document.getElementById('lblSidechainMempoolSize').innerHTML = 0;
     document.getElementById("sidechain-peerconnection-data").innerHTML = "initializing...";
 

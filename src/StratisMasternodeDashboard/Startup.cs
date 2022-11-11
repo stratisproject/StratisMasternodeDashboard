@@ -29,7 +29,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard
             {
                 MainchainNodeEndpoint = !string.IsNullOrEmpty(this.Configuration["mainchainport"]) ? $"http://localhost:{this.Configuration["mainchainport"]}" : defaultEndpoints["StratisNode"],
                 EnvType = defaultEndpoints["EnvType"],
-                SidechainNodeType = this.Configuration["nodetype"] ?? defaultEndpoints["SidechainNodeType"],
+                NodeType = this.Configuration["nodetype"] ?? defaultEndpoints["SidechainNodeType"],
                 SidechainNodeEndpoint = !string.IsNullOrEmpty(this.Configuration["sidechainport"]) ? $"http://localhost:{this.Configuration["sidechainport"]}" : defaultEndpoints["SidechainNode"],
                 IntervalTime = defaultEndpoints["IntervalTime"],
                 SDADaoContractAddress = defaultEndpoints["sdadaocontractaddress"]
@@ -37,7 +37,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard
 
             if (!string.IsNullOrEmpty(this.Configuration["nodetype"]))
             {
-                defaultEndpointsSettings.SidechainNodeType =
+                defaultEndpointsSettings.NodeType =
                     this.Configuration["nodetype"].Contains("50", StringComparison.OrdinalIgnoreCase) || this.Configuration["nodetype"]
                         .Contains("fifty", StringComparison.OrdinalIgnoreCase)
                         ? NodeTypes.FiftyK

@@ -1,14 +1,12 @@
 ﻿"use strict"
 
-$(function () {
-    MainchainDataLoad();
-});
+GetMainchainConfiguration();
 
-setInterval(function () {
-    MainchainDataLoad();
-}, 30000);
+var mainchainInterval = setInterval(function () {
+    GetMainchainConfiguration();
+}, 5000);
 
-function MainchainDataLoad() {
+function GetMainchainConfiguration() {
     $.ajax({
         type: "GET",
         url: "/getConfiguration",
@@ -18,37 +16,66 @@ function MainchainDataLoad() {
         }
     }).done(
         function (parameterValue) {
+
             var signalRPort = "";
             if (parameterValue.parameter.includes('TestNet'))
                 signalRPort = "27102";
             else
                 signalRPort = "17102";
 
-            ConnectAndReceiveSignalRServerHubMainchain(signalRPort)
+            ConnectToMainchainHub(signalRPort);
+        });
+};
+
+function LoadMainchainPartial(connection) {
+
+    // Stop trying to connect to the node.
+    clearInterval(mainchainInterval);
+
+    // Refresh the sidechain partial view.
+    $.ajax({
+        type: "GET",
+        url: "/mainchaindata"
+    }).done(
+        function (response) {
+
+            // Set the div's HTML
+            $('#divMainchainPartial').html(response);
+
+            // Configure all the signalR events.
+            ConfigureMainchainSignalREvents(connection);
         });
 }
 
-function abortTimer() {
-    clearInterval(30000);
-}
+function ConnectToMainchainHub(signalRPort) {
 
-function ConnectAndReceiveSignalRServerHubMainchain(signalRPort) {
-    abortTimer();
-    var connection = new signalR.HubConnectionBuilder().withUrl('http://localhost:' + signalRPort + '/events-hub', {
-        skipNegotiation: true,
-        transport: signalR.HttpTransportType.WebSockets
-    })
+    var connection = new signalR
+        .HubConnectionBuilder()
+        .withUrl('http://localhost:' + signalRPort + '/events-hub', {
+            skipNegotiation: true,
+            transport: signalR.HttpTransportType.WebSockets
+        })
         .withAutomaticReconnect()
         .configureLogging(signalR.LogLevel.Information)
         .build();
-    connection.start().then(function () {
-    }).catch(function (err) {
-        return console.error(err.toString());
-    });
 
-    document.getElementById('lblMainchainNodeBlockHeight').innerHTML = "initializing...";
-    document.getElementById('lblMainchainNodeHash').innerHTML = "initializing...";
-    document.getElementById('lblMainchainNodeHeaderHeight').innerHTML = "initializing...";
+    connection
+        .start()
+        .then(function () {
+
+            // If we successfully connect to the hub we can load the data into the partial view.
+            LoadMainchainPartial(connection);
+        })
+        .catch(function (err) {
+            return console.error(err.toString());
+        });
+}
+
+function ConfigureMainchainSignalREvents(connection) {
+
+    document.getElementById('lblMainchainNodeBlockHeight').innerHTML = "waiting for next block...";
+    document.getElementById('lblMainchainNodeHash').innerHTML = "waiting for next block...";
+    document.getElementById('lblMainchainNodeHeaderHeight').innerHTML = "waiting for next block...";
     document.getElementById('lblMainchainMempoolSize').innerHTML = 0;
     document.getElementById("mainchain-peerconnection-data").innerHTML = "initializing...";
 
@@ -126,6 +153,5 @@ function ConnectAndReceiveSignalRServerHubMainchain(signalRPort) {
         if (message.nodeEventType.includes("Stratis.Bitcoin.EventBus.CoreEvents.AddressIndexerStatusEvent")) {
             document.getElementById('lblAddressIndexerHeight').innerHTML = message.tip;
         }
-
     });
 }
