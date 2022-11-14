@@ -2,9 +2,13 @@
 
 GetSidechainConfiguration();
 
-var sidechainInterval = setInterval(function () {
+setInterval(function () {
     GetSidechainConfiguration();
-}, 5000);
+}, 15000);
+
+function abortSidechainTimer() { 
+    clearInterval(15000);
+}
 
 function GetSidechainConfiguration() {
     $.ajax({
@@ -30,8 +34,7 @@ function GetSidechainConfiguration() {
 function LoadSidechainPartial(connection) {
 
     // Stop trying to connect to the node.
-    clearInterval(sidechainInterval);
-
+    abortSidechainTimer();
     // Refresh the sidechain partial view.
     $.ajax({
         type: "GET",

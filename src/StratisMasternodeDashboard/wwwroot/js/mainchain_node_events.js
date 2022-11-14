@@ -2,9 +2,13 @@
 
 GetMainchainConfiguration();
 
-var mainchainInterval = setInterval(function () {
+setInterval(function () {
     GetMainchainConfiguration();
-}, 5000);
+}, 15000);
+
+function abortMainchainTimer() {
+    clearInterval(15000);
+}
 
 function GetMainchainConfiguration() {
     $.ajax({
@@ -30,7 +34,7 @@ function GetMainchainConfiguration() {
 function LoadMainchainPartial(connection) {
 
     // Stop trying to connect to the node.
-    clearInterval(mainchainInterval);
+    abortMainchainTimer();
 
     // Refresh the sidechain partial view.
     $.ajax({
