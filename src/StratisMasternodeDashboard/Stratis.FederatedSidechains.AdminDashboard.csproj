@@ -3,6 +3,10 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
+    <Title>Stratis Masternode Dashboard</Title>
+    <Version>2.0.0</Version>
+    <Authors>Stratis Group Ltd.</Authors>
+    <Company>Stratis Group Ltd.</Company>
   </PropertyGroup>
 
   <ItemGroup>
