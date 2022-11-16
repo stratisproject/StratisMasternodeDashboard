@@ -2,10 +2,6 @@
 
 GetSidechainConfiguration();
 
-var sidechainInterval = setInterval(function () {
-    GetSidechainConfiguration();
-}, 5000);
-
 function GetSidechainConfiguration() {
     $.ajax({
         type: "GET",
@@ -29,9 +25,6 @@ function GetSidechainConfiguration() {
 
 function LoadSidechainPartial(connection) {
 
-    // Stop trying to connect to the node.
-    clearInterval(sidechainInterval);
-
     // Refresh the sidechain partial view.
     $.ajax({
         type: "GET",
@@ -52,9 +45,9 @@ function ConnectToSidechainHub(signalRPort) {
     var connection = new signalR
         .HubConnectionBuilder()
         .withUrl('http://localhost:' + signalRPort + '/events-hub', {
-        skipNegotiation: true,
-        transport: signalR.HttpTransportType.WebSockets
-    })
+            skipNegotiation: true,
+            transport: signalR.HttpTransportType.WebSockets
+        })
         .withAutomaticReconnect()
         .configureLogging(signalR.LogLevel.Information)
         .build();
@@ -67,8 +60,18 @@ function ConnectToSidechainHub(signalRPort) {
             LoadSidechainPartial(connection);
         })
         .catch(function (err) {
-            return console.error(err.toString());
+            console.error(err.toString());
+            setTimeout(function () {
+                GetSidechainConfiguration();
+            }, 5000);
         });
+
+    // If disconnected from server Hub, try to reconnect
+    connection.onclose(error => {
+        setTimeout(function () {
+            GetSidechainConfiguration();
+        }, 5000);        
+    });
 }
 
 function ConfigureSidechainSignalREvents(connection) {

@@ -2,10 +2,6 @@
 
 GetMainchainConfiguration();
 
-var mainchainInterval = setInterval(function () {
-    GetMainchainConfiguration();
-}, 5000);
-
 function GetMainchainConfiguration() {
     $.ajax({
         type: "GET",
@@ -28,9 +24,6 @@ function GetMainchainConfiguration() {
 };
 
 function LoadMainchainPartial(connection) {
-
-    // Stop trying to connect to the node.
-    clearInterval(mainchainInterval);
 
     // Refresh the sidechain partial view.
     $.ajax({
@@ -67,8 +60,18 @@ function ConnectToMainchainHub(signalRPort) {
             LoadMainchainPartial(connection);
         })
         .catch(function (err) {
-            return console.error(err.toString());
+            console.error(err.toString());
+            setTimeout(function () {
+                GetMainchainConfiguration();
+            }, 5000);
         });
+
+    // If disconnected from server Hub, try to reconnect
+    connection.onclose(error => {
+        setTimeout(function () {
+            GetMainchainConfiguration();
+        }, 5000);
+    });
 }
 
 function ConfigureMainchainSignalREvents(connection) {
