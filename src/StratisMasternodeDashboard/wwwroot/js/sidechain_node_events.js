@@ -68,10 +68,26 @@ function ConnectToSidechainHub(signalRPort) {
 
     // If disconnected from server Hub, try to reconnect
     connection.onclose(error => {
+
+        ShowSidechainWaitingToConnect();
+
         setTimeout(function () {
             GetSidechainConfiguration();
         }, 5000);        
     });
+}
+
+function ShowSidechainWaitingToConnect() {
+
+    $.ajax({
+        type: "GET",
+        url: "/waitingtoconnect"
+    }).done(
+        function (response) {
+
+            // Set the div's HTML
+            $('#divSidechainPartial').html(response);
+        });
 }
 
 function ConfigureSidechainSignalREvents(connection) {

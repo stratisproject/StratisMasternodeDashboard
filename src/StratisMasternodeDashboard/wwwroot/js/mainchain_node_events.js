@@ -68,10 +68,26 @@ function ConnectToMainchainHub(signalRPort) {
 
     // If disconnected from server Hub, try to reconnect
     connection.onclose(error => {
+
+        ShowMainchainWaitingToConnect();
+
         setTimeout(function () {
             GetMainchainConfiguration();
         }, 5000);
     });
+}
+
+function ShowMainchainWaitingToConnect() {
+
+    $.ajax({
+        type: "GET",
+        url: "/waitingtoconnect"
+    }).done(
+        function (response) {
+
+            // Set the div's HTML
+            $('#divMainchainPartial').html(response);
+        });
 }
 
 function ConfigureMainchainSignalREvents(connection) {
