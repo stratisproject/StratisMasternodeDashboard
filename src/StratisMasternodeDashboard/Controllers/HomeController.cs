@@ -72,7 +72,7 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             this.ViewBag.Vote = null;
             this.ViewBag.SDAVote = new SDAVoteModel { };
 
-            return View("Dashboard", dashboardModel);
+           return View("Dashboard", dashboardModel);
         }
 
         [HttpGet]
@@ -111,6 +111,13 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
                 model.FederationWalletHistory = await GetFederationWalletHistory(this.defaultEndpointsSettings.SidechainNodeEndpoint).ConfigureAwait(false);
 
             return PartialView("SidechainPartial", model);
+        }
+
+        [HttpGet]
+        [Route("waitingtoconnect")]
+        public IActionResult WaitingToConnect()
+        {
+            return PartialView("WaitingForNodePartial");
         }
 
         /// <summary>
@@ -198,7 +205,8 @@ namespace Stratis.FederatedSidechains.AdminDashboard.Controllers
             try
             {
                 ApiResponse response = await apiRequester.GetRequestAsync(endpoint, "/api/FederationWallet/history", "maxEntriesToReturn=30").ConfigureAwait(false);
-                walletHistory = Serializer.ToObject<List<FederationWalletHistoryModel>>((response.Content as JArray).ToString());
+                if (response.Content is JArray walletJson)
+                    walletHistory = Serializer.ToObject<List<FederationWalletHistoryModel>>(walletJson.ToString());
             }
             catch (Exception)
             {
